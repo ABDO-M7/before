@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عربلازا - المرجع العقاري الأول في سوريا</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f7fbf9;
+            color: #2a2a2a;
+        }
+
+        :root {
+            --color-brand: #06aabd;
+            --color-accent: #f46648;
+            --color-dark: #2a2a2a;
+            --color-light-bg: #d6ffff;
+            --color-gray: #797b7c;
+            --color-verified: #10b981; /* لون التوثيق الأخضر */
+        }
+        
+        .text-brand { color: var(--color-brand); }
+        .bg-brand { background-color: var(--color-brand); }
+        .border-brand { border-color: var(--color-brand); }
+        
+        .text-accent { color: var(--color-accent); }
+        .bg-accent { background-color: var(--color-accent); }
+        
+        .text-verified { color: var(--color-verified); }
+        .bg-verified { background-color: var(--color-verified); }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(6, 170, 189, 0.1), 0 2px 10px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .card-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(6, 170, 189, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ticker Animation */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: #0f172a;
+            color: white;
+            padding: 8px 0;
+            white-space: nowrap;
+        }
+        .ticker-move {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            font-size: 0.85rem;
+        }
+        .trend-up { color: #4ade80; }
+        .trend-down { color: #f87171; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f7fbf9; }
+        ::-webkit-scrollbar-thumb { background: #797b7c; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06aabd; }
+
+        #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateX(100%); }
+        #mobile-menu.open { transform: translateX(0); }
+        .overlay { transition: opacity 0.3s ease-in-out; opacity: 0; pointer-events: none; }
+        .overlay.open { opacity: 1; pointer-events: auto; }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#06aabd', light: '#d6ffff', dark: '#058a9a' },
+                        accent: { DEFAULT: '#f46648', hover: '#da6f60' },
+                        dark: '#2a2a2a', secondary: '#797b7c', page: '#f7fbf9',
+                        verified: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="pb-10 relative">
+
+    <!-- Market Ticker (NEW FEATURE: Market Intelligence) -->
+    <div class="ticker-wrap relative z-40 border-b border-gray-700">
+        <div class="container mx-auto flex items-center">
+            <div class="bg-accent text-white px-3 py-1 text-xs font-bold absolute right-0 z-10 h-full flex items-center shadow-lg">
+                <i class="fas fa-chart-line ml-2"></i> مؤشر السوق
+            </div>
+            <div class="ticker-move">
+                <div class="ticker-item">دمشق - المزة: <span class="trend-up"><i class="fas fa-caret-up"></i> 2.5%</span></div>
+                <div class="ticker-item">ريف دمشق - جرمانا: <span class="trend-down"><i class="fas fa-caret-down"></i> 1.2%</span></div>
+                <div class="ticker-item">اللاذقية - الكورنيش: <span class="trend-up"><i class="fas fa-caret-up"></i> 0.8%</span></div>
+                <div class="ticker-item">حلب - الشهباء: <span class="trend-up"><i class="fas fa-caret-up"></i> 3.1%</span></div>
+                <div class="ticker-item">سعر المتر في كفرسوسة: <span class="text-yellow-400">مستقر</span></div>
+                <div class="ticker-item">دمشق - المزة: <span class="trend-up"><i class="fas fa-caret-up"></i> 2.5%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="menu-overlay" class="overlay fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
+
+    <!-- Mobile Menu Sidebar -->
+    <div id="mobile-menu" class="fixed top-0 right-0 w-[280px] h-full bg-white z-50 shadow-2xl lg:hidden flex flex-col">
+        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-brand text-white">
+            <span class="text-xl font-bold">القائمة</span>
+            <button id="close-menu-btn" class="text-white hover:text-gray-200 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4 flex-1 overflow-y-auto">
+            <div class="flex flex-col gap-4">
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-brand-light text-dark font-semibold">
+                    <i class="fas fa-home text-brand"></i> الرئيسية
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-brand-light text-dark font-semibold">
+                    <i class="fas fa-building text-brand"></i> عقارات للبيع
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-brand-light text-dark font-semibold">
+                    <i class="fas fa-key text-brand"></i> عقارات للإيجار
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-brand-light text-dark font-semibold">
+                    <i class="fas fa-couch text-brand"></i> مفروشات
+                </a>
+                <div class="border-t border-gray-100 my-2"></div>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-brand-light text-dark font-semibold">
+                    <i class="fas fa-user text-gray-500"></i> حسابي
+                </a>
+                <a href="#" class="bg-accent text-white text-center py-2 rounded-lg font-bold shadow-md">
+                    <i class="fas fa-plus-circle"></i> أضف إعلانك
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-30 border-t-4 border-brand">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo & Mobile Menu Button -->
+                <div class="flex items-center gap-4">
+                    <button id="mobile-menu-btn" class="lg:hidden text-dark text-xl focus:outline-none hover:text-brand transition p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <!-- Logo Area -->
+                    <a href="#" class="text-3xl font-black text-brand flex items-center gap-2 tracking-tighter group">
+                        <div class="w-10 h-10 bg-brand text-white rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-accent transition duration-300">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <span class="text-dark">عرب<span class="text-brand group-hover:text-accent transition duration-300">لازا</span></span>
+                    </a>
+                </div>
+
+                <!-- Search Bar (Desktop) - Enhanced with Map Option -->
+                <div class="hidden lg:flex flex-col flex-1 mx-12 max-w-3xl relative">
+                    <div class="flex gap-2">
+                        <div class="flex flex-1 border-2 border-brand/20 rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-brand focus-within:border-transparent bg-page transition-all duration-300 shadow-sm hover:shadow-md">
+                            <div class="relative border-l border-gray-200 bg-white min-w-[130px]">
+                                <select class="appearance-none h-full w-full py-3 pl-8 pr-4 bg-transparent text-sm font-semibold focus:outline-none text-dark cursor-pointer hover:bg-gray-50 transition">
+                                    <option>كل العقارات</option>
+                                    <option>للبيع</option>
+                                    <option>للإيجار</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute left-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 pointer-events-none"></i>
+                            </div>
+                            <input type="text" class="flex-1 px-5 py-3 bg-transparent focus:outline-none placeholder-gray-400 text-dark" placeholder="ابحث بالمنطقة، الحي، أو نوع العقار...">
+                            <button class="bg-brand hover:bg-brand-dark text-white px-8 transition duration-200 flex items-center justify-center">
+                                <i class="fas fa-search text-lg"></i>
+                            </button>
+                        </div>
+                        <!-- NEW FEATURE: Map Search Button -->
+                        <button class="bg-white border-2 border-gray-200 text-gray-600 hover:text-brand hover:border-brand w-12 h-12 rounded-full flex items-center justify-center shadow-sm transition-all tooltip-container relative group" title="بحث على الخريطة">
+                            <i class="fas fa-map-marked-alt text-lg"></i>
+                            <span class="absolute -bottom-8 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50">بحث الخريطة</span>
+                        </button>
+                    </div>
+
+                    <!-- Quick Search Tags -->
+                    <div class="flex items-center gap-2 mt-2 text-xs text-gray-500 pr-2">
+                        <span class="font-bold text-brand ml-1"><i class="fas fa-fire-alt text-accent ml-1"></i>بحث سريع:</span>
+                        <a href="#" class="hover:text-accent hover:bg-white transition bg-gray-50 px-3 py-1 rounded-full border border-transparent hover:border-accent/20 shadow-sm">شقق للبيع في ريف دمشق</a>
+                        <a href="#" class="hover:text-accent hover:bg-white transition bg-gray-50 px-3 py-1 rounded-full border border-transparent hover:border-accent/20 shadow-sm">مزارع للبيع في دمشق</a>
+                        <a href="#" class="hover:text-accent hover:bg-white transition bg-gray-50 px-3 py-1 rounded-full border border-transparent hover:border-accent/20 shadow-sm">أراضي للبيع في اللاذقية</a>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-4">
+                    <a href="#" class="hidden md:flex items-center gap-2 text-secondary hover:text-brand font-bold transition">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-secondary group-hover:bg-brand group-hover:text-white transition">
+                            <i class="far fa-user"></i>
+                        </div>
+                        <span>دخول</span>
+                    </a>
+                    <a href="#" class="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-accent/20 transition duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 active:scale-95">
+                        <i class="fas fa-plus"></i>
+                        <span class="hidden sm:inline">أضف عقارك</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Search -->
+            <div class="lg:hidden mt-4 pb-2">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" class="w-full border border-gray-300 rounded-full py-2.5 pr-10 pl-4 focus:outline-none focus:border-brand shadow-sm bg-page" placeholder="ابحث في عربلازا...">
+                        <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                     <button class="bg-white border border-gray-300 text-gray-600 w-11 h-11 rounded-full flex items-center justify-center shadow-sm">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </button>
+                </div>
+                <!-- Quick Search Tags (Mobile) -->
+                <div class="flex items-center gap-2 mt-3 text-[11px] text-gray-500 overflow-x-auto whitespace-nowrap pb-1 hide-scrollbar">
+                    <span class="font-bold text-brand ml-1 flex-shrink-0">رائج:</span>
+                    <a href="#" class="bg-white border border-gray-200 px-3 py-1 rounded-full hover:text-accent hover:border-accent transition shadow-sm">شقق ريف دمشق</a>
+                    <a href="#" class="bg-white border border-gray-200 px-3 py-1 rounded-full hover:text-accent hover:border-accent transition shadow-sm">مزارع دمشق</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Categories Section -->
+    <section class="bg-white py-8 border-b border-gray-100 shadow-sm mb-8">
+        <!-- ... existing categories code ... -->
+         <div class="container mx-auto px-4">
+            <h2 class="text-xl font-bold mb-6 text-dark flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-brand rounded-full"></span>
+                تصفح الأقسام
+            </h2>
+            <div class="flex overflow-x-auto pb-4 gap-4 md:grid md:grid-cols-5 scrolling-wrapper hide-scrollbar justify-start md:justify-center">
+                 <!-- ... (Keep existing categories) ... -->
+                <!-- Category Item -->
+                <a href="#" class="group flex flex-col items-center gap-3 min-w-[80px]">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md transform group-hover:-translate-y-1 border border-transparent group-hover:border-brand">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span class="text-sm font-bold text-secondary group-hover:text-brand transition whitespace-nowrap">عقارات للبيع</span>
+                </a>
+                
+                <a href="#" class="group flex flex-col items-center gap-3 min-w-[80px]">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md transform group-hover:-translate-y-1 border border-transparent group-hover:border-brand">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <span class="text-sm font-bold text-secondary group-hover:text-brand transition whitespace-nowrap">عقارات للإيجار</span>
+                </a>
+
+                <a href="#" class="group flex flex-col items-center gap-3 min-w-[80px]">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md transform group-hover:-translate-y-1 border border-transparent group-hover:border-brand">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <span class="text-sm font-bold text-secondary group-hover:text-brand transition whitespace-nowrap">فرص استثمارية</span>
+                </a>
+
+                <a href="#" class="group flex flex-col items-center gap-3 min-w-[80px]">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md transform group-hover:-translate-y-1 border border-transparent group-hover:border-brand">
+                        <i class="fas fa-couch"></i>
+                    </div>
+                    <span class="text-sm font-bold text-secondary group-hover:text-brand transition whitespace-nowrap">مفروشات</span>
+                </a>
+
+                <a href="#" class="group flex flex-col items-center gap-3 min-w-[80px]">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md transform group-hover:-translate-y-1 border border-transparent group-hover:border-brand">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <span class="text-sm font-bold text-secondary group-hover:text-brand transition whitespace-nowrap">عروض مختلفة</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 space-y-12">
+
+        <!-- NEW FEATURE: AI Property Valuator Tool -->
+        <section class="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-3xl p-8 shadow-2xl relative overflow-hidden text-white">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-brand/20 rounded-full blur-3xl"></div>
+            
+            <div class="grid md:grid-cols-2 gap-10 items-center relative z-10">
+                <div>
+                    <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block tracking-wider">جديد! حصرياً على عربلازا</span>
+                    <h2 class="text-3xl md:text-4xl font-black mb-4 leading-tight">كم يساوي منزلك اليوم؟ <br><span class="text-brand">احسب سعره بالذكاء الاصطناعي</span></h2>
+                    <p class="text-gray-300 mb-8 leading-relaxed">أداة التقييم الذكي تحلل آلاف البيانات العقارية في منطقتك لتعطيك سعراً تقديرياً عادلاً لعقارك خلال ثوانٍ. لا داعي للتخمين.</p>
+                    
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-brand"></i> بيانات محدثة يومياً من السوق</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-brand"></i> دقة تصل إلى 90% في دمشق وريفها</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-brand"></i> إمكانية نشر الإعلان فوراً بالسعر المقترح</li>
+                    </ul>
+                </div>
+
+                <!-- Valuation Form Card -->
+                <div class="bg-white text-dark rounded-2xl p-6 shadow-xl border border-gray-100">
+                    <h3 class="font-bold text-xl mb-4 border-b pb-2">أدخل بيانات العقار</h3>
+                    
+                    <div id="valuation-form" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">المدينة</label>
+                                <select id="city-select" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
+                                    <option value="2500">دمشق - وسط المدينة</option>
+                                    <option value="1800">دمشق - المزة/أبو رمانة</option>
+                                    <option value="1200">دمشق - المناطق الحديثة</option>
+                                    <option value="800">ريف دمشق - جرمانا/صحنايا</option>
+                                    <option value="600">ريف دمشق - مناطق أخرى</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">نوع العقار</label>
+                                <select id="type-select" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
+                                    <option value="1">شقة سكنية</option>
+                                    <option value="1.2">محل تجاري</option>
+                                    <option value="0.8">مكتب</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">المساحة (متر مربع)</label>
+                            <input type="number" id="area-input" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand" placeholder="مثلاً: 120">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">حالة الكسوة</label>
+                            <select id="finish-select" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
+                                <option value="1.5">سوبر ديلوكس (جاهز للسكن)</option>
+                                <option value="1.2">جيد (يحتاج صيانة خفيفة)</option>
+                                <option value="1">قديم / عادي</option>
+                                <option value="0.7">على العظم</option>
+                            </select>
+                        </div>
+
+                        <button onclick="calculatePrice()" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 group">
+                            <i class="fas fa-calculator"></i> احسب السعر التقديري
+                        </button>
+                    </div>
+
+                    <!-- Result Section (Hidden by default) -->
+                    <div id="valuation-result" class="hidden text-center py-4 animate-fade-in">
+                        <div class="text-gray-500 text-sm mb-1">السعر التقديري لعقارك هو:</div>
+                        <div class="text-3xl font-black text-brand mb-1" id="price-display">0 $</div>
+                        <div class="text-xs text-gray-400 mb-4">(السعر تقريبي ±10% حسب الإطلالة والطابق)</div>
+                        
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-accent hover:bg-accent-hover text-white font-bold py-2 rounded-lg text-sm transition shadow flex items-center justify-center gap-1">
+                                <i class="fas fa-check-circle"></i> انشر العقار للبيع بهذا السعر
+                            </button>
+                            <button onclick="resetValuation()" class="px-3 bg-gray-100 text-gray-500 rounded-lg hover:bg-gray-200">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured / Latest Ads Section -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-dark flex items-center gap-2">
+                    <i class="fas fa-star text-accent"></i>
+                    عقارات موثقة ومميزة
+                </h2>
+                <a href="#" class="text-brand font-bold hover:text-accent transition text-sm flex items-center gap-2 group">
+                    عرض الكل <i class="fas fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                
+                <!-- Card 1 (Enhanced with Trust Signals) -->
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden group border border-gray-100 h-full flex flex-col relative">
+                    <button class="absolute top-3 left-3 z-20 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition shadow-sm">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    
+                    <div class="relative h-56 overflow-hidden">
+                        <span class="absolute top-3 right-3 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10 flex items-center gap-1"><i class="fas fa-bolt"></i> مميز</span>
+                        <!-- NEW FEATURE: Verified Badge -->
+                        <span class="absolute bottom-3 right-3 bg-verified text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10 flex items-center gap-1"><i class="fas fa-check-circle"></i> طابو أخضر</span>
+                        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/800x600?text=Arablaza'" alt="شقة في دمر" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-brand font-black text-xl">48,000 $</span>
+                            <span class="text-[10px] font-bold text-secondary border border-gray-200 bg-gray-50 px-2 py-0.5 rounded uppercase tracking-wider">شقق</span>
+                        </div>
+                        <h3 class="text-dark font-bold text-base mb-2 leading-snug hover:text-brand transition cursor-pointer">شقة بكسوة حديثة - دمر البلد</h3>
+                        
+                        <!-- NEW FEATURE: Hyper-Local Tags -->
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="text-[10px] bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded border border-yellow-100"><i class="fas fa-solar-panel ml-1"></i>طاقة شمسية</span>
+                            <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100"><i class="fas fa-water ml-1"></i>بئر ماء</span>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-t border-gray-50">
+                            <div class="flex items-center text-secondary text-xs mb-4">
+                                <i class="fas fa-map-marker-alt text-brand ml-1"></i>
+                                <span class="truncate">دمر البلد، دمشق</span>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <i class="far fa-clock ml-1 text-gray-400"></i>
+                                <span>4 س</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="bg-brand text-white py-2.5 rounded-xl text-sm font-bold hover:bg-brand-dark transition flex items-center justify-center gap-2 shadow-sm active:scale-95"><i class="fas fa-phone-alt"></i> اتصال</button>
+                                <button class="bg-brand-light text-brand py-2.5 rounded-xl text-sm font-bold hover:bg-brand/20 transition flex items-center justify-center gap-2 active:scale-95"><i class="fab fa-whatsapp text-lg"></i> واتساب</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden group border border-gray-100 h-full flex flex-col relative">
+                    <button class="absolute top-3 left-3 z-20 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition shadow-sm">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <div class="relative h-56 overflow-hidden">
+                        <span class="absolute bottom-3 right-3 bg-verified text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10 flex items-center gap-1"><i class="fas fa-check-circle"></i> هوية موثقة</span>
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/800x600?text=Arablaza'" alt="أرض في عدرا" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                         <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-brand font-black text-xl">35,000 $</span>
+                            <span class="text-[10px] font-bold text-secondary border border-gray-200 bg-gray-50 px-2 py-0.5 rounded uppercase tracking-wider">أراضي</span>
+                        </div>
+                        <h3 class="text-dark font-bold text-base mb-2 leading-snug hover:text-brand transition cursor-pointer">موقع استراتيجي على الطريق الدولي.. 46 دونم</h3>
+                        
+                        <!-- NEW FEATURE: Hyper-Local Tags -->
+                         <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="text-[10px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">طابو زراعي</span>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-t border-gray-50">
+                            <div class="flex items-center text-secondary text-xs mb-4">
+                                <i class="fas fa-map-marker-alt text-brand ml-1"></i>
+                                <span class="truncate">عدرا، ريف دمشق</span>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <i class="far fa-clock ml-1 text-gray-400"></i>
+                                <span>3 س</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="bg-brand text-white py-2.5 rounded-xl text-sm font-bold hover:bg-brand-dark transition flex items-center justify-center gap-2 shadow-sm active:scale-95"><i class="fas fa-phone-alt"></i> اتصال</button>
+                                <button class="bg-brand-light text-brand py-2.5 rounded-xl text-sm font-bold hover:bg-brand/20 transition flex items-center justify-center gap-2 active:scale-95"><i class="fab fa-whatsapp text-lg"></i> واتساب</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden group border border-gray-100 h-full flex flex-col relative">
+                    <button class="absolute top-3 left-3 z-20 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition shadow-sm">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <div class="relative h-56 overflow-hidden">
+                        <span class="absolute top-3 right-3 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">لقطة</span>
+                        <img src="https://images.unsplash.com/photo-1600596542815-27b88e57e62f?q=80&w=800&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/800x600?text=Arablaza'" alt="فيلا في المزة" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                         <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-brand font-black text-xl">450,000 $</span>
+                            <span class="text-[10px] font-bold text-secondary border border-gray-200 bg-gray-50 px-2 py-0.5 rounded uppercase tracking-wider">فلل</span>
+                        </div>
+                        <h3 class="text-dark font-bold text-base mb-2 leading-snug hover:text-brand transition cursor-pointer">عقار في المزة للبيع - تشطيب سوبر ديلوكس</h3>
+                        
+                        <!-- NEW FEATURE: Hyper-Local Tags -->
+                         <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100">حديقة خاصة</span>
+                            <span class="text-[10px] bg-red-50 text-red-700 px-2 py-0.5 rounded border border-red-100">مولدة بناء</span>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-t border-gray-50">
+                            <div class="flex items-center text-secondary text-xs mb-4">
+                                <i class="fas fa-map-marker-alt text-brand ml-1"></i>
+                                <span class="truncate">المزة، دمشق</span>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <i class="far fa-clock ml-1 text-gray-400"></i>
+                                <span>11 س</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="bg-brand text-white py-2.5 rounded-xl text-sm font-bold hover:bg-brand-dark transition flex items-center justify-center gap-2 shadow-sm active:scale-95"><i class="fas fa-phone-alt"></i> اتصال</button>
+                                <button class="bg-brand-light text-brand py-2.5 rounded-xl text-sm font-bold hover:bg-brand/20 transition flex items-center justify-center gap-2 active:scale-95"><i class="fab fa-whatsapp text-lg"></i> واتساب</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden group border border-gray-100 h-full flex flex-col relative">
+                    <button class="absolute top-3 left-3 z-20 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition shadow-sm">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/800x600?text=Arablaza'" alt="كنبايات" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                         <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-brand font-black text-xl">250 $</span>
+                            <span class="text-[10px] font-bold text-secondary border border-gray-200 bg-gray-50 px-2 py-0.5 rounded uppercase tracking-wider">مفروشات</span>
+                        </div>
+                        <h3 class="text-dark font-bold text-base mb-2 leading-snug hover:text-brand transition cursor-pointer">بس بمليونين عرض ليومين - طقم كنبايات</h3>
+                        
+                        <!-- NEW FEATURE: Hyper-Local Tags -->
+                         <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded border border-purple-100">مستعمل نظيف</span>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-t border-gray-50">
+                            <div class="flex items-center text-secondary text-xs mb-4">
+                                <i class="fas fa-map-marker-alt text-brand ml-1"></i>
+                                <span class="truncate">المجتهد، دمشق</span>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <i class="far fa-clock ml-1 text-gray-400"></i>
+                                <span>1 يوم</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="bg-brand text-white py-2.5 rounded-xl text-sm font-bold hover:bg-brand-dark transition flex items-center justify-center gap-2 shadow-sm active:scale-95"><i class="fas fa-phone-alt"></i> اتصال</button>
+                                <button class="bg-brand-light text-brand py-2.5 rounded-xl text-sm font-bold hover:bg-brand/20 transition flex items-center justify-center gap-2 active:scale-95"><i class="fab fa-whatsapp text-lg"></i> واتساب</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- See More Card -->
+                <a href="#" class="bg-gradient-to-br from-brand to-brand-dark rounded-2xl card-shadow overflow-hidden group border border-transparent h-full flex flex-col items-center justify-center text-center p-6 hover:shadow-xl transition-all relative">
+                    <div class="absolute inset-0 bg-white/10 group-hover:bg-white/0 transition"></div>
+                    <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300 backdrop-blur-sm">
+                        <i class="fas fa-arrow-left text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-2">تصفح المزيد من العروض</h3>
+                    <p class="text-white/80 text-sm mb-4">لدينا آلاف الإعلانات المتجددة يومياً</p>
+                    <span class="bg-white text-brand px-6 py-2 rounded-full text-sm font-bold group-hover:bg-accent group-hover:text-white transition shadow-lg">شاهد الكل</span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Banner / Promo Section -->
+        <section class="bg-brand rounded-3xl p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden group">
+            <!-- Decorative circles -->
+            <div class="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition duration-1000"></div>
+            <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-accent/30 rounded-full blur-3xl group-hover:bg-accent/40 transition duration-1000"></div>
+            
+            <div class="text-center md:text-right relative z-10 max-w-2xl">
+                <span class="inline-block bg-accent/20 border border-accent/30 text-white font-bold tracking-wider text-xs px-3 py-1 rounded-full mb-3">هل تريد البيع بسرعة؟</span>
+                <h2 class="text-3xl md:text-4xl font-black mb-4 leading-tight">لديك عقار تريد بيعه؟</h2>
+                <p class="text-brand-light mb-8 text-lg opacity-90">انضم إلى آلاف البائعين في سوريا واعرض إعلانك أمام الملايين مجاناً وبدون عمولة.</p>
+                <a href="#" class="bg-accent hover:bg-accent-hover text-white font-bold py-4 px-10 rounded-full transition shadow-lg hover:shadow-xl inline-flex items-center gap-2 transform hover:scale-105">
+                    <i class="fas fa-plus-circle"></i> أضف إعلانك الآن
+                </a>
+            </div>
+            <div class="text-9xl text-white/10 rotate-12 relative z-10 transform translate-x-10 group-hover:scale-110 group-hover:rotate-6 transition duration-500">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+        </section>
+
+        <!-- Low Cost Properties Section -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-dark flex items-center gap-2">
+                    <i class="fas fa-tags text-brand"></i>
+                    عقارات لقطة (أقل من 20 ألف دولار)
+                </h2>
+                <a href="#" class="text-brand font-bold hover:text-accent transition text-sm flex items-center gap-2 group">
+                    عرض الكل <i class="fas fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                 <!-- Card Small 1 -->
+                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden relative group cursor-pointer">
+                    <span class="absolute top-2 left-2 bg-brand/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">شقق</span>
+                    <div class="h-32 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=400&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/400x300?text=Arablaza'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-3">
+                        <span class="text-brand font-black block mb-1">17,000 $</span>
+                        <h4 class="text-sm font-bold text-dark mb-2 truncate">دمشق حي التضامن - منزل صغير</h4>
+                        <span class="text-xs text-secondary block flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> التضامن، دمشق</span>
+                    </div>
+                 </div>
+                 
+                 <!-- Card Small 2 -->
+                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden relative group cursor-pointer">
+                    <span class="absolute top-2 left-2 bg-brand/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">شقق</span>
+                    <div class="h-32 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/400x300?text=Arablaza'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-3">
+                        <span class="text-brand font-black block mb-1">20,000 $</span>
+                        <h4 class="text-sm font-bold text-dark mb-2 truncate">للبيع غرفتين وصالون ومنتفعات</h4>
+                        <span class="text-xs text-secondary block flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> ريف دمشق</span>
+                    </div>
+                 </div>
+
+                 <!-- Card Small 3 -->
+                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden relative group cursor-pointer">
+                    <span class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">تجاري</span>
+                    <div class="h-32 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1537726235470-8504e3beef77?q=80&w=400&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/400x300?text=Arablaza'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-3">
+                        <span class="text-brand font-black block mb-1">18,500 $</span>
+                        <h4 class="text-sm font-bold text-dark mb-2 truncate">محل تجاري صغير في جرمانا</h4>
+                        <span class="text-xs text-secondary block flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> جرمانا</span>
+                    </div>
+                 </div>
+
+                 <!-- Card Small 4 -->
+                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden relative group cursor-pointer">
+                    <span class="absolute top-2 left-2 bg-brand/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">شقق</span>
+                    <div class="h-32 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=400&auto=format&fit=crop" onerror="this.src='https://via.placeholder.com/400x300?text=Arablaza'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-3">
+                        <span class="text-brand font-black block mb-1">15,000 $</span>
+                        <h4 class="text-sm font-bold text-dark mb-2 truncate">شقة على العظم للبيع</h4>
+                        <span class="text-xs text-secondary block flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> صحنايا</span>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Real Estate Studies & Articles Section -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-dark flex items-center gap-2">
+                    <i class="fas fa-book-reader text-brand"></i>
+                    دراسات عقارية ومقالات
+                </h2>
+                <a href="#" class="text-brand font-bold hover:text-accent transition text-sm flex items-center gap-2 group">
+                    عرض الكل <i class="fas fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Article 1 -->
+                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1460472178825-e5240623afd5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Study 1" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+                            <span class="text-accent">سوق العقارات</span>
+                            <span>•</span>
+                            <span>15 يناير 2026</span>
+                        </div>
+                        <h3 class="font-bold text-xl text-brand mb-3 leading-snug group-hover:text-accent transition">توقعات أسعار العقارات في دمشق وريفها لعام 2026</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">دراسة تحليلية شاملة حول المتغيرات الاقتصادية وتأثيرها على حركة البيع والشراء في المناطق التنظيمية...</p>
+                        <a href="#" class="inline-flex items-center text-brand font-bold hover:text-accent transition border-b-2 border-transparent hover:border-accent pb-0.5">
+                            اقرأ الدراسة الكاملة <i class="fas fa-arrow-left mr-2 text-xs transition-transform group-hover:-translate-x-1"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Article 2 -->
+                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Study 2" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+                            <span class="text-accent">نصائح</span>
+                            <span>•</span>
+                            <span>10 يناير 2026</span>
+                        </div>
+                        <h3 class="font-bold text-xl text-brand mb-3 leading-snug group-hover:text-accent transition">5 نصائح ذهبية قبل شراء شقتك الأولى في سوريا</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">تعرف على أهم الأمور القانونية والفنية التي يجب عليك التحقق منها قبل توقيع عقد الشراء لضمان حقك...</p>
+                        <a href="#" class="inline-flex items-center text-brand font-bold hover:text-accent transition border-b-2 border-transparent hover:border-accent pb-0.5">
+                            اقرأ المقال <i class="fas fa-arrow-left mr-2 text-xs transition-transform group-hover:-translate-x-1"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Article 3 -->
+                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Study 3" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+                            <span class="text-accent">استثمار</span>
+                            <span>•</span>
+                            <span>05 يناير 2026</span>
+                        </div>
+                        <h3 class="font-bold text-xl text-brand mb-3 leading-snug group-hover:text-accent transition">هل الاستثمار الزراعي في الريف مجدي حالياً؟</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">تقرير مفصل حول العائد الاستثماري المتوقع للمشاريع الزراعية الصغيرة والمتوسطة في ظل الظروف الحالية...</p>
+                        <a href="#" class="inline-flex items-center text-brand font-bold hover:text-accent transition border-b-2 border-transparent hover:border-accent pb-0.5">
+                            اقرأ التقرير <i class="fas fa-arrow-left mr-2 text-xs transition-transform group-hover:-translate-x-1"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+        
+        <!-- App Download Strip -->
+        <section class="bg-dark text-white rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between shadow-2xl relative overflow-hidden">
+             <!-- Abstract shapes -->
+             <div class="absolute top-0 right-0 w-64 h-64 bg-brand rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+             <div class="absolute -bottom-8 -left-8 w-64 h-64 bg-accent rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
+
+            <div class="flex items-center gap-6 mb-8 md:mb-0 relative z-10">
+                <div class="bg-gray-800 p-4 rounded-2xl shadow-lg border border-gray-700">
+                    <i class="fas fa-mobile-alt text-4xl text-brand"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-2xl mb-2">حمل تطبيق عربلازا مجاناً</h3>
+                    <p class="text-gray-400 text-sm max-w-md">تصفح آلاف الإعلانات، تواصل مع البائعين، وبع أغراضك بسرعة وسهولة من هاتفك مباشرة.</p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
+                <button class="bg-black border border-gray-600 rounded-xl px-6 py-3 flex items-center justify-center gap-3 hover:bg-gray-900 hover:border-gray-500 transition shadow-lg w-full sm:w-auto group">
+                    <i class="fab fa-google-play text-2xl text-green-500 group-hover:scale-110 transition"></i>
+                    <div class="text-right">
+                        <span class="block text-[10px] text-gray-400 leading-none uppercase">GET IT ON</span>
+                        <span class="font-bold text-base">Google Play</span>
+                    </div>
+                </button>
+                <button class="bg-black border border-gray-600 rounded-xl px-6 py-3 flex items-center justify-center gap-3 hover:bg-gray-900 hover:border-gray-500 transition shadow-lg w-full sm:w-auto group">
+                    <i class="fab fa-apple text-2xl text-gray-200 group-hover:scale-110 transition"></i>
+                    <div class="text-right">
+                        <span class="block text-[10px] text-gray-400 leading-none uppercase">Download on the</span>
+                        <span class="font-bold text-base">App Store</span>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-gray-400 py-16 border-t border-gray-800 mt-12">
+        <!-- ... existing footer content ... -->
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        // ... existing scripts ...
+
+        // Valuation Tool Logic
+        function calculatePrice() {
+            const basePrice = parseFloat(document.getElementById('city-select').value);
+            const typeMultiplier = parseFloat(document.getElementById('type-select').value);
+            const area = parseFloat(document.getElementById('area-input').value);
+            const finishMultiplier = parseFloat(document.getElementById('finish-select').value);
+            const resultDiv = document.getElementById('valuation-result');
+            const formDiv = document.getElementById('valuation-form');
+            const priceDisplay = document.getElementById('price-display');
+
+            if (!area || area <= 0) {
+                alert('يرجى إدخال مساحة صحيحة للعقار');
+                return;
+            }
+
+            // Simple Calculation Algorithm
+            // Formula: Base Price per meter * Area * Type * Finish
+            let estimatedValue = basePrice * area * typeMultiplier * finishMultiplier;
+            
+            // Adding a bit of randomness to simulate "AI" variance (Optional)
+            // estimatedValue = estimatedValue * (0.95 + Math.random() * 0.1);
+
+            // Formatting currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            // Simulate loading
+            const btn = document.querySelector('button[onclick="calculatePrice()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                formDiv.classList.add('hidden');
+                resultDiv.classList.remove('hidden');
+                priceDisplay.textContent = formatter.format(estimatedValue);
+                
+                // Reset button for next time
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        function resetValuation() {
+            document.getElementById('valuation-result').classList.add('hidden');
+            document.getElementById('valuation-form').classList.remove('hidden');
+            document.getElementById('area-input').value = '';
+        }
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('menu-overlay');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        // Simple Animation on Scroll for Cards (Intersection Observer)
+        const cards = document.querySelectorAll('.card-shadow');
+        
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

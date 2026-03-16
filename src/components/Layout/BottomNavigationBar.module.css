@@ -1,0 +1,362 @@
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 4px 0;
+  z-index: 99999;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  min-width: 60px;
+  transition: all 0.3s ease;
+  position: relative;
+  flex: 1;
+}
+
+.navItem:not(.featured):hover {
+  transform: translateY(-2px);
+}
+
+.navItem:not(.featured):active {
+  transform: translateY(0);
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.icon {
+  color: #6b7280;
+  transition: all 0.3s ease;
+}
+
+.navItem.active .icon {
+  color: rgb(246, 102, 80);
+  transform: scale(1.1);
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.3s ease;
+  margin-top: 0;
+}
+
+.navItem.active .label {
+  color: rgb(246, 102, 80);
+  font-weight: 600;
+}
+
+/* Featured Add Post Button - Engraved & Prominent */
+.navItem.featured {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 8px;
+  z-index: 10;
+  padding: 0;
+  min-width: auto;
+}
+
+.navItem.featured .iconWrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(2, 172, 191);
+  border-radius: 50%;
+  box-shadow: 
+    0 8px 16px rgba(2, 172, 191, 0.25),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: subtleBreathing 3s ease-in-out infinite;
+}
+
+.navItem.featured:hover .iconWrapper {
+  transform: translateY(-14px) scale(1.05);
+  box-shadow: 
+    0 10px 20px rgba(2, 172, 191, 0.3),
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.navItem.featured:active .iconWrapper {
+  transform: translateY(-10px) scale(0.95);
+  box-shadow: 
+    0 4px 8px rgba(2, 172, 191, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.navItem.featured .icon {
+  color: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.navItem.featured.active .iconWrapper {
+  background: rgb(2, 172, 191);
+  animation: activePulse 2s ease-in-out infinite;
+}
+
+.navItem.featured.active .icon {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+@keyframes subtleBreathing {
+  0%, 100% {
+    box-shadow: 
+      0 8px 16px rgba(2, 172, 191, 0.25),
+      0 4px 8px rgba(0, 0, 0, 0.15),
+      inset 0 2px 4px rgba(255, 255, 255, 0.2),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 10px 18px rgba(2, 172, 191, 0.3),
+      0 5px 10px rgba(0, 0, 0, 0.18),
+      inset 0 2px 4px rgba(255, 255, 255, 0.22),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@keyframes activePulse {
+  0%, 100% {
+    transform: translateY(-12px) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.02);
+  }
+}
+
+.featuredBadge {
+  display: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+/* Active indicator - underline for non-featured items */
+.navItem.active:not(.featured)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: rgb(246, 102, 80);
+  border-radius: 2px 2px 0 0;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 24px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile only - hide on desktop */
+@media (min-width: 768px) {
+  .bottomNav {
+    display: none;
+  }
+}
+
+/* Safe area for devices with notches */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottomNav {
+    padding-bottom: calc(4px + env(safe-area-inset-bottom));
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .bottomNav {
+  direction: rtl;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .bottomNav {
+    background: #1f2937;
+    border-top-color: #374151;
+  }
+  
+  .navItem.featured .iconWrapper {
+    box-shadow: 
+      0 8px 16px rgba(2, 172, 191, 0.35),
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .icon {
+    color: #9ca3af;
+  }
+
+  .label {
+    color: #9ca3af;
+  }
+
+  .navItem.active:not(.featured) .icon,
+  .navItem.active:not(.featured) .label {
+    color: rgb(246, 102, 80);
+  }
+  
+  .navItem.active:not(.featured)::after {
+    background: rgb(246, 102, 80);
+  }
+}
+
+.authPromptPortal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+.authPromptPortal * {
+  pointer-events: auto;
+}
+
+.authPromptOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.32);
+  pointer-events: auto;
+  z-index: 0;
+}
+
+.authPrompt {
+  position: absolute;
+  bottom: 112px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  z-index: 1;
+}
+
+.authPromptContent {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  padding: 24px 22px 20px;
+  width: calc(100% - 32px);
+  max-width: 360px;
+  position: relative;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.authPromptTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.authPromptDescription {
+  font-size: 13px;
+  color: #4b5563;
+  margin: 0 0 14px 0;
+}
+
+.authPromptAction {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color, #3b82f6);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.authPromptAction:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+.authPromptClose {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.authPromptClose:hover {
+  background: rgba(17, 24, 39, 0.06);
+}
+
+@media (min-width: 768px) {
+  .authPrompt {
+    display: none;
+  }
+}
+

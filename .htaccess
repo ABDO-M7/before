@@ -1,0 +1,13 @@
+# ✅ Proxy ALL requests to Next.js (Node/PM2) so Next.js can send Cache-Control headers.
+# Previously _next was served from disk by Apache, so cache headers were never sent.
+# With everything proxied, next.config.js headers() apply and Lighthouse cache passes.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    RewriteRule ^.well-known/acme-challenge/(.*) /.well-known/acme-challenge/$1 [L]
+
+    RewriteRule ^index\.html$ http://127.0.0.1:8004/ [P,L]
+    RewriteRule ^index\.php$ http://127.0.0.1:8004/ [P,L]
+    RewriteRule ^(.*)$ http://127.0.0.1:8004/$1 [P,L]
+</IfModule>
