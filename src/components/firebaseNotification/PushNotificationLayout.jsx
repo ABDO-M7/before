@@ -18,11 +18,20 @@ const PushNotificationLayout = ({ children, onNotificationReceived, setActiveTab
 
   useEffect(() => {
     if (isDev) return;
-    import('../../utils/Firebase').then((mod) => {
-      const FirebaseData = mod.default;
-      firebaseRef.current = FirebaseData();
-      firebaseRef.current.fetchToken(setFcmToken);
-    });
+    // Defer Firebase init to avoid blocking the initial critical path (LCP/TBT).
+    const initFirebase = () => {
+      import('../../utils/Firebase').then((mod) => {
+        const FirebaseData = mod.default;
+        firebaseRef.current = FirebaseData();
+        firebaseRef.current.fetchToken(setFcmToken);
+      });
+    };
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(initFirebase, { timeout: 4000 });
+    } else {
+      setTimeout(initFirebase, 3000);
+    }
   }, []);
 
   useEffect(() => {

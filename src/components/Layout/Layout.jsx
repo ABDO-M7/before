@@ -165,15 +165,13 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
           <main id="main-content" role="main" style={{ minHeight: '100vh' }}>{children}</main>
         </PushNotificationLayout>
       ) : (
-        <PushNotificationLayout
-          onNotificationReceived={handleNotificationReceived}
-        >
+        <>
           <MainHeader initialQuickSearchItems={initialQuickSearchItems} />
           {/* CLS: minHeight reserves space so main doesn't grow from 0; shift is from children loading - reserve space in page components (slider, sections) */}
           <main id="main-content" role="main" style={{ minHeight: '100vh', paddingTop: '7px' }}>{children}</main>
           <Footer />
           <BottomNavigationBar />
-        </PushNotificationLayout>
+        </>
       )}
       {pathname === "/chat" && <BottomNavigationBar />}
       {pathname === "/ad-listing" && !isMobile && <BottomNavigationBar />}

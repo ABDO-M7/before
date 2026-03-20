@@ -58,8 +58,8 @@ export default function HTMLContentRenderer({
   const stripHeavyResources = (html) => {
     return html
       // Remove Tailwind CDN script (~124 KiB)
-      // .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '')
-      // .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*\/>/gi, '')
+      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '')
+      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*\/>/gi, '')
       // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
       .replace(/<link[^>]*href=["'][^"']*fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '')
       // Remove Font Awesome CDN (all.min.css ~19 KiB + woff2 ~148 KiB)
