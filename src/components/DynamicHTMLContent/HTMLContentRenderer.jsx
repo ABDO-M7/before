@@ -17,7 +17,9 @@ export default function HTMLContentRenderer({
   contentId = 'html-content',
   // Used to keep iframe-heavy HTML (e.g. tailwind CDN) out of the critical path on the home page.
   // When > 0, the iframe is mounted after this delay (ms).
-  deferIframeLoadMs = 0
+  deferIframeLoadMs = 0,
+  // While the iframe is deferred / loading, reserve space to reduce CLS.
+  placeholderMinHeightPx = 200
 }) {
   const [iframeHeight, setIframeHeight] = useState('0px');
   const [isLoading, setIsLoading] = useState(true);
@@ -111,8 +113,14 @@ export default function HTMLContentRenderer({
           const sendHeightDeferred = () => requestAnimationFrame(sendHeight);
 
           const resizeObserver = new ResizeObserver(sendHeightDeferred);
-          window.addEventListener('load', () => {
+          window.addEventListener('load', async () => {
             if (document.body) resizeObserver.observe(document.body);
+            // Wait for web fonts to avoid multiple height jumps (CLS).
+            try {
+              if (document.fonts && document.fonts.ready) {
+                await document.fonts.ready;
+              }
+            } catch (e) {}
             sendHeightDeferred();
             document.querySelectorAll('img').forEach(img => {
               if (img.complete) sendHeightDeferred();
@@ -145,11 +153,20 @@ export default function HTMLContentRenderer({
             }
           }, true);
 
-          // Initial calls and interval backup
-          if (document.readyState === 'complete') sendHeight();
-          else window.addEventListener('DOMContentLoaded', sendHeight);
-          
-          setInterval(sendHeight, 3000);
+          // Initial call (no polling interval to reduce forced reflow + CLS).
+          if (document.readyState === 'complete') {
+            try {
+              if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => sendHeight());
+              } else {
+                sendHeight();
+              }
+            } catch (e) {
+              sendHeight();
+            }
+          } else {
+            window.addEventListener('DOMContentLoaded', () => sendHeight(), { once: true });
+          }
         })();
       </script>
     `;
@@ -203,7 +220,14 @@ export default function HTMLContentRenderer({
   const preparedHtml = prepareHtml(htmlContent);
 
   return (
-    <div className={`html-content-wrapper html-content-wrapper-${contentId}`} style={{ position: 'relative', width: '100%', minHeight: isLoading ? '200px' : 'auto' }}>
+    <div
+      className={`html-content-wrapper html-content-wrapper-${contentId}`}
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: isLoading ? `${placeholderMinHeightPx}px` : 'auto'
+      }}
+    >
       {isLoading && (
         <div style={{
           position: 'absolute',
