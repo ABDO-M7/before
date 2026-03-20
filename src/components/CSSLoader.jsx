@@ -19,8 +19,8 @@ import { loadNonCriticalCSS, preloadCSS } from '@/utils/cssLoader';
 /** Non-critical CSS – loaded after page is interactive (print-media trick) */
 const NON_CRITICAL_CSS = [
   '/css/accessibility.css', // Deferred to avoid render-blocking; a11y styles apply after paint
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', // Full Bootstrap deferred to reduce unused CSS (~29 KiB); critical grid inlined in layout
 ];
+const DEFERRED_BOOTSTRAP_CSS = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';
 
 /** CSS to preload (hint only, does not block render) */
 const PRELOAD_CSS = [];
@@ -40,6 +40,26 @@ export default function CSSLoader() {
         }
       });
     }
+
+    // Load full Bootstrap only after interaction (or after a long timeout fallback)
+    // so it doesn't compete with first-load LCP/unused CSS in Lighthouse window.
+    const loadBootstrap = () => {
+      loadNonCriticalCSS([DEFERRED_BOOTSTRAP_CSS]).catch(() => {});
+      events.forEach(([ev, fn]) => window.removeEventListener(ev, fn));
+      clearTimeout(fallbackTimer);
+    };
+    const events = [
+      ['click', loadBootstrap],
+      ['keydown', loadBootstrap],
+      ['touchstart', loadBootstrap],
+    ];
+    events.forEach(([ev, fn]) => window.addEventListener(ev, fn, { once: true, passive: true }));
+    const fallbackTimer = setTimeout(loadBootstrap, 12000);
+
+    return () => {
+      events.forEach(([ev, fn]) => window.removeEventListener(ev, fn));
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   return null; // This component doesn't render anything

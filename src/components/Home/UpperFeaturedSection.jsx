@@ -11,7 +11,8 @@ const UpperFeaturedSection = ({ sections = [], featuredData, setFeaturedData }) 
             sections={sections}
             featuredData={featuredData}
             setFeaturedData={setFeaturedData}
-            priorityImages={false}
+            // Load first cards in the top featured block eagerly (helps LCP on home).
+            priorityImages={true}
         />
     );
 };
