@@ -35,7 +35,6 @@ const RegisterModal = ({
   invitationCode
 }) => {
   const router = useRouter();
-  const auth = getAuth(firebaseApp);
   const emailInputRef = useRef(null);
   const usernameInputRef = useRef(null);
   const otpInputRef = useRef(null);
@@ -278,6 +277,9 @@ const RegisterModal = ({
   };
 
   useEffect(() => {
+    // Avoid initializing Firebase Auth / reCAPTCHA on page load.
+    if (!IsRegisterModalOpen) return;
+
     generateRecaptcha();
 
     return () => {
@@ -291,7 +293,7 @@ const RegisterModal = ({
         window.recaptchaVerifier = null; // Clear the recaptchaVerifier reference
       }
     };
-  }, []); // Empty dependency array ensures this effect runs only once after mount
+  }, [IsRegisterModalOpen]);
 
   const sendOTP = async () => {
     setShowLoader(true);
@@ -312,6 +314,7 @@ const RegisterModal = ({
       }
     } else {
       try {
+        const auth = getAuth(firebaseApp);
         const appVerifier = generateRecaptcha();
         const confirmation = await signInWithPhoneNumber(
           auth,
@@ -360,6 +363,7 @@ const RegisterModal = ({
       }
     } else {
       try {
+        const auth = getAuth(firebaseApp);
         const appVerifier = generateRecaptcha();
         const confirmation = await signInWithPhoneNumber(
           auth,

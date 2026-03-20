@@ -89,6 +89,8 @@ const PopularAiTools = ({ initialAiToolData: initialAiToolDataProp }) => {
                 <HTMLContentRenderer
                   htmlContent={featuredTool?.description || ''}
                   contentId={`featured-tool-description-${featuredTool?.id}`}
+                  // Defer iframe mount so tailwind-in-HTML doesn't block LCP on the homepage.
+                  deferIframeLoadMs={2500}
                 />
               </div>
             </div>

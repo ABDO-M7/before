@@ -14,18 +14,34 @@ import { useEffect, useState } from 'react';
  */
 export default function HTMLContentRenderer({
   htmlContent,
-  contentId = 'html-content'
+  contentId = 'html-content',
+  // Used to keep iframe-heavy HTML (e.g. tailwind CDN) out of the critical path on the home page.
+  // When > 0, the iframe is mounted after this delay (ms).
+  deferIframeLoadMs = 0
 }) {
   const [iframeHeight, setIframeHeight] = useState('0px');
   const [isLoading, setIsLoading] = useState(true);
   const [key, setKey] = useState(0);
+  const [shouldRenderIframe, setShouldRenderIframe] = useState(deferIframeLoadMs <= 0);
 
   // Reset loading state and force re-mount when content changes
   useEffect(() => {
     setIsLoading(true);
     setIframeHeight('0px');
     setKey(prev => prev + 1);
+    if (deferIframeLoadMs > 0) setShouldRenderIframe(false);
   }, [htmlContent]);
+
+  // Defer mounting the iframe to avoid critical-path blocking.
+  useEffect(() => {
+    if (deferIframeLoadMs <= 0) {
+      setShouldRenderIframe(true);
+      return;
+    }
+    setShouldRenderIframe(false);
+    const t = setTimeout(() => setShouldRenderIframe(true), deferIframeLoadMs);
+    return () => clearTimeout(t);
+  }, [deferIframeLoadMs, htmlContent]);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -57,9 +73,9 @@ export default function HTMLContentRenderer({
   // Note: We strip all Google Fonts first, then inject only Cairo after
   const stripHeavyResources = (html) => {
     return html
-      // Remove Tailwind CDN script (~124 KiB)
-      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '')
-      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*\/>/gi, '')
+      // Keep Tailwind CDN when needed for embedded tool UIs.
+      // (We handle critical-path impact by deferring the iframe mount on the homepage.)
+      // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
       // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
       .replace(/<link[^>]*href=["'][^"']*fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '')
       // Remove Font Awesome CDN (all.min.css ~19 KiB + woff2 ~148 KiB)
@@ -204,21 +220,23 @@ export default function HTMLContentRenderer({
           <div className="loader"></div>
         </div>
       )}
-      <iframe
-        key={`${contentId}-${key}`}
-        srcDoc={preparedHtml}
-        style={{
-          width: '100%',
-          height: iframeHeight,
-          border: 'none',
-          overflow: 'hidden',
-          display: 'block',
-          opacity: isLoading ? 0 : 1,
-          transition: 'opacity 0.3s ease, height 0.2s ease'
-        }}
-        title={`content-${contentId}`}
-        scrolling="no"
-      />
+      {shouldRenderIframe ? (
+        <iframe
+          key={`${contentId}-${key}`}
+          srcDoc={preparedHtml}
+          style={{
+            width: '100%',
+            height: iframeHeight,
+            border: 'none',
+            overflow: 'hidden',
+            display: 'block',
+            opacity: isLoading ? 0 : 1,
+            transition: 'opacity 0.3s ease, height 0.2s ease'
+          }}
+          title={`content-${contentId}`}
+          scrolling="no"
+        />
+      ) : null}
     </div>
   );
 }

@@ -40,7 +40,6 @@ const LoginModal = ({
   onAutoSubmitPhoneLoginHandled = () => {},
 }) => {
   const router = useRouter();
-  const auth = getAuth(firebaseApp);
   const emailInputRef = useRef(null);
   const numberInputRef = useRef(null);
   const otpInputRef = useRef(null);
@@ -372,10 +371,13 @@ const Signin = async (e) => {
   };
 
   useEffect(() => {
+    // Avoid initializing Firebase Auth / reCAPTCHA on page load.
+    // Only do it when the modal is actually opened.
+    if (!IsLoginModalOpen) return;
+
     generateRecaptcha();
 
     return () => {
-      // Clean up recaptcha container and verifier when component unmounts
       const recaptchaContainer = document.getElementById("recaptcha-container");
       if (recaptchaContainer) {
         recaptchaContainer.innerHTML = "";
@@ -385,7 +387,7 @@ const Signin = async (e) => {
         window.recaptchaVerifier = null; // Clear the recaptchaVerifier reference
       }
     };
-  }, []); // Empty dependency array ensures this effect runs only once after mount
+  }, [IsLoginModalOpen]);
 
   const sendOTP = async () => {
     setShowLoader(true);
@@ -407,6 +409,7 @@ const Signin = async (e) => {
     }
     else {
       try {
+        const auth = getAuth(firebaseApp);
         const appVerifier = generateRecaptcha();
         const confirmation = await signInWithPhoneNumber(
           auth,
@@ -453,6 +456,7 @@ const Signin = async (e) => {
     }
     else {
       try {
+        const auth = getAuth(firebaseApp);
         const appVerifier = generateRecaptcha();
         const confirmation = await signInWithPhoneNumber(
           auth,
