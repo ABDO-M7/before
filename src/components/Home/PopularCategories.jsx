@@ -11,7 +11,7 @@ import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";
 import PopularCategoriesSkeleton from "../Skeleton/PopularCategoriesSkeleton";
 import PopularCategory from "./PopularCategory";
 
-const PopularCategories = ({ initialCategoriesData }) => {
+const PopularCategories = ({ initialCategoriesData, showTitle = true }) => {
 
   const dispatch = useDispatch()
   const swiperRef = useRef()
@@ -198,7 +198,11 @@ const PopularCategories = ({ initialCategoriesData }) => {
           <div className="row mrg_btm">
             <div className="col-12">
               <div className="pop_cat_header">
-                <h2 className="pop_cat_head text-dark">{t("popularCategories")}</h2>
+                {showTitle ? (
+                  <h2 className="pop_cat_head text-dark">{t("popularCategories")}</h2>
+                ) : (
+                  <div aria-hidden="true" />
+                )}
 
                 <div className="pop_cat_arrow">
                   <button

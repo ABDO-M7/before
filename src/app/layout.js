@@ -87,14 +87,7 @@ export default async function RootLayout({ children }) {
             <link rel="dns-prefetch" href={API_ORIGIN} />
           </>
         )}
-        {process.env.NODE_ENV === 'production' && (
-          <>
-            <link rel="preconnect" href="https://www.googletagmanager.com" />
-            <link rel="preconnect" href="https://connect.facebook.net" />
-            <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-            <link rel="dns-prefetch" href="https://connect.facebook.net" />
-          </>
-        )}
+        {/* Analytics/pixel are deferred; avoid early preconnects on initial critical path */}
         {/* ✅ Facebook Domain Verification - from env so no production value in source */}
         {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
           <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />

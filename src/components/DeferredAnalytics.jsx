@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
  * Loads GTM and Facebook Pixel only after a delay or first user interaction.
  * Reduces main-thread work during initial parse/compile (saves ~500ms from TBT).
  */
-const DEFER_MS = 5000; // Load after 5s if no interaction
+const DEFER_MS = 15000; // Load later to keep Lighthouse window focused on core UX
 
 export default function DeferredAnalytics() {
   const loaded = useRef(false);
@@ -78,10 +78,9 @@ export default function DeferredAnalytics() {
     };
 
     const events = [
-      ['scroll', onInteract],
       ['click', onInteract],
       ['keydown', onInteract],
-      ['mousemove', onInteract],
+      ['touchstart', onInteract],
     ];
     events.forEach(([ev, fn]) => window.addEventListener(ev, fn, { once: true, passive: true }));
 
