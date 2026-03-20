@@ -29,19 +29,5 @@ const fetchFeaturedCategories = async () => {
 
 export default async function ServerPopularCategories() {
   const data = await fetchFeaturedCategories();
-  return (
-    <>
-      {/* Render title on server so the LCP text can paint earlier */}
-      <div className="container main_padding">
-        <div className="row mrg_btm">
-          <div className="col-12">
-            <div className="pop_cat_header">
-              <h2 className="pop_cat_head text-dark">تصفح اقسام الاعلانات</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-      <PopularCategories initialCategoriesData={data} showTitle={false} />
-    </>
-  );
+  return <PopularCategories initialCategoriesData={data} showTitle={false} />;
 }

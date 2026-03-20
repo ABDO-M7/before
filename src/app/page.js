@@ -109,6 +109,16 @@ const HomePageRoute = async () => {
           }}
         >
           {/* Categories -- streams independently */}
+          <div className="container main_padding">
+            <div className="row mrg_btm">
+              <div className="col-12">
+                <div className="pop_cat_header">
+                  {/* Render this immediately (not blocked by categories API call) */}
+                  <h2 className="pop_cat_head text-dark">تصفح اقسام الاعلانات</h2>
+                </div>
+              </div>
+            </div>
+          </div>
           <ComponentErrorBoundary componentName="PopularCategories">
             <Suspense fallback={<PopularCategoriesSkeleton />}>
               <ServerPopularCategories />
