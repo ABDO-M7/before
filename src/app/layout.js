@@ -25,9 +25,7 @@ const cairo = Cairo({
 // Bootstrap: full CSS loaded deferred via CSSLoader to reduce unused CSS; minimal grid inlined below
 import "../../public/css/style.css";
 import { Toaster } from "react-hot-toast";
-import DeferredWebVitals from "@/components/DeferredWebVitals";
 import DeferredAnalytics from "@/components/DeferredAnalytics";
-import DeferredMonitoring from "@/components/DeferredMonitoring";
 import DeferredPrefetcher from "@/components/DeferredPrefetcher";
 import CSSLoader from "@/components/CSSLoader";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -133,9 +131,7 @@ export default async function RootLayout({ children }) {
           {/* ✅ Global Error Boundary - Catches any unhandled errors */}
           <ErrorBoundary name="RootLayout">
             <Toaster position="top-center" reverseOrder={false} />
-            <DeferredWebVitals />
             <DeferredAnalytics />
-            <DeferredMonitoring />
             <CSSLoader />
             <DeferredPrefetcher />
             {children}

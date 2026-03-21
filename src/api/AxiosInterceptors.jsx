@@ -11,6 +11,9 @@ const Api = axios.create({
 
 
 let isUnauthorizedToastShown = false;
+const isClientMonitoringEnabled =
+  process.env.NODE_ENV === "development" ||
+  process.env.NEXT_PUBLIC_ENABLE_CLIENT_MONITORING === "true";
 
 Api.interceptors.request.use(function (config) {
   // Add metadata for timing
@@ -85,13 +88,13 @@ Api.interceptors.response.use(
       const duration = Date.now() - response.config.metadata.startTime;
       const url = (response.config?.baseURL || '') + (response.config?.url || '');
       
-      if (typeof window !== 'undefined') {
+      if (isClientMonitoringEnabled && typeof window !== 'undefined') {
         import('@/utils/analyticsDashboard').then(({ analyticsDashboard }) => {
           analyticsDashboard.trackAPICall(url, duration, response.status);
         }).catch(() => {});
       }
       
-      if (duration > 1000 && typeof window !== 'undefined') {
+      if (isClientMonitoringEnabled && duration > 1000 && typeof window !== 'undefined') {
         import('@/utils/rumTracking').then(({ rumTracker }) => {
           rumTracker.trackPerformanceMetric(
             `api_${response.config.url}`,
@@ -128,7 +131,7 @@ Api.interceptors.response.use(
   },
   function (error) {
     // ✅ Track API errors
-    if (typeof window !== 'undefined') {
+    if (isClientMonitoringEnabled && typeof window !== 'undefined') {
       import('@/utils/errorTracker').then(({ errorTracker }) => {
         const url = (error?.config?.baseURL || '') + (error?.config?.url || '');
         const status = error?.response?.status;

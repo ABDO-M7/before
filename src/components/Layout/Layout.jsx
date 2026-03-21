@@ -54,17 +54,12 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Keep body from horizontal overflow (Ant Design Drawer can set body overflow: auto on close)
+  // Keep body from horizontal overflow without a MutationObserver loop
+  // (observer caused repeated style invalidations and extra reflow work).
   useEffect(() => {
-    const enforceNoHorizontalScroll = () => {
-      document.documentElement.style.overflowX = 'hidden';
-      document.body.style.overflowX = 'hidden';
-      document.body.style.maxWidth = '100vw';
-    };
-    enforceNoHorizontalScroll();
-    const observer = new MutationObserver(enforceNoHorizontalScroll);
-    observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
-    return () => observer.disconnect();
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+    document.body.style.maxWidth = '100vw';
   }, [pathname]);
 
   useEffect(() => {
