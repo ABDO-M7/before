@@ -30,14 +30,11 @@ import { settingsData } from "@/redux/reuducer/settingSlice";
 import { useEffect, useState, useMemo, useRef, memo } from "react";
 // import { store } from "@/redux/store"; // unused
 import { usePrefetchOnHover } from "@/utils/prefetchUtils";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 // ✅ TBT Fix: Lazy-load antd Modal (only needed when image gallery opens)
 import dynamic from "next/dynamic";
 const Modal = dynamic(() => import("antd").then(mod => mod.Modal), { ssr: false });
+const Swiper = dynamic(() => import("../LazySwiper").then(mod => mod.Swiper), { ssr: false });
+const SwiperSlide = dynamic(() => import("../LazySwiper").then(mod => mod.SwiperSlide), { ssr: false });
 
 /**
  * Darken a hex color by a factor to ensure WCAG AA contrast on white/light backgrounds.
@@ -539,6 +536,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
       </div>
 
       {/* Image Gallery Modal */}
+      {isImageModalOpen && (
       <Modal
         centered
         open={isImageModalOpen}
@@ -626,12 +624,6 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
               slidesPerView={1}
               spaceBetween={10}
               initialSlide={initialSlideIndex}
-              modules={[Pagination, Navigation]}
-              pagination={{
-                clickable: true,
-                dynamicBullets: true
-              }}
-              navigation={modalImages.length > 1}
               style={{
                 width: '100%',
                 height: '100%',
@@ -801,6 +793,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
           `
         }} />
       </Modal>
+      )}
       {/* Unused: targets product_card_prod_name_link / product_card_prod_name; this component uses product_title_new
       <style dangerouslySetInnerHTML={{
         __html: `

@@ -114,7 +114,15 @@ const HomePageRoute = async () => {
               <div className="col-12">
                 <div className="pop_cat_header">
                   {/* Render this immediately (not blocked by categories API call) */}
-                  <h2 className="pop_cat_head text-dark">تصفح اقسام الاعلانات</h2>
+                  <h2
+                    className="pop_cat_head text-dark"
+                    style={{
+                      fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+                      fontWeight: 800,
+                    }}
+                  >
+                    تصفح اقسام الاعلانات
+                  </h2>
                 </div>
               </div>
             </div>
