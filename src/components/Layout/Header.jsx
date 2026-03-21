@@ -8,7 +8,6 @@ import { GiHamburgerMenu } from "react-icons/gi";
 // ✅ TBT Fix: Lazy-load antd components to reduce initial JS bundle
 import dynamic from "next/dynamic";
 const Drawer = dynamic(() => import("antd").then(mod => mod.Drawer), { ssr: false });
-const Select = dynamic(() => import("antd").then(mod => mod.Select), { ssr: false });
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
 // ✅ TBT Fix: Removed "swiper/css" import — Swiper is not used in Header
@@ -1110,38 +1109,38 @@ const Header = ({ initialQuickSearchItems }) => {
       {isDesktop && <div aria-hidden="true" style={{ minHeight: '125px', marginBottom: '5px' }} />}
 
 {/* Drawer is the side menu for mobile and tablet */}
-      <Drawer
-        className="eclassify_drawer mobile_drawer"
-        maskClosable={true}
-        styles={{ wrapper: { width: '80%' }, body: { padding: 0 } }
-        }
-        zIndex={1050}
-        placement={drawerPlacement}
-        title={
-          <Image
-            src={settings?.header_logo2}
-            loading="eager"
-            width={160}
-            height={60}
-            alt="logo"
-            style={{
-              height: 'auto',
-              // width: 'auto', 
-              maxWidth: '140px',
-              objectFit: 'contain',
-              display: 'block',
-
-            }}
-            onErrorCapture={placeholderImage}
-            className="drawer_title_logo"
-          />
-        }
-        onClose={handleClose}
-        open={isDrawerOpen}
-        closeIcon={CloseIcon}
-      >
-        <div className="mobile_drawer_body" style={{ paddingTop: '10px' }}>
-          <ul className="drawer_menu" dir={CurrentLanguage?.rtl ? "rtl" : "ltr"}>
+      {isDrawerOpen ? (
+        <Drawer
+          className="eclassify_drawer mobile_drawer"
+          maskClosable={true}
+          styles={{ wrapper: { width: '80%' }, body: { padding: 0 } }
+          }
+          zIndex={1050}
+          placement={drawerPlacement}
+          title={
+            <Image
+              src={settings?.header_logo2}
+              loading="eager"
+              width={160}
+              height={60}
+              alt="logo"
+              style={{
+                height: 'auto',
+                // width: 'auto',
+                maxWidth: '140px',
+                objectFit: 'contain',
+                display: 'block',
+              }}
+              onErrorCapture={placeholderImage}
+              className="drawer_title_logo"
+            />
+          }
+          onClose={handleClose}
+          open={isDrawerOpen}
+          closeIcon={CloseIcon}
+        >
+          <div className="mobile_drawer_body" style={{ paddingTop: '10px' }}>
+            <ul className="drawer_menu" dir={CurrentLanguage?.rtl ? "rtl" : "ltr"}>
             <li className="drawer_menu_item drawer_menu_item--single">
               <button
                 type="button"
@@ -1312,16 +1311,17 @@ const Header = ({ initialQuickSearchItems }) => {
                 </li> */}
               </>
             )}
-          </ul>
-        </div>
-      </Drawer >
+            </ul>
+          </div>
+        </Drawer>
+      ) : null}
       <Suspense fallback={null}>
         <InvitationHandler />
       </Suspense>
 
       {/* Hide LoginModal on invitation pages - handled by the invitation page itself */}
       {
-        !pathname.startsWith('/invitation/') && (
+        !pathname.startsWith('/invitation/') && IsLoginModalOpen && (
           <LoginModal
             IsLoginModalOpen={IsLoginModalOpen}
             setIsLoginModalOpen={toggleLoginModal}
@@ -1334,7 +1334,7 @@ const Header = ({ initialQuickSearchItems }) => {
 
       {/* Hide RegisterModal on invitation pages - handled by the invitation page itself */}
       {
-        !pathname.startsWith('/invitation/') && (
+        !pathname.startsWith('/invitation/') && IsRegisterModalOpen && (
           <RegisterModal
             IsRegisterModalOpen={IsRegisterModalOpen}
             setIsLoginModalOpen={toggleLoginModal}
@@ -1346,7 +1346,7 @@ const Header = ({ initialQuickSearchItems }) => {
 
       {/* Hide MailSentSucessfully on invitation pages - handled by the invitation page itself */}
       {
-        !pathname.startsWith('/invitation/') && (
+        !pathname.startsWith('/invitation/') && IsMailSentOpen && (
           <MailSentSucessfully
             IsMailSentOpen={IsMailSentOpen}
             OnHide={() => setIsMailSentOpen(false)}
@@ -1355,11 +1355,13 @@ const Header = ({ initialQuickSearchItems }) => {
         )
       }
 
-      <LocationModal
-        key={IsLocationModalOpen}
-        IsLocationModalOpen={IsLocationModalOpen}
-        OnHide={() => setIsLocationModalOpen(false)}
-      />
+      {IsLocationModalOpen ? (
+        <LocationModal
+          key={IsLocationModalOpen}
+          IsLocationModalOpen={IsLocationModalOpen}
+          OnHide={() => setIsLocationModalOpen(false)}
+        />
+      ) : null}
 
     </>
   );
