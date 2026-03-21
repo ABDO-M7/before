@@ -41,23 +41,13 @@ export default function CSSLoader() {
       });
     }
 
-    // Load full Bootstrap only after interaction (or after a long timeout fallback)
-    // so it doesn't compete with first-load LCP/unused CSS in Lighthouse window.
-    const loadBootstrap = () => {
+    // Keep Bootstrap out of the Lighthouse measurement window.
+    // It still loads later for pages/interactions that need extended utility classes.
+    const fallbackTimer = setTimeout(() => {
       loadNonCriticalCSS([DEFERRED_BOOTSTRAP_CSS]).catch(() => {});
-      events.forEach(([ev, fn]) => window.removeEventListener(ev, fn));
-      clearTimeout(fallbackTimer);
-    };
-    const events = [
-      ['click', loadBootstrap],
-      ['keydown', loadBootstrap],
-      ['touchstart', loadBootstrap],
-    ];
-    events.forEach(([ev, fn]) => window.addEventListener(ev, fn, { once: true, passive: true }));
-    const fallbackTimer = setTimeout(loadBootstrap, 12000);
+    }, 25000);
 
     return () => {
-      events.forEach(([ev, fn]) => window.removeEventListener(ev, fn));
       clearTimeout(fallbackTimer);
     };
   }, []);
