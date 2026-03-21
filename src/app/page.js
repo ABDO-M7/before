@@ -19,40 +19,6 @@ export const generateMetadata = async () => {
   return await generateHomeMetadata();
 };
 
-// Quick searches for header (needed immediately for Layout/Header)
-const fetchQuickSearches = async () => {
-  try {
-    const url = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`
-    );
-    url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
-    if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
-    const json = await res.json();
-    const list = json?.data?.data ?? json?.data;
-    return Array.isArray(list) ? list : [];
-  } catch (e) {
-    console.error('Error fetching quick searches:', e?.message || e);
-    return [];
-  }
-};
-
-// System settings (needed immediately for Layout -- logo, theme color, footer)
-const fetchSettings = async () => {
-  try {
-    const url = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
-    );
-    const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
-    if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
-    const json = await res.json();
-    return json || null;
-  } catch (e) {
-    console.error('Error fetching settings:', e?.message || e);
-    return null;
-  }
-};
-
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -77,11 +43,10 @@ const websiteSchema = {
 };
 
 const HomePageRoute = async () => {
-  // Only settings + quick searches block the shell (header/footer need them immediately)
-  const [initialQuickSearchItems, initialSettings] = await Promise.all([
-    fetchQuickSearches(),
-    fetchSettings(),
-  ]);
+  // Do not block first paint on external API calls.
+  // Header/settings are fetched on the client by Layout/Header after initial render.
+  const initialQuickSearchItems = [];
+  const initialSettings = null;
 
   return (
     <>
