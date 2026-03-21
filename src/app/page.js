@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import Layout from '@/components/Layout/Layout';
 import JsonLd from '@/components/SEO/JsonLd';
-import ComponentErrorBoundary from '@/components/ErrorBoundary/ComponentErrorBoundary';
 import AiToolsSkeleton from '@/components/Skeleton/AiToolsSkeleton';
 import PopularCategoriesSkeleton from '@/components/Skeleton/PopularCategoriesSkeleton';
 import FeaturedSectionsSkeleton from '@/components/Skeleton/FeaturedSectionsSkeleton';
@@ -90,11 +89,9 @@ const HomePageRoute = async () => {
       <Layout initialQuickSearchItems={initialQuickSearchItems} initialSettings={initialSettings}>
 
         {/* AI Tools -- above the fold, LCP element. Streams as soon as its API responds */}
-        <ComponentErrorBoundary componentName="PopularAiTools">
-          <Suspense fallback={<AiToolsSkeleton />}>
-            <ServerPopularAiTools />
-          </Suspense>
-        </ComponentErrorBoundary>
+        <Suspense fallback={<AiToolsSkeleton />}>
+          <ServerPopularAiTools />
+        </Suspense>
 
         {/* Below-the-fold sections: each streams independently */}
         <div
@@ -127,25 +124,21 @@ const HomePageRoute = async () => {
               </div>
             </div>
           </div>
-          <ComponentErrorBoundary componentName="PopularCategories">
-            <Suspense fallback={<PopularCategoriesSkeleton />}>
-              <ServerPopularCategories />
-            </Suspense>
-          </ComponentErrorBoundary>
+          <Suspense fallback={<PopularCategoriesSkeleton />}>
+            <ServerPopularCategories />
+          </Suspense>
 
           {/* Featured Sections (up + ad banner + middle + blogs + down) */}
           {/* All featured sections depend on the same API call, so they stream together. */}
           {/* Blogs stream independently INSIDE the featured block via nested Suspense. */}
-          <ComponentErrorBoundary componentName="FeaturedSections">
-            <Suspense fallback={<FeaturedSectionsSkeleton />}>
-              <ServerFeaturedSectionsLoader>
-                {/* Blogs slot: streams independently even though it's placed between middle & down featured */}
-                <Suspense fallback={<div style={{ minHeight: '300px' }} />}>
-                  <ServerHomeBlogsRow />
-                </Suspense>
-              </ServerFeaturedSectionsLoader>
-            </Suspense>
-          </ComponentErrorBoundary>
+          <Suspense fallback={<FeaturedSectionsSkeleton />}>
+            <ServerFeaturedSectionsLoader>
+              {/* Blogs slot: streams independently even though it's placed between middle & down featured */}
+              <Suspense fallback={<div style={{ minHeight: '300px' }} />}>
+                <ServerHomeBlogsRow />
+              </Suspense>
+            </ServerFeaturedSectionsLoader>
+          </Suspense>
         </div>
 
       </Layout>
