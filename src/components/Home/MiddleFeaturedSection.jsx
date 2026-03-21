@@ -11,7 +11,7 @@ const MiddleFeaturedSection = ({ sections = [], featuredData, setFeaturedData })
             sections={sections}
             featuredData={featuredData}
             setFeaturedData={setFeaturedData}
-            priorityImages={false}
+            priorityImages={true}
         />
     );
 };
