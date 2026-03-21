@@ -2,9 +2,6 @@
 import React from "react";
 import { Component } from "react";
 import { t } from "@/utils";
-import Image from "next/image";
-import somthingWrong from "../../public/assets/something_went_wrong.svg";
-import { placeholderImage } from "@/utils";
 
 /**
  * ✅ Error Boundary Component
@@ -80,27 +77,22 @@ class ErrorBoundary extends Component {
         return this.props.fallback;
       }
 
-      // Default fallback UI
+      // Keep default fallback intentionally minimal so it does not become
+      // a large LCP element on low-end devices when an exception occurs.
       return (
-        <div className="wentWrong" style={{ padding: "2rem", textAlign: "center" }}>
-          <div className="col-12 text-center">
-            <div>
-              <Image
-                loading="lazy"
-                src={somthingWrong}
-                alt="Error"
-                width={200}
-                height={200}
-                onError={placeholderImage}
-              />
-            </div>
-            <div className="no_data_found_text">
-              <h3>{t("somthingWentWrong") || "Something went wrong"}</h3>
-              <span>{t("tryLater") || "Please try again later"}</span>
-              <button onClick={this.handleReset} style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}>
-                {t("tryAgain") || "Try Again"}
-              </button>
-            </div>
+        <div
+          className="wentWrong"
+          role="alert"
+          style={{ padding: "0.75rem 1rem", textAlign: "center" }}
+        >
+          <div className="no_data_found_text" style={{ lineHeight: 1.4 }}>
+            <span>{t("somthingWentWrong") || "Something went wrong"}</span>
+            <button
+              onClick={this.handleReset}
+              style={{ marginInlineStart: "0.5rem", padding: "0.25rem 0.6rem" }}
+            >
+              {t("tryAgain") || "Try Again"}
+            </button>
           </div>
         </div>
       );
