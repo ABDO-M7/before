@@ -36,6 +36,7 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
   // so the page can render immediately. Settings API refreshes in the background.
   const [settingsReady, setSettingsReady] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showNonCriticalChrome, setShowNonCriticalChrome] = useState(false);
   const requiresAuth = protectedRoutes.some((route) => route.test(pathname));
   const appliedRange = useSelector(getKilometerRange);
   const IsLoggedIn = useSelector(getIsLoggedIn);
@@ -65,6 +66,25 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
   useEffect(() => {
     handleRouteAccess();
   }, [pathname, IsLoggedIn]);
+
+  useEffect(() => {
+    // Keep header/main immediate; defer footer/bottom-nav on home to reduce
+    // initial JS work on mobile Lighthouse runs.
+    if (pathname !== "/") {
+      setShowNonCriticalChrome(true);
+      return;
+    }
+
+    const reveal = () => setShowNonCriticalChrome(true);
+
+    if (typeof requestIdleCallback !== "undefined") {
+      const id = requestIdleCallback(reveal, { timeout: 5000 });
+      return () => cancelIdleCallback(id);
+    }
+
+    const t = setTimeout(reveal, 3000);
+    return () => clearTimeout(t);
+  }, [pathname]);
 
   const handleRouteAccess = () => {
     if (requiresAuth && !IsLoggedIn) {
@@ -150,7 +170,7 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
           <MainHeader initialQuickSearchItems={initialQuickSearchItems} />
           {/* CLS: minHeight reserves space so main doesn't grow from 0; shift is from children loading - reserve space in page components (slider, sections) */}
           <main id="main-content" role="main" style={{ minHeight: '100vh' }}>{children}</main>
-          <Footer />
+          {showNonCriticalChrome ? <Footer /> : null}
         </>
       ) : pathname === "/ad-listing" && isMobile ? (
         <PushNotificationLayout
@@ -164,12 +184,12 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
           <MainHeader initialQuickSearchItems={initialQuickSearchItems} />
           {/* CLS: minHeight reserves space so main doesn't grow from 0; shift is from children loading - reserve space in page components (slider, sections) */}
           <main id="main-content" role="main" style={{ minHeight: '100vh', paddingTop: '7px' }}>{children}</main>
-          <Footer />
-          <BottomNavigationBar />
+          {showNonCriticalChrome ? <Footer /> : null}
+          {showNonCriticalChrome ? <BottomNavigationBar /> : null}
         </>
       )}
-      {pathname === "/chat" && <BottomNavigationBar />}
-      {pathname === "/ad-listing" && !isMobile && <BottomNavigationBar />}
+      {pathname === "/chat" && showNonCriticalChrome && <BottomNavigationBar />}
+      {pathname === "/ad-listing" && !isMobile && showNonCriticalChrome && <BottomNavigationBar />}
       <ScrollToTopButton />
     </>
   );
