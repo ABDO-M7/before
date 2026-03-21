@@ -19,7 +19,6 @@ import {
 import { BiBadgeCheck, BiPhoneCall } from "react-icons/bi";
 import { LuMapPin } from "react-icons/lu";
 import { FaHeart, FaWhatsapp } from "react-icons/fa6";
-import { MdClose } from "react-icons/md";
 import { manageFavouriteApi } from "@/utils/api";
 import toast from "react-hot-toast";
 import { userSignUpData } from "../../redux/reuducer/authSlice";
@@ -27,14 +26,10 @@ import { useSelector } from "react-redux";
 import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";
 import { settingsData } from "@/redux/reuducer/settingSlice";
-import { useEffect, useState, useMemo, useRef, memo } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 // import { store } from "@/redux/store"; // unused
 import { usePrefetchOnHover } from "@/utils/prefetchUtils";
 // ✅ TBT Fix: Lazy-load antd Modal (only needed when image gallery opens)
-import dynamic from "next/dynamic";
-const Modal = dynamic(() => import("antd").then(mod => mod.Modal), { ssr: false });
-const Swiper = dynamic(() => import("../LazySwiper").then(mod => mod.Swiper), { ssr: false });
-const SwiperSlide = dynamic(() => import("../LazySwiper").then(mod => mod.SwiperSlide), { ssr: false });
 
 /**
  * Darken a hex color by a factor to ensure WCAG AA contrast on white/light backgrounds.
@@ -57,10 +52,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
   const systemSettingsData = useSelector(settingsData);
   const settings = systemSettingsData?.data;
   const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [initialSlideIndex, setInitialSlideIndex] = useState(0);
   const isRtl = useIsRtl();
-  const modalSwiperRef = useRef();
   const isJobCategory = Number(data?.category?.is_job_category) === 1;
 
   // Category label: use translation for current language when available, else translated_name or name
@@ -104,24 +96,6 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
     return image ? normalizeImageUrl(image) : placeholderImageUrl;
   }, [allImages, data?.image, data?.compressed, placeholderImageUrl]);
   
-  // Get images for modal slider - use 'medium' compressed versions
-  const modalImages = useMemo(() => {
-    // Try to get compressed 'medium' image, fallback to original image
-    const mainImageMedium = getCompressedImage(data, 'medium', data?.image);
-    const mainImageFinal = (mainImageMedium && mainImageMedium !== data?.image) ? mainImageMedium : data?.image;
-    const mainImageNormalized = mainImageFinal ? normalizeImageUrl(mainImageFinal) : null;
-    
-    const galleryImagesMedium = data?.gallery_images?.map((img) => {
-      const originalImg = typeof img === 'string' ? img : img?.image;
-      const compressedImg = getCompressedImage(img, 'medium', originalImg);
-      // If compressed path doesn't exist or is invalid, use original image
-      const finalImg = (compressedImg && compressedImg !== originalImg) ? compressedImg : originalImg;
-      return finalImg ? normalizeImageUrl(finalImg) : null;
-    }).filter(Boolean) || [];
-    
-    return [mainImageNormalized, ...galleryImagesMedium].filter(Boolean);
-  }, [data?.image, data?.compressed, data?.gallery_images]);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsMobileDevice(
@@ -240,17 +214,6 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
     window.open(contactInfo.whatsappLink, "_blank");
   };
 
-  const handleImageClick = (e, slideIndex = 0) => {
-    if (e && typeof e.preventDefault === 'function') {
-      e.preventDefault();
-    }
-    if (e && typeof e.stopPropagation === 'function') {
-      e.stopPropagation();
-    }
-    setInitialSlideIndex(slideIndex);
-    setIsImageModalOpen(true);
-  };
-
   const productDetailsUrl = userData?.id == data?.user_id
     ? `/my-listing/${encodeURIComponent(data?.slug || '')}`
     : `/product-details/${encodeURIComponent(data?.slug || '')}`;
@@ -262,22 +225,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
-    // If more than 1 image, open modal
-    if (modalImages.length > 1) {
-      handleImageClick(e, 0);
-    } else {
-      router.push(productDetailsUrl);
-    }
-  };
-
-  const handleCloseImageModal = (e) => {
-    if (e && typeof e.preventDefault === 'function') {
-      e.preventDefault();
-    }
-    if (e && typeof e.stopPropagation === 'function') {
-      e.stopPropagation();
-    }
-    setIsImageModalOpen(false);
+    router.push(productDetailsUrl);
   };
 
   // ✅ Prefetch on hover for faster navigation
@@ -415,7 +363,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
         />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
         
-        {modalImages.length > 1 && (
+        {allImages.length > 1 && (
           <div 
             className="product_card_image_count"
             style={{
@@ -432,7 +380,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
               pointerEvents: 'none'
             }}
           >
-            {modalImages.length} {t('images') || 'Images'}
+            {allImages.length} {t('images') || 'Images'}
           </div>
         )}
       </div>
@@ -535,265 +483,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
         </div>
       </div>
 
-      {/* Image Gallery Modal */}
-      {isImageModalOpen && (
-      <Modal
-        centered
-        open={isImageModalOpen}
-        onCancel={(e) => {
-          // Prevent navigation when closing via mask click
-          if (e && typeof e.preventDefault === 'function') {
-            e.preventDefault();
-          }
-          if (e && typeof e.stopPropagation === 'function') {
-            e.stopPropagation();
-          }
-          handleCloseImageModal(e);
-        }}
-        footer={null}
-        closeIcon={
-          <div 
-            className="close_icon_cont"
-            onClick={(e) => {
-              if (e && typeof e.preventDefault === 'function') {
-                e.preventDefault();
-              }
-              if (e && typeof e.stopPropagation === 'function') {
-                e.stopPropagation();
-              }
-              handleCloseImageModal(e);
-            }}
-          >
-            <MdClose size={24} color="black" />
-          </div>
-        }
-        className="product_image_modal"
-        maskClosable={true}
-        width="90%"
-        style={{ maxWidth: '900px' }}
-        onClick={(e) => {
-          // Stop propagation to prevent navigation when clicking inside modal
-          if (e && typeof e.stopPropagation === 'function') {
-            e.stopPropagation();
-          }
-        }}
-        onOk={(e) => {
-          // Prevent any default behavior
-          if (e && typeof e.preventDefault === 'function') {
-            e.preventDefault();
-          }
-          if (e && typeof e.stopPropagation === 'function') {
-            e.stopPropagation();
-          }
-        }}
-      >
-        <div 
-          style={{ 
-            position: 'relative',
-            width: '100%',
-            minHeight: '400px',
-            maxHeight: '80vh',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-          onClick={(e) => {
-            // Stop propagation to prevent navigation
-            if (e && typeof e.stopPropagation === 'function') {
-              e.stopPropagation();
-            }
-          }}
-        >
-          {/* Image Swiper */}
-          <div 
-            style={{ 
-              flex: 1,
-              width: '100%',
-              position: 'relative',
-              marginBottom: '16px'
-            }}
-            onClick={(e) => {
-              // Stop propagation to prevent navigation
-              if (e && typeof e.stopPropagation === 'function') {
-                e.stopPropagation();
-              }
-            }}
-          >
-            <Swiper
-              ref={modalSwiperRef}
-              dir={isRtl ? "rtl" : "ltr"}
-              slidesPerView={1}
-              spaceBetween={10}
-              initialSlide={initialSlideIndex}
-              style={{
-                width: '100%',
-                height: '100%',
-                minHeight: '400px'
-              }}
-              className="product_modal_swiper"
-              onClick={(e) => {
-                // Stop propagation to prevent navigation
-                if (e && typeof e.stopPropagation === 'function') {
-                  e.stopPropagation();
-                }
-              }}
-            >
-              {modalImages.map((img, index) => {
-                const imageSrc = img ? normalizeImageUrl(img) : placeholderImageUrl;
-                return (
-                  <SwiperSlide 
-                    key={index} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                    onClick={(e) => {
-                      // Stop propagation to prevent navigation
-                      if (e && typeof e.stopPropagation === 'function') {
-                        e.stopPropagation();
-                      }
-                    }}
-                  >
-                    <div 
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minHeight: '400px'
-                      }}
-                      onClick={(e) => {
-                        // Stop propagation to prevent navigation
-                        if (e && typeof e.stopPropagation === 'function') {
-                          e.stopPropagation();
-                        }
-                      }}
-                    >
-                      <Image
-                        loading="lazy"
-                        src={imageSrc}
-                        width={800}
-                        height={600}
-                        alt={`Product ${index + 1}`}
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          maxHeight: '70vh',
-                          objectFit: 'contain',
-                          borderRadius: '8px',
-                          pointerEvents: 'none' // Prevent image clicks
-                        }}
-                        onError={(e) => {
-                          if (e.target.src !== placeholderImageUrl) {
-                            e.target.src = placeholderImageUrl;
-                          }
-                        }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          </div>
-
-          {/* View Details Button */}
-          <Link 
-            href={productDetailsUrl}
-            prefetch={false}
-            style={{
-              display: 'block',
-              width: '100%',
-              textDecoration: 'none'
-            }}
-            onClick={(e) => {
-              // Allow navigation only for this button
-              handleCloseImageModal();
-              // Don't stop propagation here - we want the link to work
-            }}
-          >
-            <button
-              style={{
-                width: '100%',
-                padding: '12px 24px',
-                background: 'var(--primary-color, #007bff)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'opacity 0.2s ease',
-                textAlign: 'center'
-              }}
-              onMouseEnter={(e) => {
-                if (!isMobileDevice) {
-                  e.currentTarget.style.opacity = '0.9';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isMobileDevice) {
-                  e.currentTarget.style.opacity = '1';
-                }
-              }}
-            >
-              {t('viewAd') || 'View Ad'}
-            </button>
-          </Link>
-        </div>
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            .product_image_modal .ant-modal-content {
-              padding: 24px;
-            }
-            .product_image_modal .ant-modal-body {
-              padding: 0;
-            }
-            .product_modal_swiper .swiper-button-next,
-            .product_modal_swiper .swiper-button-prev {
-              color: #fff;
-              background: rgba(0, 0, 0, 0.5);
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-            }
-            .product_modal_swiper .swiper-button-next:after,
-            .product_modal_swiper .swiper-button-prev:after {
-              font-size: 18px;
-            }
-            .product_modal_swiper .swiper-button-next:hover,
-            .product_modal_swiper .swiper-button-prev:hover {
-              background: rgba(0, 0, 0, 0.7);
-            }
-            .product_modal_swiper .swiper-pagination {
-              bottom: 10px !important;
-            }
-            .product_modal_swiper .swiper-pagination-bullet {
-              width: 8px !important;
-              height: 8px !important;
-              background: rgba(255, 255, 255, 0.5) !important;
-              opacity: 1 !important;
-            }
-            .product_modal_swiper .swiper-pagination-bullet-active {
-              background: #fff !important;
-            }
-            @media (max-width: 768px) {
-              .product_modal_swiper .swiper-button-next,
-              .product_modal_swiper .swiper-button-prev {
-                width: 32px;
-                height: 32px;
-              }
-              .product_modal_swiper .swiper-button-next:after,
-              .product_modal_swiper .swiper-button-prev:after {
-                font-size: 14px;
-              }
-            }
-          `
-        }} />
-      </Modal>
-      )}
+      {/* Image modal/gallery removed from cards to reduce initial JS on home. */}
       {/* Unused: targets product_card_prod_name_link / product_card_prod_name; this component uses product_title_new
       <style dangerouslySetInnerHTML={{
         __html: `
