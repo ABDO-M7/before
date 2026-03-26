@@ -21,16 +21,6 @@ const StripePayment = ({
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadStripeInstance = async () => {
-      if (packageSettings?.Stripe?.api_key) {
-        const stripeInstance = await loadStripe(packageSettings.Stripe.api_key);
-        setStripePromise(stripeInstance);
-      }
-    };
-    loadStripeInstance();
-  }, [packageSettings]);
-
   const handleStripePayment = useCallback(async () => {
     try {
       const res = await createPaymentIntentApi.createIntent({
@@ -42,7 +32,11 @@ const StripePayment = ({
         const paymentIntent = res.data.data.payment_intent?.payment_gateway_response;
         const clientSecret = paymentIntent.client_secret;
         setClientSecret(clientSecret);
-        setShowStripeForm(true);
+        if (packageSettings?.Stripe?.api_key) {
+          // Load Stripe.js only after we know the payment flow is active.
+          const stripeInstance = await loadStripe(packageSettings.Stripe.api_key);
+          setStripePromise(stripeInstance);
+        }
       }
 
       if (res?.data?.error) {

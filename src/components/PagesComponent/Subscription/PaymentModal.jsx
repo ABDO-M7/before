@@ -100,6 +100,8 @@ const PaymentModal = ({
         colorIconHover="transparent"
         className="ant_payment_modal"
         onCancel={PaymentModalClose}
+        // Ensure the modal contents (and Stripe-related effects) are unmounted when closed.
+        destroyOnClose
         footer={null}
         maskClosable={false}
       >
