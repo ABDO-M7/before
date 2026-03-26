@@ -244,22 +244,29 @@ const Subscription = () => {
           </div>
         </div>
       </div>
-      <PaymentModal
-        isPaymentModal={isPaymentModal}
-        OnHide={() => {
-          setIsPaymentModal(false);
-          setIsReadonlyModal(false);
-        }}
-        packageSettings={packageSettings}
-        priceData={priceData}
-        settingsData={settingsData}
-        user={UserData}
-        setItemPackages={setItemPackages}
-        setAdvertisementPackage={setAdvertisementPackage}
-        isReadonly={isReadonlyModal}
-      />
+      {isPaymentModal ? (
+        <PaymentModal
+          isPaymentModal={isPaymentModal}
+          OnHide={() => {
+            setIsPaymentModal(false);
+            setIsReadonlyModal(false);
+          }}
+          packageSettings={packageSettings}
+          priceData={priceData}
+          settingsData={settingsData}
+          user={UserData}
+          setItemPackages={setItemPackages}
+          setAdvertisementPackage={setAdvertisementPackage}
+          isReadonly={isReadonlyModal}
+        />
+      ) : null}
 
-      <BankDetailsModal priceData={priceData} bankDetails={packageSettings?.bankTransfer} />
+      {isPaymentModal ? (
+        <BankDetailsModal
+          priceData={priceData}
+          bankDetails={packageSettings?.bankTransfer}
+        />
+      ) : null}
     </section>
   );
 };
