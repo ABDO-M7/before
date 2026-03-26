@@ -64,7 +64,8 @@ const AnythingYouWant = () => {
                 // height={200}
                 // width={180}
                 alt="Featured listing"
-                loading="lazy"
+                priority
+                loading="eager"
                 onErrorCapture={placeholderImage}
                 // style={{ height: 'auto', width: 'auto' }}
               />
@@ -155,7 +156,8 @@ const AnythingYouWant = () => {
                 // height={200}
                 // width={180}
                 alt="Featured listing"
-                loading="lazy"
+                priority
+                loading="eager"
                 onErrorCapture={placeholderImage}
                 // style={{ height: 'auto', width: 'auto' }}
               />
@@ -183,11 +185,13 @@ const AnythingYouWant = () => {
           </div>
         </div>
       </section>
-      <LocationModal
-        key={IsLocationModalOpen}
-        IsLocationModalOpen={IsLocationModalOpen}
-        OnHide={() => setIsLocationModalOpen(false)}
-      />
+      {IsLocationModalOpen ? (
+        <LocationModal
+          key={IsLocationModalOpen}
+          IsLocationModalOpen={IsLocationModalOpen}
+          OnHide={() => setIsLocationModalOpen(false)}
+        />
+      ) : null}
     </>
   );
 };
