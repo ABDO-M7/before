@@ -353,10 +353,11 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
           loading={priority ? "eager" : "lazy"}
           {...(priority ? { fetchPriority: "high" } : {})}
           // Reduce bytes for listing thumbnails (helps LCP on mobile category/search pages).
-          quality={priority ? 55 : 40}
+          quality={priority ? 50 : 30}
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNCIgZmlsbD0iI2YxZjVmOSIvPjwvc3ZnPg=="
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          // Tune sizes so mobile doesn't download oversized variants for grid cards.
+          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 48vw, 25vw"
           onError={(e) => {
             if (e.target.src !== placeholderImageUrl) {
               e.target.src = placeholderImageUrl;
