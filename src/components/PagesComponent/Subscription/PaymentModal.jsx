@@ -2,12 +2,12 @@ import { placeholderImage, t } from "@/utils";
 import { Modal } from "antd";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { FaAngleRight } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
 import stripe from "../../../../public/assets/ic_stripe.png";
 import toast from "react-hot-toast";
 import PaymentModalSkeleton from "@/components/Skeleton/PaymentModalSkeleton";
-import StripePayment from "./StripePayment";
 import RazorpayPayment from "./RazorpayPayment";
 import PaystackPayment from "./PaystackPayment";
 import FlutterwavePayment from "./FlutterwavePayment";
@@ -15,6 +15,9 @@ import PhonepePayment from "./PhonepePayment";
 import BankTransfer from "./BankTransfer";
 import ShamCashPayment from "./ShamCashPayment";
 import ThirdPartyTransferPayment from "./ThirdPartyTransferPayment";
+
+// Stripe is heavy and pulls third-party JS. Load only when user selects Stripe.
+const StripePayment = dynamic(() => import("./StripePayment"), { ssr: false });
 
 const PaymentModal = ({
   isPaymentModal,
