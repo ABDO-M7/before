@@ -19,7 +19,8 @@ export default function HTMLContentRenderer({
   // When > 0, the iframe is mounted after this delay (ms).
   deferIframeLoadMs = 0,
   // While the iframe is deferred / loading, reserve space to reduce CLS.
-  placeholderMinHeightPx = 200
+  placeholderMinHeightPx = 200,
+  onLoadComplete
 }) {
   const [iframeHeight, setIframeHeight] = useState('0px');
   const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +53,7 @@ export default function HTMLContentRenderer({
         if (newHeight > 0) {
           setIframeHeight(`${newHeight}px`);
           setIsLoading(false);
+          if (onLoadComplete) onLoadComplete();
         }
       }
     };
@@ -75,7 +77,8 @@ export default function HTMLContentRenderer({
   // Note: We strip all Google Fonts first, then inject only Cairo after
   const stripHeavyResources = (html) => {
     return html
-      // Keep Tailwind CDN when needed for embedded tool UIs.
+      // Keep Tailwind CDN when needed for embedded tool UIs, but defer it so it doesn't block parsing.
+      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '<script src="https://cdn.tailwindcss.com" defer></script>')
       // (We handle critical-path impact by deferring the iframe mount on the homepage.)
       // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
       // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)

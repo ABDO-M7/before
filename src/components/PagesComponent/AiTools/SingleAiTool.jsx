@@ -23,6 +23,7 @@ const HTMLContentRenderer = dynamic(() => import('@/components/DynamicHTMLConten
 
 const SingleAiTool = () => {
     const dispatch = useDispatch()
+    const [isIframeLoaded, setIsIframeLoaded] = useState(false)
     const router = useParams()
     // Decode slug if percent-encoded (e.g. Arabic) so API receives the actual string
     const rawSlug = router?.slug
@@ -39,22 +40,24 @@ const SingleAiTool = () => {
     const getToolData = async () => {
         if (!toolSlug || typeof toolSlug !== 'string' || toolSlug.trim() === '') return;
         try {
-            const res = await getAiToolsApi.getAiTools({ slug: toolSlug.trim(), hub: 'web' })
-            const data = res?.data?.data
-            setToolData(data)
+            const [res, relatedRes] = await Promise.all([
+                getAiToolsApi.getAiTools({ slug: toolSlug.trim(), hub: 'web' }),
+                getAiToolsApi.getAiTools({ limit: 4, hub: 'web' })
+            ]);
+            
+            const data = res?.data?.data;
+            setToolData(data);
             
             dispatch(setBreadcrumbPath([{
                 name: t("aiTools"),
                 slug: '/ai-tools'
             }, {
                 name: truncate(data?.title, 30)
-            }]))
+            }]));
 
-            // Get related tools
-            const relatedRes = await getAiToolsApi.getAiTools({ limit: 4, hub: 'web' })
-            setRelatedTools(relatedRes?.data?.data?.data?.filter(t => t.slug !== toolSlug) || [])
+            setRelatedTools(relatedRes?.data?.data?.data?.filter(t => t.slug !== toolSlug) || []);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
@@ -63,6 +66,12 @@ const SingleAiTool = () => {
             getToolData()
         }
     }, [toolSlug])
+
+    useEffect(() => {
+        if (toolData && typeof toolData.description !== 'undefined' && !toolData.description) {
+            setIsIframeLoaded(true);
+        }
+    }, [toolData])
 
     const handleCopyUrl = async () => {
         try {
@@ -104,51 +113,56 @@ const SingleAiTool = () => {
                                     <HTMLContentRenderer
                                         htmlContent={toolData?.description || ''}
                                         contentId={`tool-description-${toolSlug}`}
+                                        onLoadComplete={() => setIsIframeLoaded(true)}
                                     />
                                 </div>
 
-                                <div className="admin_details mt-4">
-                                    {toolData?.views > 0 && (
-                                        <>
+                                {isIframeLoaded && (
+                                    <>
+                                        <div className="admin_details mt-4">
+                                            {toolData?.views > 0 && (
+                                                <>
+                                                    <div className="date_of_blog_cont">
+                                                        <FaEye size={16} color="rgba(0, 0, 0, 0.64)" />
+                                                        <p className="date_of_blog">{t('views')}: {toolData?.views}</p>
+                                                    </div>
+                                                    <div className="vLine"></div>
+                                                </>
+                                            )}
+                                            {/* Date on single AI tool page - re-enable to show again
                                             <div className="date_of_blog_cont">
-                                                <FaEye size={16} color="rgba(0, 0, 0, 0.64)" />
-                                                <p className="date_of_blog">{t('views')}: {toolData?.views}</p>
+                                                <FaRegCalendarCheck size={16} color="rgba(0, 0, 0, 0.64)" />
+                                                <p className="date_of_blog">{t('postedOn')}: {formatDateMonth(toolData?.created_at)}</p>
                                             </div>
-                                            <div className="vLine"></div>
-                                        </>
-                                    )}
-                                    {/* Date on single AI tool page - re-enable to show again
-                                    <div className="date_of_blog_cont">
-                                        <FaRegCalendarCheck size={16} color="rgba(0, 0, 0, 0.64)" />
-                                        <p className="date_of_blog">{t('postedOn')}: {formatDateMonth(toolData?.created_at)}</p>
-                                    </div>
-                                    */}
-                                </div>
-
-                                <div className="link_tag_cont mt-4">
-                                    <div className="share_cont">
-                                        <p className="share_blog">{t('shareThisOnSocialMedia')}</p>
-                                        <div className="share_icons_cont">
-                                            <button onClick={handleCopyUrl} className="copyClipboardBtn">
-                                                <BiLink size={24} color="#595B6C" />
-                                            </button>
-                                            <FacebookShareButton url={currentUrl}>
-                                                <BiLogoFacebook size={24} color="#595B6C" />
-                                            </FacebookShareButton>
-                                            <TwitterShareButton url={currentUrl}>
-                                                <RiTwitterXLine size={21} color="#595B6C" />
-                                            </TwitterShareButton>
-                                            <WhatsappShareButton url={currentUrl} title={toolData?.title}>
-                                                <BiLogoWhatsapp size={24} color="#595B6C" />
-                                            </WhatsappShareButton>
+                                            */}
                                         </div>
-                                    </div>
-                                </div>
+
+                                        <div className="link_tag_cont mt-4">
+                                            <div className="share_cont">
+                                                <p className="share_blog">{t('shareThisOnSocialMedia')}</p>
+                                                <div className="share_icons_cont">
+                                                    <button onClick={handleCopyUrl} className="copyClipboardBtn">
+                                                        <BiLink size={24} color="#595B6C" />
+                                                    </button>
+                                                    <FacebookShareButton url={currentUrl}>
+                                                        <BiLogoFacebook size={24} color="#595B6C" />
+                                                    </FacebookShareButton>
+                                                    <TwitterShareButton url={currentUrl}>
+                                                        <RiTwitterXLine size={21} color="#595B6C" />
+                                                    </TwitterShareButton>
+                                                    <WhatsappShareButton url={currentUrl} title={toolData?.title}>
+                                                        <BiLogoWhatsapp size={24} color="#595B6C" />
+                                                    </WhatsappShareButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {relatedTools?.length > 0 && (
+                    {isIframeLoaded && relatedTools?.length > 0 && (
                         <div className="mt-5">
                             <h4 className="pop_cat_head mb-4">{t('relatedTools')}</h4>
                             <div className="row blog_card_row_gap">
