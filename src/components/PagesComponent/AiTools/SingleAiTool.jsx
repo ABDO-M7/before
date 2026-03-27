@@ -11,11 +11,15 @@ import { store } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from "react-icons/bi"
-import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from "react-share"
 import { RiTwitterXLine } from "react-icons/ri"
 import toast from "react-hot-toast"
 import React from "react"
-import HTMLContentRenderer from '@/components/DynamicHTMLContent/HTMLContentRenderer';
+import dynamic from "next/dynamic"
+
+const FacebookShareButton = dynamic(() => import("react-share").then(mod => mod.FacebookShareButton), { ssr: false })
+const TwitterShareButton = dynamic(() => import("react-share").then(mod => mod.TwitterShareButton), { ssr: false })
+const WhatsappShareButton = dynamic(() => import("react-share").then(mod => mod.WhatsappShareButton), { ssr: false })
+const HTMLContentRenderer = dynamic(() => import('@/components/DynamicHTMLContent/HTMLContentRenderer'), { ssr: false })
 
 const SingleAiTool = () => {
     const dispatch = useDispatch()
@@ -100,6 +104,7 @@ const SingleAiTool = () => {
                                     <HTMLContentRenderer
                                         htmlContent={toolData?.description || ''}
                                         contentId={`tool-description-${toolSlug}`}
+                                        deferIframeLoadMs={2500}
                                     />
                                 </div>
 

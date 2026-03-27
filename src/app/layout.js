@@ -81,7 +81,7 @@ export default async function RootLayout({ children }) {
         {/* ✅ Resource Hints - Preconnect to API domain from env (no hardcoded URL) */}
         {API_ORIGIN && (
           <>
-            <link rel="preconnect" href={API_ORIGIN} />
+            <link rel="preconnect" href={API_ORIGIN} crossOrigin="anonymous" />
             <link rel="dns-prefetch" href={API_ORIGIN} />
           </>
         )}

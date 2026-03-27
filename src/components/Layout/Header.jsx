@@ -571,8 +571,7 @@ const Header = ({ initialQuickSearchItems }) => {
                     className="header_logo"
                     onErrorCapture={placeholderImage}
                     style={{
-                      height: 'auto',
-                      minHeight: '50px',
+                      aspectRatio: '140/50',
                       maxWidth: '140px',
                       objectFit: 'contain',
                       display: 'block'
@@ -638,8 +637,7 @@ const Header = ({ initialQuickSearchItems }) => {
                       className="header_logo"
                       onErrorCapture={placeholderImage}
                       style={{
-                        height: 'auto',
-                        width: 'auto',
+                        aspectRatio: '140/50',
                         maxWidth: '140px',
                         objectFit: 'contain',
                         display: 'block'
