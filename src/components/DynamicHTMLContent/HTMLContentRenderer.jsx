@@ -248,6 +248,7 @@ export default function HTMLContentRenderer({
         <iframe
           key={`${contentId}-${key}`}
           srcDoc={preparedHtml}
+          loading="lazy"
           style={{
             width: '100%',
             height: iframeHeight,

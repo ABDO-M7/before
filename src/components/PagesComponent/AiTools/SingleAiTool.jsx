@@ -91,7 +91,7 @@ const SingleAiTool = () => {
 
                                 {toolData?.show_image && toolData?.image && (
                                     <Image
-                                        loading="lazy"
+                                        priority={true}
                                         src={normalizeImageUrl(getCompressedImage(toolData, 'large', toolData.image))}
                                         width={838}
                                         height={500}
@@ -104,7 +104,6 @@ const SingleAiTool = () => {
                                     <HTMLContentRenderer
                                         htmlContent={toolData?.description || ''}
                                         contentId={`tool-description-${toolSlug}`}
-                                        deferIframeLoadMs={2500}
                                     />
                                 </div>
 
