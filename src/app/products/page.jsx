@@ -52,7 +52,7 @@ const ProductsPage = async () => {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        itemListElement: AllItems.map((product, index) => ({
+        itemListElement: (AllItems?.data || []).map((product, index) => ({
             "@type": "ListItem",
             position: index + 1, // Position starts at 1
             item: {
