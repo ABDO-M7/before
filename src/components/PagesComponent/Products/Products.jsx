@@ -27,7 +27,7 @@ import ComponentErrorBoundary from '@/components/ErrorBoundary/ComponentErrorBou
 
 
 
-const Products = ({ breadcrumbPath: breadcrumbPathProp } = {}) => {
+const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], paginationData = {} } = {}) => {
     const searchParams = useSearchParams()
     const { lat, long } = useSelector(getCityData)
     const CurrentLanguage = useSelector(CurrentLanguageData)
@@ -35,12 +35,12 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp } = {}) => {
     const search = useSelector(SearchData)
     const pendingQuickSearchFilters = useSelector(pendingQuickSearchFiltersData)
     const userData = useSelector(userSignUpData);
-    const [IsLoading, setIsLoading] = useState(false)
-    const [searchedData, setSearchedData] = useState([])
+    const [IsLoading, setIsLoading] = useState(initialData.length === 0)
+    const [searchedData, setSearchedData] = useState(initialData)
     const sortBy = useSelector(categorySortBy)
     const view = useSelector(ViewCategory)
-    const [currentPage, setCurrentPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(paginationData?.current_page || 1);
+    const [lastPage, setLastPage] = useState(paginationData?.last_page || 1);
     const [selectedLocationKey, setSelectedLocationKey] = useState(['all_countries'])
     const [MinMaxPrice, setMinMaxPrice] = useState({
         min_price: '',
@@ -494,13 +494,13 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp } = {}) => {
                                                             view === "list" ? (
                                                                 <div className="col-12" key={item.id || index}>
                                                                     <Link href={userData?.id === item?.user_id ? `/my-listing/${encodeURIComponent(item?.slug || '')}` : `/product-details/${encodeURIComponent(item?.slug || '')}`} prefetch={false} target="_blank">
-                                                                        <ProdcutHorizontalCard data={item} handleLike={handleLike} />
+                                                                        <ProdcutHorizontalCard data={item} handleLike={handleLike} priority={index < 4} />
                                                                     </Link>
                                                                 </div>
                                                             ) : (
                                                                 <div className="col-12 col-md-6 col-lg-4 col-xxl-4" key={item.id || index}>
                                                                     <ComponentErrorBoundary componentName="ProductCard">
-                                                                        <ProductCard data={item} handleLike={handleLike} priority={index < 2} />
+                                                                        <ProductCard data={item} handleLike={handleLike} priority={index < 4} />
                                                                     </ComponentErrorBoundary>
                                                                 </div>
                                                             )

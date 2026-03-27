@@ -38,7 +38,7 @@ const getAllItems = async () => {
             }
         );
         const data = await res.json();
-        return data?.data?.data || [];
+        return data?.data || {};
     } catch (error) {
         console.error('Error fetching Product Items Data:', error);
         return [];
@@ -82,7 +82,7 @@ const ProductsPage = async () => {
         <>
             <JsonLd data={jsonLd} />
             <Layout>
-                <Products />
+                <Products initialData={AllItems?.data || []} paginationData={AllItems} />
             </Layout>
         </>
     )

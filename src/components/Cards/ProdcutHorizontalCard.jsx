@@ -13,7 +13,7 @@ import { toggleLoginModal } from '@/redux/reuducer/globalStateSlice'
 import { settingsData } from '@/redux/reuducer/settingSlice';
 
 
-const ProdcutHorizontalCard = ({ data, handleLike }) => {
+const ProdcutHorizontalCard = ({ data, handleLike, priority = false }) => {
     const userData = useSelector(userSignUpData)
     const systemSettingsData = useSelector(settingsData);
     const settings = systemSettingsData?.data;
@@ -68,12 +68,14 @@ const ProdcutHorizontalCard = ({ data, handleLike }) => {
             <div className='product_horizontal_card card'>
                 <div className="product_img_div">
                     <Image 
-                        loading="lazy"
                         src={imageSrc} 
                         width={220} 
                         height={190} 
                         alt={data?.name || "Product"} 
                         className="prodcut_img" 
+                        priority={priority}
+                        loading={priority ? "eager" : "lazy"}
+                        {...(priority ? { fetchPriority: "high" } : {})}
                         onError={(e) => {
                             if (e.target.src !== placeholderImageUrl) {
                                 e.target.src = placeholderImageUrl;
