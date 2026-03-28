@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef, memo, useTransition, Suspense } from "react";
+import { useEffect, useState, useRef, memo, useTransition, Suspense, useMemo } from "react";
 // import { useDeferredValue } from "react"; // unused (deferredSearchQuery was never used in render)
 // import dynamic from "next/dynamic";
 import Image from "next/image";
