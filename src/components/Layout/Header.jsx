@@ -48,7 +48,7 @@ import { categoryApi, quickSearchesApi } from "@/utils/api";
 // FilterTree removed — commented out in drawer, import antd Tree unnecessarily
 const LocationModal = dynamic(() => import("../LandingPage/LocationModal"), { ssr: false });
 import { saveOfferData } from "@/redux/reuducer/offerSlice";
-import HeaderCategories from "./HeaderCategories";
+const HeaderCategories = dynamic(() => import("./HeaderCategories"), { ssr: false });
 const ProfileDropdown = dynamic(() => import("../Profile/ProfileDropdown"), { ssr: false });
 const MailSentSucessfully = dynamic(() => import("../Auth/MailSentSucessfully"), { ssr: false });
 // ✅ Lazy load auth modals (heavy: react-phone-input-2, antd) - load only when needed

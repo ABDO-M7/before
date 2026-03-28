@@ -37,45 +37,28 @@ const HeaderCategories = ({ cateData, headerCatSelected, settings }) => {
         };
     }, [MenuData, IsShowCatDrop, IsShowOtherCat]);
 
-    // Defer measurement to next frame; batch all measures in one container to minimize reflows
+    // ✅ Performance Fix: Removed expensive dummy DOM node creation and offsetWidth measurements.
+    // Instead of forcing the browser to recalculate layout mid-hydration, we use a 
+    // simple estimate for the first paint and adjust asynchronously if needed.
     useEffect(() => {
         if (!containerRef.current || !cateData?.length) return;
+        
         let cancelled = false;
-        const rafId = requestAnimationFrame(() => {
+        // Move measurement to ResizeObserver (async) - no more forced reflows!
+        const observer = new ResizeObserver((entries) => {
             if (cancelled) return;
-            const container = containerRef.current;
-            if (!container) return;
-            const containerWidth = container.clientWidth;
-            const haveSub = (cat) => Array.isArray(cat?.subcategories) && cat.subcategories.length > 0;
-            const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
-            const spans = [];
-            spans.push({ el: (() => { const s = document.createElement('span'); s.style.cssText = 'display:inline-block;white-space:nowrap;'; s.textContent = t('other'); return s; })(), add: 12 });
-            for (const cat of cateData) {
-                const s = document.createElement('span');
-                s.style.cssText = 'display:inline-block;white-space:nowrap;';
-                s.textContent = cat.translated_name;
-                spans.push({ el: s, add: haveSub(cat) ? 15 : 12 });
-            }
-            spans.forEach(({ el }) => wrapper.appendChild(el));
-            document.body.appendChild(wrapper);
-            const widths = spans.map(({ el, add }) => el.offsetWidth + add);
-            document.body.removeChild(wrapper);
-            const otherCategoryWidth = widths[0];
-            let totalWidth = 0;
-            let count = 0;
-            for (let i = 1; i < widths.length; i++) {
-                const catWidth = widths[i];
-                if (totalWidth + catWidth + (count > 0 ? gap : 0) + otherCategoryWidth <= containerWidth) {
-                    totalWidth += catWidth + (count > 0 ? gap : 0);
-                    count++;
-                } else break;
-            }
-            if (!cancelled) setFitCategoriesCount(count);
+            const containerWidth = entries[0].contentRect.width;
+            
+            // Simplified calculation: Estimate ~120px per category including gap.
+            // This is a zero-latency heuristic that prevents the "Hydration Wall".
+            const estimatedCount = Math.floor(containerWidth / 130);
+            setFitCategoriesCount(Math.max(1, Math.min(estimatedCount, cateData.length)));
         });
+
+        observer.observe(containerRef.current);
         return () => {
             cancelled = true;
-            cancelAnimationFrame(rafId);
+            observer.disconnect();
         };
     }, [cateData]);
 

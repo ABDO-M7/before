@@ -4,9 +4,9 @@ import dynamic from "next/dynamic";
 
 // ✅ Lazy-load Header & Footer (antd, Swiper, SweetAlert2, Firebase, react-icons) – separate chunks for faster initial load
 const MainHeader = dynamic(() => import("./MainHeader"), { ssr: true });
-const Footer = dynamic(() => import("./Footer"), { ssr: true });
-const BottomNavigationBar = dynamic(() => import("./BottomNavigationBar"), { ssr: true });
-const PushNotificationLayout = dynamic(() => import("../firebaseNotification/PushNotificationLayout"), { ssr: true });
+const Footer = dynamic(() => import("./Footer"), { ssr: false });
+const BottomNavigationBar = dynamic(() => import("./BottomNavigationBar"), { ssr: false });
+const PushNotificationLayout = dynamic(() => import("../firebaseNotification/PushNotificationLayout"), { ssr: false });
 import { settingsData, settingsSucess } from "@/redux/reuducer/settingSlice";
 import { settingsApi } from "@/utils/api";
 import { useDispatch, useSelector } from "react-redux";

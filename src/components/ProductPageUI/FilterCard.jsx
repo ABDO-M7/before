@@ -5,8 +5,8 @@ const Radio = dynamic(() => import('antd').then(mod => mod.Radio), { ssr: false 
 const Slider = dynamic(() => import('antd').then(mod => mod.Slider), { ssr: false });
 import { Fragment, useState, useTransition } from 'react';
 const DownOutlined = dynamic(() => import('@ant-design/icons').then(mod => mod.DownOutlined), { ssr: false });
-import FilterTree from '../Category/FilterTree';
-import LocationTree from '../Category/LocationTree';
+const FilterTree = dynamic(() => import('../Category/FilterTree'), { ssr: false });
+const LocationTree = dynamic(() => import('../Category/LocationTree'), { ssr: false });
 import { t } from '@/utils';
 import { useSelector } from 'react-redux';
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice';
