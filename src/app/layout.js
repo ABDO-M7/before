@@ -25,8 +25,10 @@ const cairo = Cairo({
 import "../../public/css/style.css";
 import { Toaster } from "react-hot-toast";
 import CSSLoader from "@/components/CSSLoader";
+import DeferredPrefetcher from "@/components/DeferredPrefetcher";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Script from "next/script";
+import DeferredAnalytics from "@/components/DeferredAnalytics";
 
 const SITE_URL = process.env.NEXT_PUBLIC_WEB_URL || 'https://arablaza.com';
 const SITE_NAME = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
