@@ -134,9 +134,6 @@ export default async function RootLayout({ children }) {
             {/* ✅ Prioritize Page Content: Render children FIRST */}
             {children}
 
-            {/* ✅ Defer non-critical hydration blocks to clear main-thread for LCP */}
-            <CSSLoader />
-            <DeferredPrefetcher />
             {/* ✅ Optimized Analytics: Load ONLY during idle time (lazyOnload) */}
             {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
               <Script
