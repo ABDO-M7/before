@@ -189,7 +189,15 @@ const nextConfig = {
     // ✅ Inline CSS to eliminate render-blocking stylesheet requests (~220ms Lighthouse savings)
     inlineCss: true,
     // ✅ Automate tree-shaking for heavy libraries
-    optimizePackageImports: ['@mui/material', 'antd', '@mui/icons-material', 'react-icons'],
+    optimizePackageImports: [
+      '@mui/material', 
+      'antd', 
+      '@mui/icons-material', 
+      'react-icons', 
+      'react-phone-input-2', 
+      'react-hot-toast',
+      'sweetalert2'
+    ],
   },
   // ✅ Performance optimization
   poweredByHeader: false, // Remove X-Powered-By header for security

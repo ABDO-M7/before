@@ -16,7 +16,7 @@ if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
 const cairo = Cairo({
   subsets: ["latin", "arabic"],
   weight: ["400", "500", "600", "700"],
-  display: "swap",
+  display: "optional", // ✅ Use 'optional' to prevent font-loading from blocking the LCP paint
   variable: "--primary-font",
   preload: true,
 });
