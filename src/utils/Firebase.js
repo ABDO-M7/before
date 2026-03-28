@@ -31,7 +31,8 @@ const FirebaseData = () => {
     return auth;
   };
 
-  const authentication = typeof window !== 'undefined' ? getAuthentication() : null;
+  // Removed immediate call to getAuthentication() - making it truly lazy
+  const authentication = null; // No longer needed here, uses the getter below
 
   const messagingInstance = async () => {
     // Skip messaging in development mode
@@ -159,7 +160,15 @@ const FirebaseData = () => {
   const signOut = () => {
     return getAuthentication().signOut();
   };
-  return { firebase, authentication: getAuthentication, fetchToken, requestNotificationPermission, onMessageListener, signOut }
+
+  return { 
+    firebase, 
+    authentication: getAuthentication, // Exported as a getter function
+    fetchToken, 
+    requestNotificationPermission, 
+    onMessageListener, 
+    signOut 
+  }
 }
 
 export default FirebaseData;

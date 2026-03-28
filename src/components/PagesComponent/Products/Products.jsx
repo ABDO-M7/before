@@ -1,13 +1,13 @@
 'use client'
+import dynamic from "next/dynamic";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react"
 import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent"
 import ProdcutHorizontalCard from "@/components/Cards/ProdcutHorizontalCard"
 import ProductCard from "@/components/Cards/ProductCard"
-import FilterCard from "@/components/ProductPageUI/FilterCard"
-import { useEffect, useState, useMemo, useRef, useCallback } from "react"
+const FilterCard = dynamic(() => import("@/components/ProductPageUI/FilterCard"), { ssr: false });
 import { useSearchParams } from "next/navigation"
 import { IoCloseCircle, IoGrid } from "react-icons/io5"
 import { CgArrowsExchangeAltV } from "react-icons/cg";
-import dynamic from "next/dynamic";
 const Select = dynamic(() => import('@mui/material/Select'), { ssr: true });
 const MenuItem = dynamic(() => import('@mui/material/MenuItem'), { ssr: true });
 import { useDispatch, useSelector } from "react-redux"
@@ -112,7 +112,8 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
                 }
                 if (search !== "") params.search = search;
             }
-            if (page === 1) {
+            // ✅ Anti-Flicker: Skip loading state during hydration to preserve server-rendered LCP element
+            if (page === 1 && !isFirstRender.current) {
                 setIsLoading(true);
             }
             const res = await allItemApi.getItems(params);

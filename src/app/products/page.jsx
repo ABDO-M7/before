@@ -15,7 +15,7 @@ const fetchLcpData = async () => {
 
         const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
         const normalized = serverNormalizeImageUrl(rawImg);
-        // Match the ProductCard optimized URL for mobile (width 640, quality 75)
+        // Precise match for Next.js image proxy on mobile (width 640, quality 75)
         return serverGetOptimizedImageUrl(normalized, 640, 75);
     } catch (e) {
         return null;

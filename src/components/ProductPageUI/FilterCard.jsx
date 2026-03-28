@@ -1,7 +1,10 @@
-'use client'
-import { Checkbox, Collapse, Radio, Slider } from 'antd';
+import dynamic from 'next/dynamic';
+const Checkbox = dynamic(() => import('antd').then(mod => mod.Checkbox), { ssr: false });
+const Collapse = dynamic(() => import('antd').then(mod => mod.Collapse), { ssr: false });
+const Radio = dynamic(() => import('antd').then(mod => mod.Radio), { ssr: false });
+const Slider = dynamic(() => import('antd').then(mod => mod.Slider), { ssr: false });
 import { Fragment, useState, useTransition } from 'react';
-import { DownOutlined } from '@ant-design/icons';
+const DownOutlined = dynamic(() => import('@ant-design/icons').then(mod => mod.DownOutlined), { ssr: false });
 import FilterTree from '../Category/FilterTree';
 import LocationTree from '../Category/LocationTree';
 import { t } from '@/utils';
