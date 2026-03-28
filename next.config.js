@@ -187,8 +187,9 @@ const nextConfig = {
     // Enable advanced optimizations
     optimizeCss: true, // Optimize CSS output
     // ✅ Inline CSS to eliminate render-blocking stylesheet requests (~220ms Lighthouse savings)
-    // Trade-off: CSS is not cached separately from HTML (returning visitors re-download with page)
     inlineCss: true,
+    // ✅ Automate tree-shaking for heavy libraries
+    optimizePackageImports: ['@mui/material', 'antd', '@mui/icons-material', 'react-icons'],
   },
   // ✅ Performance optimization
   poweredByHeader: false, // Remove X-Powered-By header for security

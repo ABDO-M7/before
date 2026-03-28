@@ -2,7 +2,7 @@
 // firebase/app init handled by @/utils/firebaseApp
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging'
 import firebase from "firebase/compat/app"
-import { getAuth } from "firebase/auth";
+// import { getAuth } from "firebase/auth"; // Removed top-level import to break critical path chain
 import toast from 'react-hot-toast';
 import { createStickyNote, t } from '.';
 import { getFcmToken } from '@/redux/reuducer/settingSlice';
@@ -24,8 +24,13 @@ const FirebaseData = () => {
   }
 
   let auth = null;
-  const getAuthentication = () => {
+  /**
+   * ✅ Ultra-Lazy: Dynamically imports the Firebase Auth SDK only when called.
+   * This removes the 90KB auth/iframe.js from the critical LCP path.
+   */
+  const getAuthentication = async () => {
     if (!auth) {
+      const { getAuth } = await import("firebase/auth");
       auth = getAuth(firebaseApp);
     }
     return auth;
@@ -157,8 +162,9 @@ const FirebaseData = () => {
       return null;
     }
   };
-  const signOut = () => {
-    return getAuthentication().signOut();
+  const signOut = async () => {
+    const auth = await getAuthentication();
+    return auth.signOut();
   };
 
   return { 
