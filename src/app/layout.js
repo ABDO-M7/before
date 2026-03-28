@@ -29,7 +29,6 @@ import DeferredAnalytics from "@/components/DeferredAnalytics";
 import DeferredPrefetcher from "@/components/DeferredPrefetcher";
 import CSSLoader from "@/components/CSSLoader";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import RegistryProvider from "@/components/RegistryProvider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_WEB_URL || 'https://arablaza.com';
 const SITE_NAME = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
@@ -75,26 +74,25 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   return (
-    <RegistryProvider>
-      <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
-        <head>
-          <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#000000" />
-          {/* ✅ Resource Hints - Preconnect to API domain from env (no hardcoded URL) */}
-          {API_ORIGIN && (
-            <>
-              <link rel="preconnect" href={API_ORIGIN} crossOrigin="anonymous" />
-              <link rel="dns-prefetch" href={API_ORIGIN} />
-            </>
-          )}
+    <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+        {/* ✅ Resource Hints - Preconnect to API domain from env (no hardcoded URL) */}
+        {API_ORIGIN && (
+          <>
+            <link rel="preconnect" href={API_ORIGIN} crossOrigin="anonymous" />
+            <link rel="dns-prefetch" href={API_ORIGIN} />
+          </>
+        )}
 
-          {/* ✅ Facebook Domain Verification */}
-          {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
-            <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />
-          )}
+        {/* ✅ Facebook Domain Verification */}
+        {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
+          <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />
+        )}
 
-          {/* ✅ Critical CSS (inline) – provides minimal grid/flex structure to prevent FOUC */}
-          <style dangerouslySetInnerHTML={{ __html: `
+        {/* ✅ Critical CSS (inline) – provides minimal grid/flex structure to prevent FOUC */}
+        <style dangerouslySetInnerHTML={{ __html: `
             body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;}
             #main-content,main{min-height:50vh;}
             .container{width:100%;margin:0 auto;padding-left:12px;padding-right:12px;max-width:1320px;}
@@ -118,38 +116,37 @@ export default async function RootLayout({ children }) {
             @media(min-width:768px){.col-md-6{flex:0 0 50%;max-width:50%;}}
             @media(min-width:992px){.col-lg-3{flex:0 0 25%;max-width:25%;}.col-lg-4{flex:0 0 33.333333%;max-width:33.333333%;}.col-lg-8{flex:0 0 66.666667%;max-width:66.666667%;}.col-lg-9{flex:0 0 75%;max-width:75%;}.d-lg-flex{display:flex!important;}}
           ` }} />
-        </head>
+      </head>
 
-        <body>
-          {/* Facebook Pixel Noscript Fallback */}
-          {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
-            <noscript>
-              <img
-                height="1"
-                width="1"
-                style={{ display: "none" }}
-                src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID}&ev=PageView&noscript=1`}
-                alt=""
-                loading="lazy"
-              />
-            </noscript>
-          )}
+      <body>
+        {/* Facebook Pixel Noscript Fallback */}
+        {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID}&ev=PageView&noscript=1`}
+              alt=""
+              loading="lazy"
+            />
+          </noscript>
+        )}
 
-          <AppProviders>
-            <ErrorBoundary name="RootLayout">
-              <Toaster position="top-center" reverseOrder={false} />
-              
-              {/* ✅ Prioritize Page Content: Render children FIRST */}
-              {children}
+        <AppProviders>
+          <ErrorBoundary name="RootLayout">
+            <Toaster position="top-center" reverseOrder={false} />
+            
+            {/* ✅ Prioritize Page Content: Render children FIRST */}
+            {children}
 
-              {/* ✅ Defer non-critical hydration blocks to clear main-thread for LCP */}
-              <CSSLoader />
-              <DeferredPrefetcher />
-              <DeferredAnalytics />
-            </ErrorBoundary>
-          </AppProviders>
-        </body>
-      </html>
-    </RegistryProvider>
+            {/* ✅ Defer non-critical hydration blocks to clear main-thread for LCP */}
+            <CSSLoader />
+            <DeferredPrefetcher />
+            <DeferredAnalytics />
+          </ErrorBoundary>
+        </AppProviders>
+      </body>
+    </html>
   );
 }
