@@ -739,19 +739,6 @@ export const isEmptyObject = (obj) => {
   return Object.keys(obj).length === 0;
 };
 
-// Create a temporary element to measure the width of category names
-
-export const measureCategoryWidth = (categoryName) => {
-  const tempElement = document.createElement("span");
-  tempElement.style.display = "inline-block";
-  tempElement.style.visibility = "hidden";
-  tempElement.style.position = "absolute";
-  tempElement.innerText = categoryName;
-  document.body.appendChild(tempElement);
-  const width = tempElement.offsetWidth + 15; //icon width(12) + gap(3) between category and icon
-  document.body.removeChild(tempElement);
-  return width;
-};
 
 export const formatTime = (dateString) => {
   const date = new Date(dateString);

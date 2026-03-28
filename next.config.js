@@ -337,68 +337,48 @@ const nextConfig = {
         // ✅ Advanced code splitting
         splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 50,
-          maxInitialRequests: 50,
-          minSize: 10000,
-          maxSize: 100000,
+          maxAsyncRequests: 60,
+          maxInitialRequests: 60,
+          minSize: 5000,
+          maxSize: 80000, // ✅ Force tiny shards (was 100KB)
+          enforceSizeThreshold: 50000,
           cacheGroups: {
             default: false,
             vendors: false,
-            // ✅ Vendor chunk for large libraries
+            // ✅ Force all heavy icons into a single parallel-loading chunk
+            icons: {
+              name: 'icons',
+              test: /[\\/]node_modules[\\/](@ant-design|react-icons|@mui\/icons-material)[\\/]/,
+              chunks: 'all',
+              priority: 40,
+              enforce: true,
+              reuseExistingChunk: true,
+            },
+            // ✅ Dedicated vendor chunk for framework core
             vendor: {
               name: 'vendor',
               chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-              minChunks: 1,
+              test: /[\\/]node_modules[\\/](react|react-dom|next|@reduxjs|react-redux|redux-persist)[\\/]/,
+              priority: 30,
+              enforce: true,
               reuseExistingChunk: true,
             },
-            // ✅ Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
-            },
-            // ✅ Ant Design chunk (large library)
+            // ✅ Ant Design Styles & Components
             antd: {
               name: 'antd',
               test: /[\\/]node_modules[\\/]antd[\\/]/,
               chunks: 'all',
-              priority: 30,
-              reuseExistingChunk: true,
-            },
-            // ✅ MUI chunk (large library)
-            mui: {
-              name: 'mui',
-              test: /[\\/]node_modules[\\/]@mui[\\/]/,
-              chunks: 'all',
-              priority: 30,
-              reuseExistingChunk: true,
-            },
-            // ✅ Swiper chunk (large library, used in carousels)
-            swiper: {
-              name: 'swiper',
-              test: /[\\/]node_modules[\\/]swiper[\\/]/,
-              chunks: 'all',
               priority: 25,
+              enforce: true,
               reuseExistingChunk: true,
             },
-            // ✅ React Leaflet chunk (large library, used in maps)
-            reactLeaflet: {
-              name: 'react-leaflet',
-              test: /[\\/]node_modules[\\/]react-leaflet[\\/]/,
+            // ✅ Common chunks for everything else
+            common: {
+              name: 'common',
+              minChunks: 1,
               chunks: 'all',
-              priority: 25,
-              reuseExistingChunk: true,
-            },
-            // ✅ Redux chunk (state management)
-            redux: {
-              name: 'redux',
-              test: /[\\/]node_modules[\\/](@reduxjs|react-redux|redux-persist)[\\/]/,
-              chunks: 'all',
-              priority: 20,
+              priority: 10,
+              enforce: true,
               reuseExistingChunk: true,
             },
           },

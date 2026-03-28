@@ -41,7 +41,13 @@ const LandingPageHeader = () => {
                 if (show) {
                     setShow(false)
                 }
-                dispatch(setCurrentLanguage(res?.data?.data));
+                /** ✅ Performance: Defer Redux dispatch to idle time to prioritize LCP paint */
+                const triggerDispatch = () => dispatch(setCurrentLanguage(res?.data?.data));
+                if (typeof window !== 'undefined' && window.requestIdleCallback) {
+                  window.requestIdleCallback(triggerDispatch);
+                } else {
+                  setTimeout(triggerDispatch, 2000); // 2s fallback
+                }
 
             }
         } catch (error) {
@@ -65,7 +71,13 @@ const LandingPageHeader = () => {
                 toast.error(res?.data?.message)
             }
             else {
-                dispatch(setCurrentLanguage(res?.data?.data));
+                /** ✅ Performance: Defer Redux dispatch to idle time to prioritize LCP paint */
+                const triggerDispatch = () => dispatch(setCurrentLanguage(res?.data?.data));
+                if (typeof window !== 'undefined' && window.requestIdleCallback) {
+                  window.requestIdleCallback(triggerDispatch);
+                } else {
+                  setTimeout(triggerDispatch, 2000); // 2s fallback
+                }
             }
         } catch (error) {
             console.log(error)
