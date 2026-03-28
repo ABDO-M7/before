@@ -185,7 +185,7 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
           {/* ✅ CLS Fix: Match padding-top to critical CSS header reservation (fixed on desktop, relative on mobile) */}
           <main id="main-content" role="main" style={{ 
             minHeight: '100vh', 
-            paddingTop: isDesktop ? '140px' : '7px' 
+            paddingTop: !isMobile ? '140px' : '7px' 
           }}>{children}</main>
           {showNonCriticalChrome ? <Footer /> : null}
           {showNonCriticalChrome ? <BottomNavigationBar /> : null}
