@@ -70,9 +70,9 @@ export default function HTMLContentRenderer({
   // Use @font-face with the same Google Fonts URL but load it non-blocking via font-display:swap.
   // On repeat visits, the browser serves from disk cache (no network request).
   const cairoFontLink = `<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">`;
-  const cairoFontStyle = `* { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }`;
+  const cairoFontStyle = `body { font-family: 'Cairo', system-ui, -apple-system, sans-serif; }`;
 
-  // ✅ Strip heavy external resources (Tailwind CDN, OTHER Google Fonts, Font Awesome CDN)
+  // ✅ Strip heavy external resources (Tailwind CDN, OTHER Google Fonts)
   // These add ~300 KiB+ of render-blocking resources to EVERY page that embeds this iframe
   // Note: We strip all Google Fonts first, then inject only Cairo after
   const stripHeavyResources = (html) => {
@@ -81,11 +81,7 @@ export default function HTMLContentRenderer({
       .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '<script src="https://cdn.tailwindcss.com" defer></script>')
       // (We handle critical-path impact by deferring the iframe mount on the homepage.)
       // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
-      // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
-      .replace(/<link[^>]*href=["'][^"']*fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '')
-      // Remove Font Awesome CDN (all.min.css ~19 KiB + woff2 ~148 KiB)
-      .replace(/<link[^>]*href=["'][^"']*cdnjs\.cloudflare\.com[^"']*font-?awesome[^"']*["'][^>]*\/?>/gi, '')
-      .replace(/<link[^>]*href=["'][^"']*cdnjs\.cloudflare\.com[^"']*all\.min\.css[^"']*["'][^>]*\/?>/gi, '');
+      .replace(/<link[^>]*href=["'][^"']*fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '');
   };
 
   // Sanitize/Prepare the HTML content

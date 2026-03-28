@@ -98,23 +98,23 @@ export default async function RootLayout({ children }) {
             .container{width:100%;margin:0 auto;padding-left:12px;padding-right:12px;max-width:1320px;}
             .row{display:flex;flex-wrap:wrap;margin-left:-12px;margin-right:-12px;}
             .col-12{flex:0 0 100%;max-width:100%;padding-left:12px;padding-right:12px;}
-            .d-flex{display:flex!important;}
-            .flex-wrap{flex-wrap:wrap!important;}
-            .justify-content-between{justify-content:space-between!important;}
-            .align-items-center{align-items:center!important;}
-            .gap-1{gap:0.25rem!important;}
-            .gap-2{gap:0.5rem!important;}
-            .mb-2{margin-bottom:0.5rem!important;}
-            .mb-3{margin-bottom:1rem!important;}
-            .mt-auto{margin-top:auto!important;}
-            .w-100{width:100%!important;}
+            .d-flex{display:flex;}
+            .flex-wrap{flex-wrap:wrap;}
+            .justify-content-between{justify-content:space-between;}
+            .align-items-center{align-items:center;}
+            .gap-1{gap:0.25rem;}
+            .gap-2{gap:0.5rem;}
+            .mb-2{margin-bottom:0.5rem;}
+            .mb-3{margin-bottom:1rem;}
+            .mt-auto{margin-top:auto;}
+            .w-100{width:100%;}
             .text-truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
             .product_card_img_cont{min-height:180px;position:relative;background:#f1f5f9;overflow:hidden;}
             .product_horizontal_card .product_img_div{min-width:220px;height:190px;background:#f1f5f9;}
             .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
             .d-none{display:none!important;}
             @media(min-width:768px){.col-md-6{flex:0 0 50%;max-width:50%;}}
-            @media(min-width:992px){.col-lg-3{flex:0 0 25%;max-width:25%;}.col-lg-4{flex:0 0 33.333333%;max-width:33.333333%;}.col-lg-8{flex:0 0 66.666667%;max-width:66.666667%;}.col-lg-9{flex:0 0 75%;max-width:75%;}.d-lg-flex{display:flex!important;}}
+            @media(min-width:992px){.col-lg-3{flex:0 0 25%;max-width:25%;}.col-lg-4{flex:0 0 33.333333%;max-width:33.333333%;}.col-lg-8{flex:0 0 66.666667%;max-width:66.666667%;}.col-lg-9{flex:0 0 75%;max-width:75%;}.d-lg-flex{display:flex;}}
           ` }} />
       </head>
 
