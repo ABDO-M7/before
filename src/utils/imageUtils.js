@@ -90,3 +90,46 @@ export function getOptimalImageFormat() {
   
   return 'jpg'; // Fallback
 }
+/**
+ * ✅ Normalize image URL - Add API URL prefix if image is relative
+ * @param {string} imageUrl - Image URL from API
+ * @returns {string} - Normalized image URL
+ */
+export const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== 'string') return imageUrl;
+  if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) return imageUrl;
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl.replace(/([^:]\/)\/+/g, '$1');
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const cleanApiUrl = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
+  if (!cleanApiUrl) return imageUrl;
+
+  let cleanImagePath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  const baseEndsWithPublic = /\/public$/i.test(cleanApiUrl);
+  if (baseEndsWithPublic && /^\/public(\/|$)/i.test(cleanImagePath)) {
+    cleanImagePath = cleanImagePath.replace(/^\/public/i, '');
+  }
+
+  return `${cleanApiUrl}${cleanImagePath}`.replace(/([^:]\/)\/+/g, '$1');
+};
+
+/**
+ * Get compressed image path based on size preference
+ */
+export const getCompressedImage = (item, size = 'small', fallbackImage = null) => {
+  if (typeof item === 'string') return item || fallbackImage;
+  if (item && typeof item === 'object') {
+    const compressed = item?.compressed;
+    if (compressed && typeof compressed === 'object' && !Array.isArray(compressed)) {
+      const compressedPath = compressed[size];
+      if (compressedPath && compressedPath !== '' && compressedPath !== null) return compressedPath;
+      if (compressed.small) return compressed.small;
+      if (compressed.medium) return compressed.medium;
+      if (compressed.large) return compressed.large;
+    }
+    if (item.image) return item.image;
+  }
+  return fallbackImage || null;
+};

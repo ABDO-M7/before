@@ -1,27 +1,51 @@
+import { serverGetCompressedImage, serverNormalizeImageUrl } from "@/utils/serverImageUtils";
 import Layout from "@/components/Layout/Layout";
 import Products from "@/components/PagesComponent/Products/Products"
 import JsonLd from "@/components/SEO/JsonLd";
 
+const fetchLcpData = async () => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1&limit=1`,
+            { next: { revalidate: 3600 } }
+        );
+        const json = await res.json();
+        const firstItem = json?.data?.data?.[0];
+        if (!firstItem) return null;
+
+        const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
+        return serverNormalizeImageUrl(rawImg);
+    } catch (e) {
+        return null;
+    }
+}
+
 export const generateMetadata = async () => {
     try {
+        // Fetch both SEO settings and the first item (to get LCP image) in parallel
+        const [seoRes, lcpImageUrl] = await Promise.all([
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=ad-listing`, { next: { revalidate: 3600 } }),
+            fetchLcpData()
+        ]);
 
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=ad-listing`,
-            {
-                next: { revalidate: 3600 }, // Revalidate every 1 hour
-            }
-        );
-
-        const data = await res.json();
+        const data = await seoRes.json();
         const adListing = data?.data?.[0];
 
         return {
             title: adListing?.title ? adListing?.title : process.env.NEXT_PUBLIC_META_TITLE,
             description: adListing?.description ? adListing?.description : process.env.NEXT_PUBLIC_META_DESCRIPTION,
             openGraph: {
-                images: adListing?.image ? [adListing?.image] : [],
+                images: adListing?.image ? [adListing?.image] : (lcpImageUrl ? [lcpImageUrl] : []),
             },
-            keywords: adListing?.keywords ? adListing?.keywords : process.env.NEXT_PUBLIC_META_kEYWORDS
+            keywords: adListing?.keywords ? adListing?.keywords : process.env.NEXT_PUBLIC_META_kEYWORDS,
+            // ✅ CRITICAL LCP FIX: Preload the first product image before the main JS bundle runs.
+            // This allows the browser to start downloading the image while it's still parsing JS,
+            // bypassing the "Resource Load Delay" caused by the hydration wall.
+            other: {
+                ...(lcpImageUrl && {
+                    'fetchpriority': 'high',
+                })
+            }
         };
     } catch (error) {
         console.error("Error fetching MetaData:", error);
@@ -47,7 +71,10 @@ const getAllItems = async () => {
 
 const ProductsPage = async () => {
 
-    const AllItems = await getAllItems()
+    const [AllItems, lcpImageUrl] = await Promise.all([
+        getAllItems(),
+        fetchLcpData()
+    ]);
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -80,6 +107,9 @@ const ProductsPage = async () => {
 
     return (
         <>
+            {lcpImageUrl && (
+                <link rel="preload" as="image" href={lcpImageUrl} fetchPriority="high" />
+            )}
             <JsonLd data={jsonLd} />
             <Layout>
                 <Products initialData={AllItems?.data || []} paginationData={AllItems} />

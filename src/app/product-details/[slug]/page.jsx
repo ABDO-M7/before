@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout/Layout";
 import SingleProductDetail from "@/components/PagesComponent/SingleProductDetail/SingleProductDetail";
 import JsonLd from "@/components/SEO/JsonLd";
+import { serverGetCompressedImage, serverNormalizeImageUrl } from "@/utils/serverImageUtils";
 
 import { generateProductMetadata } from '@/utils/metadataHelpers';
 
@@ -93,6 +94,11 @@ const getItemData = async (slug) => {
 const SingleProductDetailPage = async ({ params }) => {
   const resolvedParams = await params;
   const product = await getItemData(resolvedParams?.slug);
+
+  const lcpImageUrl = product?.image 
+    ? serverNormalizeImageUrl(serverGetCompressedImage(product, 'large', Array.isArray(product.image) ? product.image[0] : product.image))
+    : null;
+
   const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
   const productUrl = product?.slug
     ? `${baseUrl}/product-details/${encodeURIComponent(product.slug)}`
@@ -124,6 +130,9 @@ const SingleProductDetailPage = async ({ params }) => {
 
   return (
     <>
+      {lcpImageUrl && (
+        <link rel="preload" as="image" href={lcpImageUrl} fetchPriority="high" />
+      )}
       <JsonLd data={jsonLd} />
       <Layout>
         <SingleProductDetail slug={resolvedParams?.slug} initialData={product} />

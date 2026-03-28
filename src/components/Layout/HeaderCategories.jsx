@@ -1,5 +1,6 @@
 'use client'
-import { t, getCompressedImage, normalizeImageUrl } from "@/utils";
+import { t } from "@/utils/translate";
+import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";

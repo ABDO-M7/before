@@ -11,7 +11,11 @@ const Drawer = dynamic(() => import("antd").then(mod => mod.Drawer), { ssr: fals
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
 // ✅ TBT Fix: Removed "swiper/css" import — Swiper is not used in Header
-import { getSlug, isEmptyObject, placeholderImage, t, truncate, getCompressedImage, normalizeImageUrl } from "@/utils";
+import { getSlug, isEmptyObject } from "@/utils/helpers";
+import { placeholderImage } from "@/utils/imageHandlers";
+import { t } from "@/utils/translate";
+import { truncate } from "@/utils/textUtils";
+import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils";
 import { BiPlanet } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { MdClose } from "react-icons/md";
