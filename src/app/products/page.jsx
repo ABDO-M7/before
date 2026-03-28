@@ -1,4 +1,4 @@
-import { serverGetCompressedImage, serverNormalizeImageUrl } from "@/utils/serverImageUtils";
+import { serverGetCompressedImage, serverNormalizeImageUrl, serverGetOptimizedImageUrl } from "@/utils/serverImageUtils";
 import Layout from "@/components/Layout/Layout";
 import Products from "@/components/PagesComponent/Products/Products"
 import JsonLd from "@/components/SEO/JsonLd";
@@ -14,7 +14,9 @@ const fetchLcpData = async () => {
         if (!firstItem) return null;
 
         const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
-        return serverNormalizeImageUrl(rawImg);
+        const normalized = serverNormalizeImageUrl(rawImg);
+        // Match the ProductCard optimized URL for mobile (width 640, quality 75)
+        return serverGetOptimizedImageUrl(normalized, 640, 75);
     } catch (e) {
         return null;
     }

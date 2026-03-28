@@ -23,7 +23,15 @@ const FirebaseData = () => {
     });
   }
 
-  const authentication = getAuth(firebaseApp);
+  let auth = null;
+  const getAuthentication = () => {
+    if (!auth) {
+      auth = getAuth(firebaseApp);
+    }
+    return auth;
+  };
+
+  const authentication = typeof window !== 'undefined' ? getAuthentication() : null;
 
   const messagingInstance = async () => {
     // Skip messaging in development mode
@@ -149,9 +157,9 @@ const FirebaseData = () => {
     }
   };
   const signOut = () => {
-    return authentication.signOut();
+    return getAuthentication().signOut();
   };
-  return { firebase, authentication, fetchToken, requestNotificationPermission, onMessageListener, signOut }
+  return { firebase, authentication: getAuthentication, fetchToken, requestNotificationPermission, onMessageListener, signOut }
 }
 
 export default FirebaseData;

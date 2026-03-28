@@ -182,8 +182,11 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
       ) : (
         <>
           <MainHeader initialQuickSearchItems={initialQuickSearchItems} />
-          {/* CLS: minHeight reserves space so main doesn't grow from 0; shift is from children loading - reserve space in page components (slider, sections) */}
-          <main id="main-content" role="main" style={{ minHeight: '100vh', paddingTop: '7px' }}>{children}</main>
+          {/* ✅ CLS Fix: Match padding-top to critical CSS header reservation (fixed on desktop, relative on mobile) */}
+          <main id="main-content" role="main" style={{ 
+            minHeight: '100vh', 
+            paddingTop: isDesktop ? '140px' : '7px' 
+          }}>{children}</main>
           {showNonCriticalChrome ? <Footer /> : null}
           {showNonCriticalChrome ? <BottomNavigationBar /> : null}
         </>

@@ -95,9 +95,12 @@ const SingleProductDetailPage = async ({ params }) => {
   const resolvedParams = await params;
   const product = await getItemData(resolvedParams?.slug);
 
-  const lcpImageUrl = product?.image 
-    ? serverNormalizeImageUrl(serverGetCompressedImage(product, 'large', Array.isArray(product.image) ? product.image[0] : product.image))
+  const rawLcpUrl = product?.image 
+    ? serverGetCompressedImage(product, 'medium', Array.isArray(product.image) ? product.image[0] : product.image)
     : null;
+    
+  // Match Next.js optimized proxy URL for mobile (width 640, quality 75)
+  const lcpImageUrl = rawLcpUrl ? serverGetOptimizedImageUrl(rawLcpUrl, 640, 75) : null;
 
   const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
   const productUrl = product?.slug

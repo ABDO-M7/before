@@ -7,7 +7,9 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { IoCloseCircle, IoGrid } from "react-icons/io5"
 import { CgArrowsExchangeAltV } from "react-icons/cg";
-import { Select, MenuItem } from '@mui/material';
+import dynamic from "next/dynamic";
+const Select = dynamic(() => import('@mui/material/Select'), { ssr: true });
+const MenuItem = dynamic(() => import('@mui/material/MenuItem'), { ssr: true });
 import { useDispatch, useSelector } from "react-redux"
 import { t } from "@/utils"
 import { SearchData, setSearch, pendingQuickSearchFiltersData, clearPendingQuickSearchFilters } from "@/redux/reuducer/searchSlice"

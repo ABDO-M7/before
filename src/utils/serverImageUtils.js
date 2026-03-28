@@ -52,3 +52,17 @@ export const serverGetCompressedImage = (item, size = 'small', fallbackImage = n
   }
   return fallbackImage || null;
 };
+
+/**
+ * ✅ Mimics Next.js internal image loader for preloading.
+ * URL format: /_next/image?url=[ENCODED_URL]&w=[WIDTH]&q=[QUALITY]
+ */
+export const serverGetOptimizedImageUrl = (url, width = 640, quality = 75) => {
+  if (!url) return null;
+  const normalized = serverNormalizeImageUrl(url);
+  // Ensure we don't double proxy if it's already a relative path or local
+  if (normalized.startsWith('/_next/image')) return normalized;
+  
+  const encodedUrl = encodeURIComponent(normalized);
+  return `/_next/image?url=${encodedUrl}&w=${width}&q=${quality}`;
+};
