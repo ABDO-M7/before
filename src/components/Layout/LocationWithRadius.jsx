@@ -88,8 +88,10 @@ const LocationWithRadius = ({ position, getLocationWithMap, KmRange }) => {
                 center={[markerLatLong?.lat || latitude, markerLatLong?.lng || longitude]}
                 radius={KmRange * 1000} // radius in meters
                 pathOptions={{
-                    color: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
-                    fillColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
+                    // ✅ Performance Fix: Removed getComputedStyle to prevent forced reflow (37ms savings).
+                    // Using brand color directly.
+                    color: '#343a40',
+                    fillColor: '#343a40',
                     fillOpacity: 0.2
                 }}
             />

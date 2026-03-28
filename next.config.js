@@ -337,10 +337,10 @@ const nextConfig = {
         // ✅ Advanced code splitting
         splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 30,
-          maxInitialRequests: 30,
-          minSize: 20000,
-          maxSize: 244000,
+          maxAsyncRequests: 50,
+          maxInitialRequests: 50,
+          minSize: 10000,
+          maxSize: 100000,
           cacheGroups: {
             default: false,
             vendors: false,

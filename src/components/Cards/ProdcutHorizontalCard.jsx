@@ -75,6 +75,7 @@ const ProdcutHorizontalCard = ({ data, handleLike, priority = false }) => {
                         className="prodcut_img" 
                         priority={priority}
                         loading={priority ? "eager" : "lazy"}
+                        decoding="async"
                         {...(priority ? { fetchPriority: "high" } : {})}
                         onError={(e) => {
                             if (e.target.src !== placeholderImageUrl) {

@@ -351,6 +351,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
           alt={data?.name || "Product"}
           priority={priority}
           loading={priority ? "eager" : "lazy"}
+          decoding="async"
           {...(priority ? { fetchPriority: "high" } : {})}
           // Reduce bytes for listing thumbnails (helps LCP on mobile category/search pages).
           quality={65}
