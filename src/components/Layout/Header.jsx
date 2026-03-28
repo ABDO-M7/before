@@ -181,12 +181,13 @@ const Header = ({ initialQuickSearchItems }) => {
   };
 
   useEffect(() => {
-    // Home page uses get-categories with featured=1 only (PopularCategories). Skip get-categories?page=1 on home.
-    if (pathname === "/") return;
+    // Categories are only needed for the header dropdown/search. 
+    // Defer fetching them on listing pages to prioritize LCP.
+    if (pathname === "/" || pathname === "/products" || pathname.startsWith('/category/')) return;
     if (cateData.length === 0) {
       getCategoriesData(1);
     }
-  }, []);
+  }, [pathname]);
 
   const translateCategories = (categories) => {
     return categories.map((category) => {
@@ -204,14 +205,16 @@ const Header = ({ initialQuickSearchItems }) => {
     });
   };
 
+  // ✅ Performance Fix: Translate categories in a useMemo instead of a dispatch-back-to-redux effect.
+  // This avoids infinite update loops and heavy main-thread work during hydration.
+  const translatedCateData = useMemo(() => {
+    if (!cateData || cateData.length === 0) return [];
+    return translateCategories(cateData);
+  }, [cateData, CurrentLanguage?.id]);
+
   useEffect(() => {
-    if (cateData.length > 0) {
-      const updatedCateData = translateCategories(cateData);
-      dispatch(setCateData(updatedCateData));
-    }
-    document.documentElement.lang =
-      CurrentLanguage?.code?.toLowerCase() || "ar";
-  }, [CurrentLanguage, cateData?.length]);
+    document.documentElement.lang = CurrentLanguage?.code?.toLowerCase() || "ar";
+  }, [CurrentLanguage?.code]);
 
   useEffect(() => {
     const categoryPathRegex = /^\/category(\/|$)/;

@@ -501,9 +501,7 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
                                                                 </div>
                                                             ) : (
                                                                 <div className="col-12 col-md-6 col-lg-4 col-xxl-4" key={item.id || index}>
-                                                                    <ComponentErrorBoundary componentName="ProductCard">
-                                                                        <ProductCard data={item} handleLike={handleLike} priority={index < 4} />
-                                                                    </ComponentErrorBoundary>
+                                                                    <ProductCard data={item} handleLike={handleLike} priority={index < 4} />
                                                                 </div>
                                                             )
                                                         ))}
