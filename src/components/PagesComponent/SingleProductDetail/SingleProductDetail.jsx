@@ -43,7 +43,7 @@ import { useSearchParams } from "next/navigation";
 
 
 
-const SingleProductDetail = ({ slug: slugFromParams }) => {
+const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
   // Decode slug if percent-encoded (e.g. Arabic) so API receives the actual string
   const slug = typeof slugFromParams === 'string' && slugFromParams.includes('%')
     ? decodeURIComponent(slugFromParams)
@@ -56,14 +56,28 @@ const SingleProductDetail = ({ slug: slugFromParams }) => {
   const CurrentLanguage = useSelector(CurrentLanguageData);
   const settingsData = systemSettingsData?.data?.data || {};
   const placeholderImageUrl = settingsData?.placeholder_image || '/assets/Transperant_Placeholder.png';
-  const [productData, setProductData] = useState({});
+  const [productData, setProductData] = useState(initialData || {});
   const [isBeginning, setIsBeginning] = useState(null);
   const [isEnd, setIsEnd] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [displayedImage, setDisplayedImage] = useState();
-  const [images, setImages] = useState([]); // For lightbox (large)
-  const [galleryThumbnails, setGalleryThumbnails] = useState([]); // For gallery row (small)
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize display arrays from SSR data to prevent FOUC / hydration gap
+  const getInitialImages = (data, type) => {
+    if (!data) return [];
+    const main = getCompressedImage(data, type, data?.image);
+    const gallery = data?.gallery_images?.map(img => getCompressedImage(img, type, typeof img === 'string' ? img : img?.image)) || [];
+    return [main, ...gallery].filter(Boolean).map(normalizeImageUrl);
+  };
+
+  const [displayedImage, setDisplayedImage] = useState(() => {
+    if (!initialData) return undefined;
+    const img = getCompressedImage(initialData, 'medium', initialData?.image);
+    return img ? normalizeImageUrl(img) : undefined;
+  });
+  const [images, setImages] = useState(() => getInitialImages(initialData, 'large')); 
+  const [galleryThumbnails, setGalleryThumbnails] = useState(() => getInitialImages(initialData, 'small')); 
+  
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isReportModal, setIsReportModal] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [isVideClicked, setIsVideClicked] = useState(false);
@@ -121,7 +135,9 @@ const SingleProductDetail = ({ slug: slugFromParams }) => {
   };
 
   useEffect(() => {
-    fetchProductData();
+    if (!initialData || Object.keys(initialData).length === 0) {
+      fetchProductData();
+    }
   }, []);
 
   const swipePrev = () => {
@@ -282,11 +298,13 @@ const SingleProductDetail = ({ slug: slugFromParams }) => {
                     <div className="display_img" style={{ position: 'relative', width: '100%', minHeight: '400px' }}>
                       {isVideClicked == false ? (
                         <Image
-                          loading="lazy"
+                          priority={true}
+                          loading="eager"
                           src={displayedImage ? normalizeImageUrl(displayedImage) : placeholderImageUrl}
                           fill
                           alt="display_img"
                           style={{ objectFit: 'contain' }}
+                          {...({ fetchPriority: "high" })}
                           onError={(e) => {
                             if (e.target.src !== placeholderImageUrl) {
                               e.target.src = placeholderImageUrl;

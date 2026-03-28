@@ -41,15 +41,10 @@ export default function CSSLoader() {
       });
     }
 
-    // Keep Bootstrap out of the Lighthouse measurement window.
-    // It still loads later for pages/interactions that need extended utility classes.
-    const fallbackTimer = setTimeout(() => {
-      loadNonCriticalCSS([DEFERRED_BOOTSTRAP_CSS]).catch(() => {});
-    }, 25000);
+    // Load Bootstrap using non-blocking strategy
+    loadNonCriticalCSS([DEFERRED_BOOTSTRAP_CSS]).catch(() => {});
 
-    return () => {
-      clearTimeout(fallbackTimer);
-    };
+    return () => {};
   }, []);
 
   return null; // This component doesn't render anything

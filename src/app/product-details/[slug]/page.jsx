@@ -126,7 +126,7 @@ const SingleProductDetailPage = async ({ params }) => {
     <>
       <JsonLd data={jsonLd} />
       <Layout>
-        <SingleProductDetail slug={resolvedParams?.slug} />
+        <SingleProductDetail slug={resolvedParams?.slug} initialData={product} />
       </Layout>
     </>
   );

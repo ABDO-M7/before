@@ -144,10 +144,12 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
         dispatch(setCategoryView(viewType))
     };
 
+    const isFirstRender = useRef(true)
     useEffect(() => {
-        // Skip initial fetch when pending quick search filters exist — they will be applied first,
-        // then setIsFetchSingleCatItem will trigger this effect again with correct params.
-        // Prevents two overlapping fetches (one wrong, one correct) where the wrong one can overwrite.
+        if (isFirstRender.current && searchedData && searchedData.length > 0) {
+            isFirstRender.current = false
+            return
+        }
         if (pendingQuickSearchFilters) return
         getProducts(1)
     }, [search, sortBy, IsFetchSingleCatItem, pendingQuickSearchFilters])
