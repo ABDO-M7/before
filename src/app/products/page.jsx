@@ -110,7 +110,14 @@ const ProductsPage = async () => {
     return (
         <>
             {lcpImageUrl && (
-                <link rel="preload" as="image" href={lcpImageUrl} fetchPriority="high" />
+                <link 
+                    rel="preload" 
+                    as="image" 
+                    href={lcpImageUrl} 
+                    fetchPriority="high" 
+                    imageSrcSet={`${lcpImageUrl} 1x`} // Correct hint for responsive images
+                    imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
             )}
             <JsonLd data={jsonLd} />
             <Layout>

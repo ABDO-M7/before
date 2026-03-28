@@ -24,10 +24,9 @@ const cairo = Cairo({
 // ✅ Critical CSS only – above-the-fold
 import "../../public/css/style.css";
 import { Toaster } from "react-hot-toast";
-import DeferredAnalytics from "@/components/DeferredAnalytics";
-import DeferredPrefetcher from "@/components/DeferredPrefetcher";
 import CSSLoader from "@/components/CSSLoader";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Script from "next/script";
 
 const SITE_URL = process.env.NEXT_PUBLIC_WEB_URL || 'https://arablaza.com';
 const SITE_NAME = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
@@ -138,7 +137,43 @@ export default async function RootLayout({ children }) {
             {/* ✅ Defer non-critical hydration blocks to clear main-thread for LCP */}
             <CSSLoader />
             <DeferredPrefetcher />
-            <DeferredAnalytics />
+            {/* ✅ Optimized Analytics: Load ONLY during idle time (lazyOnload) */}
+            {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+                strategy="lazyOnload"
+              />
+            )}
+            {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+              <Script id="google-analytics" strategy="lazyOnload">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+                `}
+              </Script>
+            )}
+            {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
+              <Script id="fb-pixel" strategy="lazyOnload">
+                {`
+                  !function(f,b,e,v,n,t,s)
+                  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                  n.queue=[];t=b.createElement(e);t.async=!0;
+                  t.src=v;s=b.getElementsByTagName(e)[0];
+                  s.parentNode.insertBefore(t,s)}(window, document,'script',
+                  'https://connect.facebook.net/en_US/fbevents.js');
+                  fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+                  fbq('track', 'PageView');
+                `}
+              </Script>
+            )}
+
+            {/* ✅ Defer non-critical hydration blocks */}
+            <CSSLoader />
+            <DeferredPrefetcher />
           </ErrorBoundary>
         </AppProviders>
       </body>

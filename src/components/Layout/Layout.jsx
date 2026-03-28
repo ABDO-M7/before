@@ -45,14 +45,15 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
     console.log("notification received");
   };
 
-  // Detect mobile device
+  // ✅ Performance Fix: Use matchMedia instead of window.innerWidth 
+  // to avoid forced reflows during hydration.
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const media = window.matchMedia("(max-width: 768px)");
+    const listener = (e) => setIsMobile(e.matches);
+    
+    setIsMobile(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
   }, []);
 
   // Keep body from horizontal overflow without a MutationObserver loop

@@ -2,7 +2,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { GiHamburgerMenu } from "react-icons/gi";
-import { Drawer } from 'antd';
+import dynamic from 'next/dynamic';
+const Drawer = dynamic(() => import('antd').then(mod => mod.Drawer), { ssr: false });
 import Link from 'next/link';
 import { isEmptyObject, placeholderImage, t } from '@/utils';
 import { getLanguageApi } from '@/utils/api';

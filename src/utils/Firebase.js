@@ -1,104 +1,54 @@
 'use client'
-// firebase/app init handled by @/utils/firebaseApp
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging'
-import firebase from "firebase/compat/app"
-// import { getAuth } from "firebase/auth"; // Removed top-level import to break critical path chain
-import toast from 'react-hot-toast';
-import { createStickyNote, t } from '.';
-import { getFcmToken } from '@/redux/reuducer/settingSlice';
+import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
 import firebaseApp from './firebaseApp';
+import { getFcmToken } from '@/redux/reuducer/settingSlice';
 
 const isDev = process.env.NODE_ENV === 'development';
 
+/**
+ * ✅ Modular Firebase Optimization:
+ * Removed the legacy "compat" SDK which was triggering the auth/iframe.js eagerly early.
+ * This modern V9+ structure ensures zero Firebase initialization work occurs during LCP.
+ */
 const FirebaseData = () => {
-  if (!firebase.apps.length) {
-    firebase.initializeApp({
-      apiKey: process.env.NEXT_PUBLIC_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_APP_ID,
-      measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
-    });
-  }
-
-  let auth = null;
-  /**
-   * ✅ Ultra-Lazy: Dynamically imports the Firebase Auth SDK only when called.
-   * This removes the 90KB auth/iframe.js from the critical LCP path.
-   */
-  const getAuthentication = async () => {
-    if (!auth) {
-      const { getAuth } = await import("firebase/auth");
-      auth = getAuth(firebaseApp);
+  let authInstance = null;
+  const getAuthentication = () => {
+    if (!authInstance) {
+      authInstance = getAuth(firebaseApp);
     }
-    return auth;
+    return authInstance;
   };
 
-  // Removed immediate call to getAuthentication() - making it truly lazy
-  const authentication = null; // No longer needed here, uses the getter below
-
   const messagingInstance = async () => {
-    // Skip messaging in development mode
-    if (isDev) {
-      return null;
-    }
+    if (isDev) return null;
     try {
-      const isSupportedBrowser = await isSupported();
-      if (isSupportedBrowser) {
+      if (await isSupported()) {
         return getMessaging(firebaseApp);
-      } else {
-        // Abo omar told from mw to hidden it
-        // do it to hidden the sticky note that show in the bottom of the page
-        // it was like this :Chat and Notification features are not supported on this browser. For a better user experience, please use our mobile application.
-        // createStickyNote();
-        return null;
       }
+      return null;
     } catch (err) {
       console.error('Error checking messaging support:', err);
       return null;
     }
   };
-  const fetchToken = async (setFcmToken) => {
-    // Skip FCM token fetching in development mode
-    if (isDev) {
-      console.log('[Dev] Skipping FCM token fetch - push notifications disabled in development');
-      return;
-    }
+
+  const fetchToken = async (setFcmTokenCallback) => {
+    if (isDev) return;
     try {
       if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
         const messaging = await messagingInstance();
-        if (!messaging) {
-          console.error('Messaging not supported.');
-          return;
-        }
-        // ✅ Only auto-fetch token if permission was already granted (returning user).
-        // Never call Notification.requestPermission() on page load — Lighthouse flags it
-        // and users distrust unprompted permission dialogs.
+        if (!messaging) return;
+        
         const currentPermission = Notification.permission;
         if (currentPermission === 'granted') {
-          getToken(messaging, {
+          const currentToken = await getToken(messaging, {
             vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
-          })
-            .then((currentToken) => {
-              if (currentToken) {
-                getFcmToken(currentToken);
-                setFcmToken(currentToken);
-              } else {
-                console.log('No FCM token available');
-              }
-            })
-            .catch((err) => {
-              console.error('Error retrieving token:', err);
-              if (err.message.includes('no active Service Worker')) {
-                registerServiceWorker(setFcmToken);
-              }
-            });
-        } else if (currentPermission === 'default') {
-          // Permission not yet asked — don't prompt on page load.
-          // Call requestNotificationPermission() from a user gesture (e.g. button click).
-          console.log('Notification permission not yet requested — waiting for user gesture.');
+          });
+          if (currentToken) {
+            getFcmToken(currentToken);
+            setFcmTokenCallback(currentToken);
+          }
         }
       }
     } catch (err) {
@@ -106,70 +56,40 @@ const FirebaseData = () => {
     }
   };
 
-  /**
-   * ✅ Call this from a user gesture (button click, toggle, etc.) to request permission.
-   * Example: <button onClick={() => requestNotificationPermission(setFcmToken)}>Enable Notifications</button>
-   */
-  const requestNotificationPermission = async (setFcmToken) => {
+  const requestNotificationPermission = async (setFcmTokenCallback) => {
     if (isDev) return;
     try {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
-        await fetchToken(setFcmToken);
+        await fetchToken(setFcmTokenCallback);
       }
     } catch (err) {
       console.error('Error requesting notification permission:', err);
     }
   };
 
-  const registerServiceWorker = (setFcmToken) => {
-    // Skip service worker registration in development mode
-    if (isDev) {
-      console.log('[Dev] Skipping service worker registration - disabled in development');
-      return;
-    }
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/firebase-messaging-sw.js')
-        .then((registration) => {
-          console.log('Service Worker registration successful with scope: ', registration.scope);
-          // After successful registration, try to fetch the token again
-          if (setFcmToken) {
-            fetchToken(setFcmToken);
-          }
-        })
-        .catch((err) => {
-          console.log('Service Worker registration failed: ', err);
-        });
-    }
-  };
-
   const onMessageListener = async () => {
-    // Skip message listener in development mode
-    if (isDev) {
-      // Return a never-resolving promise to avoid errors
-      return new Promise(() => {});
-    }
+    if (isDev) return new Promise(() => {});
     const messaging = await messagingInstance();
     if (messaging) {
       return new Promise((resolve) => {
-        onMessage(messaging, (payload) => {
-          resolve(payload);
-        });
+        onMessage(messaging, (payload) => resolve(payload));
       });
-    } else {
-      console.error('Messaging not supported.');
-      return null;
     }
+    return null;
   };
+
   const signOut = async () => {
-    const auth = await getAuthentication();
-    return auth.signOut();
+    try {
+      const auth = getAuthentication();
+      await firebaseSignOut(auth);
+    } catch (e) {
+      console.error('SignOut error:', e);
+    }
   };
 
   return { 
-    firebase, 
-    authentication: getAuthentication, // Exported as a getter function
+    authentication: getAuthentication, 
     fetchToken, 
     requestNotificationPermission, 
     onMessageListener, 

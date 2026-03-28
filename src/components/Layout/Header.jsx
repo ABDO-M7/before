@@ -159,7 +159,11 @@ const Header = ({ initialQuickSearchItems }) => {
 
   useEffect(() => {
     if (isEmptyObject(CurrentLanguage)) {
-      setDefaultLanguage();
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => setDefaultLanguage());
+      } else {
+        setTimeout(setDefaultLanguage, 100);
+      }
     }
   }, []);
 
