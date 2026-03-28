@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import { useRef } from 'react'; // unused
 
 /**
  * HTMLContentRenderer Component
@@ -66,27 +65,9 @@ export default function HTMLContentRenderer({
     return null;
   }
 
-  // Cairo font files are already cached by the browser from the parent page (next/font/google).
-  // Use @font-face with the same Google Fonts URL but load it non-blocking via font-display:swap.
-  // On repeat visits, the browser serves from disk cache (no network request).
-  const cairoFontLink = `<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">`;
-  const cairoFontStyle = `body { font-family: 'Cairo', system-ui, -apple-system, sans-serif; }`;
-
-  // ✅ Strip heavy external resources (Tailwind CDN, OTHER Google Fonts)
-  // These add ~300 KiB+ of render-blocking resources to EVERY page that embeds this iframe
-  // Note: We strip all Google Fonts first, then inject only Cairo after
-  const stripHeavyResources = (html) => {
-    return html
-      // Keep Tailwind CDN when needed for embedded tool UIs, but defer it so it doesn't block parsing.
-      .replace(/<script[^>]*src=["'][^"']*cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '<script src="https://cdn.tailwindcss.com" defer></script>')
-      // (We handle critical-path impact by deferring the iframe mount on the homepage.)
-      // Remove ALL Google Fonts <link> (we inject only Cairo after stripping)
-      .replace(/<link[^>]*href=["'][^"']*fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '');
-  };
-
-  // Sanitize/Prepare the HTML content
+  // Prepared HTML content
   const prepareHtml = (content) => {
-    const trimmedContent = stripHeavyResources(content.trim());
+    const trimmedContent = content.trim();
     const isFullHtml = trimmedContent.toLowerCase().includes('<html') || trimmedContent.toLowerCase().startsWith('<!doctype');
 
     const resizeScript = `
@@ -152,17 +133,9 @@ export default function HTMLContentRenderer({
             }
           }, true);
 
-          // Initial call (no polling interval to reduce forced reflow + CLS).
+          // Initial call
           if (document.readyState === 'complete') {
-            try {
-              if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(() => sendHeight());
-              } else {
-                sendHeight();
-              }
-            } catch (e) {
-              sendHeight();
-            }
+            sendHeight();
           } else {
             window.addEventListener('DOMContentLoaded', () => sendHeight(), { once: true });
           }
@@ -170,41 +143,30 @@ export default function HTMLContentRenderer({
       </script>
     `;
 
-    // ✅ Inject Cairo font into full HTML content
     if (isFullHtml) {
-      let result = trimmedContent;
-      // Inject Cairo font link + override style into <head>
-      if (result.toLowerCase().includes('</head>')) {
-        result = result.replace(/<\/head>/i, `${cairoFontLink}<style>${cairoFontStyle}</style></head>`);
-      } else if (result.toLowerCase().includes('<body')) {
-        result = result.replace(/<body/i, `${cairoFontLink}<style>${cairoFontStyle}</style><body`);
-      }
-      // Inject resize script before </body>
-      if (result.toLowerCase().includes('</body>')) {
-        return result.replace(/<\/body>/i, `${resizeScript}</body>`);
-      } else if (result.toLowerCase().includes('</html>')) {
-        return result.replace(/<\/html>/i, `${resizeScript}</html>`);
+      if (trimmedContent.toLowerCase().includes('</body>')) {
+        return trimmedContent.replace(/<\/body>/i, `${resizeScript}</body>`);
+      } else if (trimmedContent.toLowerCase().includes('</html>')) {
+        return trimmedContent.replace(/<\/html>/i, `${resizeScript}</html>`);
       } else {
-        return result + resizeScript;
+        return trimmedContent + resizeScript;
       }
     }
 
-    // If it's partial, wrap it with Cairo font
+    // Default wrapper for partial HTML
     return `
       <!DOCTYPE html>
       <html dir="rtl">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          ${cairoFontLink}
           <style>
             body { 
               margin: 0; 
               padding: 0; 
               overflow: hidden; 
-              font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+              font-family: system-ui, -apple-system, sans-serif;
             }
-            ${cairoFontStyle}
             img { max-width: 100%; height: auto; }
           </style>
         </head>
