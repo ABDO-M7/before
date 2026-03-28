@@ -10,7 +10,6 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { CgArrowsExchangeAltV } from "react-icons/cg";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import ProductHorizontalCardSkeleton from "@/components/Skeleton/ProductHorizontalCardSkeleton"
 import ProductCardSkeleton from "@/components/Skeleton/ProductCardSkeleton"
 import NoData from "@/components/NoDataFound/NoDataFound"
