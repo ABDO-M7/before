@@ -93,7 +93,13 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
                 if (MinMaxPrice?.min_price) params.min_price = MinMaxPrice?.min_price;
                 if (MinMaxPrice?.max_price) params.max_price = MinMaxPrice?.max_price;
                 if (DatePosted) params.posted_since = DatePosted;
-                if (urlCustomFields && Object.keys(urlCustomFields).length > 0) params.custom_fields = urlCustomFields;
+                if (urlCustomFields && Object.keys(urlCustomFields).length > 0) {
+                    const validDetails = {};
+                    Object.entries(urlCustomFields).forEach(([k, v]) => {
+                        if (v && v.length > 0) validDetails[k] = v;
+                    });
+                    if (Object.keys(validDetails).length > 0) params.custom_fields = validDetails;
+                }
                 if (IsShowKmRange) {
                     const useLat = urlLat != null ? urlLat : lat;
                     const useLong = urlLng != null ? urlLng : long;

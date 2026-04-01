@@ -101,20 +101,16 @@ export default async function RootLayout({ children }) {
         <style dangerouslySetInnerHTML={{ __html: `
             body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;overflow-x:hidden;}
             #main-content,main{min-height:70vh;padding-top:140px;}
-            .main-header-reserve{height:140px;position:fixed;top:0;left:0;right:0;background:#fff;z-index:100;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05);}
             .container{width:100%;margin:0 auto;max-width:1320px;padding-left:12px;padding-right:12px;}
             .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
             .d-none{display:none!important;}
             @media (max-width: 991px) {
               #main-content,main{padding-top:0;}
-              .main-header-reserve{height:120px;position:relative;}
             }
           ` }} />
       </head>
 
       <body>
-        {/* Placeholder to reserve space and prevent layout shifts during hydration */}
-        <div className="main-header-reserve sticky-top" />
         {/* Facebook Pixel Noscript Fallback */}
         {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
           <noscript>

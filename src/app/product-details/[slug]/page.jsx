@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout/Layout";
 import SingleProductDetail from "@/components/PagesComponent/SingleProductDetail/SingleProductDetail";
 import JsonLd from "@/components/SEO/JsonLd";
-import { serverGetCompressedImage, serverNormalizeImageUrl } from "@/utils/serverImageUtils";
+import { serverGetCompressedImage, serverNormalizeImageUrl, serverGetOptimizedImageUrl } from "@/utils/serverImageUtils";
 
 import { generateProductMetadata } from '@/utils/metadataHelpers';
 

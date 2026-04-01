@@ -99,8 +99,15 @@ const SingleCategory = ({ slug }) => {
                 if (MinMaxPrice?.min_price) params.min_price = MinMaxPrice?.min_price;
                 if (MinMaxPrice?.max_price) params.max_price = MinMaxPrice?.max_price;
                 if (DatePosted) params.posted_since = DatePosted;
-                if (catId) params.category_slug = catId;
-                if (ExtraDetails && Object.keys(ExtraDetails).length > 0) params.custom_fields = ExtraDetails;
+                if (categoryIds) params.category_id = categoryIds;
+                if (catId && !categoryIds) params.category_slug = catId;
+                if (ExtraDetails && Object.keys(ExtraDetails).length > 0) {
+                    const validDetails = {};
+                    Object.entries(ExtraDetails).forEach(([k, v]) => {
+                        if (v && v.length > 0) validDetails[k] = v;
+                    });
+                    if (Object.keys(validDetails).length > 0) params.custom_fields = validDetails;
+                }
                 if (IsShowKmRange) {
                     const useLat = urlLat != null ? urlLat : lat;
                     const useLong = urlLng != null ? urlLng : long;
