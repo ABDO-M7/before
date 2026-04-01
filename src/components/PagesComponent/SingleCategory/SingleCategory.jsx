@@ -32,7 +32,8 @@ const SingleCategory = ({ slug }) => {
     const dispatch = useDispatch()
     const BreadcrumbPath = useSelector(BreadcrumbPathData)
     const CurrentLanguage = useSelector(CurrentLanguageData)
-    const catId = slug && Array.isArray(slug) && slug.length > 0 ? slug[0] : null;
+    const rawCatId = slug && Array.isArray(slug) && slug.length > 0 ? slug[0] : null;
+    const catId = typeof rawCatId === 'string' && rawCatId.includes('%') ? decodeURIComponent(rawCatId) : rawCatId;
     const userData = useSelector(userSignUpData);
     const SingleCatItem = useSelector(CatItems)
     const currentPage = useSelector(SingleCurrentPage)

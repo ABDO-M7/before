@@ -529,7 +529,7 @@ const Header = ({ initialQuickSearchItems }) => {
   // Header styles: fixed on desktop, normal on mobile/tablet; prevent header from causing horizontal overflow
   const headerStyle = isDesktop
     ? {
-      position: 'fixed',
+      position: 'sticky',
       top: 0,
       left: 0,
       right: 0,
