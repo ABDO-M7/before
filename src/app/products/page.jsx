@@ -15,7 +15,7 @@ const fetchLcpData = async () => {
 
         const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
         const normalized = serverNormalizeImageUrl(rawImg);
-        {/* ✅ Precise match for Next.js image proxy on mobile (width 640, quality 65) */}
+        // ✅ Precise match for Next.js image proxy on mobile (width 640, quality 65)
         return serverGetOptimizedImageUrl(normalized, 640, 65);
     } catch (e) {
         return null;
@@ -63,11 +63,15 @@ const getAllItems = async () => {
                 next: { revalidate: 86400 }, // Revalidate every 1 DAY
             }
         );
+        if (!res.ok) {
+            console.error('API responded with status:', res.status);
+            return { data: [] };
+        }
         const data = await res.json();
-        return data?.data || {};
+        return data?.data || { data: [] };
     } catch (error) {
         console.error('Error fetching Product Items Data:', error);
-        return [];
+        return { data: [] };
     }
 }
 
@@ -115,8 +119,8 @@ const ProductsPage = async () => {
                     as="image" 
                     href={lcpImageUrl} 
                     fetchPriority="high" 
-                    imageSrcSet={`${lcpImageUrl} 1x`} // Correct hint for responsive images
-                    imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    // ✅ Simplified hint to match next/image on mobile exactly.
+                    // This resolves the "preloaded but not used" warning.
                 />
             )}
             <JsonLd data={jsonLd} />
