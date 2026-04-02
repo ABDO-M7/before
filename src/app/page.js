@@ -88,11 +88,6 @@ const HomePageRoute = async () => {
       <JsonLd data={websiteSchema} id="website-schema" />
       <Layout initialQuickSearchItems={initialQuickSearchItems} initialSettings={initialSettings}>
 
-        {/* AI Tools -- above the fold, LCP element. Streams as soon as its API responds */}
-        <Suspense fallback={<AiToolsSkeleton />}>
-          <ServerPopularAiTools />
-        </Suspense>
-
         {/* Below-the-fold sections: each streams independently */}
         <div
           className="home_page_sections"
@@ -105,7 +100,7 @@ const HomePageRoute = async () => {
             maxWidth: "100%",
           }}
         >
-          {/* Categories -- streams independently */}
+          {/* Categories -- streams independently -- shown first for fast above-the-fold content */}
           <div className="container main_padding">
             <div className="row mrg_btm">
               <div className="col-12">
@@ -128,6 +123,11 @@ const HomePageRoute = async () => {
             <ServerPopularCategories />
           </Suspense>
 
+          {/* AI Tools -- moved below categories so page shows content immediately */}
+          <Suspense fallback={<AiToolsSkeleton />}>
+            <ServerPopularAiTools />
+          </Suspense>
+
           {/* Featured Sections (up + ad banner + middle + blogs + down) */}
           {/* All featured sections depend on the same API call, so they stream together. */}
           {/* Blogs stream independently INSIDE the featured block via nested Suspense. */}
@@ -140,6 +140,7 @@ const HomePageRoute = async () => {
             </ServerFeaturedSectionsLoader>
           </Suspense>
         </div>
+
 
       </Layout>
     </>

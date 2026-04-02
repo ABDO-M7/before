@@ -1114,8 +1114,7 @@ const Header = ({ initialQuickSearchItems }) => {
         )
       } */}
 
-      {/* Spacer only on desktop when header is fixed; extra margin for gap below header */}
-      {isDesktop && <div aria-hidden="true" style={{ minHeight: '125px', marginBottom: '5px' }} />}
+
 
 {/* Drawer is the side menu for mobile and tablet */}
       {isDrawerOpen ? (
