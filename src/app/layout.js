@@ -22,6 +22,7 @@ const cairo = Cairo({
 });
 
 // ✅ Critical CSS only – above-the-fold
+import "bootstrap/dist/css/bootstrap.min.css";
 import "../../public/css/style.css";
 import { Toaster } from "react-hot-toast";
 import CSSLoader from "@/components/CSSLoader";
