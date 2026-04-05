@@ -522,7 +522,7 @@ const Header = ({ initialQuickSearchItems }) => {
 
   return (
     <>
-      {/* ✅ Header CSS moved to style.css — removed dangerouslySetInnerHTML injection that ran on every render */}
+      <style dangerouslySetInnerHTML={{ __html: headerCSS }} />
       <header style={headerStyle}>
         <nav className="navbar navbar-expand-lg" style={{
           backgroundColor: '#ffffff',

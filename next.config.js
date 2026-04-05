@@ -234,14 +234,14 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV === 'development';
 
     // ✅ Hashed static assets (_next/static) — immutable in prod only
-    const immutableCache = isDev
-      ? [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }]
-      : [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }];
+    const immutableCache = [
+      { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+    ];
 
     // ✅ Public assets (images, CSS in /css/) - long cache but not immutable (no hash in URL)
-    const longCache = isDev
-      ? [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }]
-      : [{ key: 'Cache-Control', value: 'public, max-age=31536000, stale-while-revalidate=86400' }];
+    const longCache = [
+      { key: 'Cache-Control', value: 'public, max-age=31536000, stale-while-revalidate=86400' }
+    ];
 
     // ✅ Order matters: more specific sources MUST come first so they are not overridden by /:path*
     const securityHeaders = [
@@ -292,10 +292,7 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           ...securityHeaders,
-          ...(isDev
-            ? [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' }]
-            : [{ key: 'Cache-Control', value: 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' }]
-          ),
+          { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' }
         ],
       },
     ];
@@ -340,10 +337,10 @@ const nextConfig = {
         // ✅ Advanced code splitting
         splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 60,
-          maxInitialRequests: 60,
-          minSize: 5000,
-          maxSize: 50000, // ✅ Force tiny shards (was 80KB)
+          maxAsyncRequests: 30,
+          maxInitialRequests: 30,
+          minSize: 20000,
+          maxSize: 250000, // Revert to reasonable chunk size
           enforceSizeThreshold: 50000,
           cacheGroups: {
             default: false,
