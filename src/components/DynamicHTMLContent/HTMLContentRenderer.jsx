@@ -143,13 +143,30 @@ export default function HTMLContentRenderer({
       </script>
     `;
 
+    const fontInjection = `
+      <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+      <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
+        * { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
+      </style>
+    `;
+
     if (isFullHtml) {
-      if (trimmedContent.toLowerCase().includes('</body>')) {
-        return trimmedContent.replace(/<\/body>/i, `${resizeScript}</body>`);
-      } else if (trimmedContent.toLowerCase().includes('</html>')) {
-        return trimmedContent.replace(/<\/html>/i, `${resizeScript}</html>`);
+      let result = trimmedContent;
+      if (result.toLowerCase().includes('</head>')) {
+        result = result.replace(/<\/head>/i, `${fontInjection}</head>`);
       } else {
-        return trimmedContent + resizeScript;
+        result = fontInjection + result;
+      }
+
+      if (result.toLowerCase().includes('</body>')) {
+        return result.replace(/<\/body>/i, `${resizeScript}</body>`);
+      } else if (result.toLowerCase().includes('</html>')) {
+        return result.replace(/<\/html>/i, `${resizeScript}</html>`);
+      } else {
+        return result + resizeScript;
       }
     }
 
