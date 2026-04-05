@@ -497,19 +497,19 @@ const Header = ({ initialQuickSearchItems }) => {
   // Header styles: fixed on desktop, normal on mobile/tablet; prevent header from causing horizontal overflow
   const headerStyle = isDesktop
     ? {
-      position: 'sticky',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 1030,
-      backgroundColor: '#ffffff',
-      boxShadow: isScrolled
-        ? '0 4px 12px rgba(0, 0, 0, 0.08)'
-        : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-      transition: 'box-shadow 0.25s ease',
-      overflowX: 'hidden',
-      maxWidth: '100vw',
-      width: '100%',
+    position: 'sticky',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1030,
+    backgroundColor: '#ffffff',
+    boxShadow: isScrolled
+      ? '0 4px 12px rgba(0, 0, 0, 0.08)'
+      : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    transition: 'box-shadow 0.25s ease',
+    overflowX: 'hidden',
+    maxWidth: '100vw',
+    width: '100%',
     }
     : {
       position: 'relative',
@@ -518,7 +518,7 @@ const Header = ({ initialQuickSearchItems }) => {
       overflowX: 'hidden',
       maxWidth: '100vw',
       width: '100%',
-    };
+  };
 
   return (
     <>
