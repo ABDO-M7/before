@@ -64,7 +64,7 @@ const FeaturedSectionPlacement = ({ sections = [], featuredData, setFeaturedData
                                 <div className="row row-cols-xxl-4 row-cols-lg-4 row-cols-md-3 row-cols-2 product_card_card_gap">
                                     {(ele?.section_data || []).slice(0, 4).map((data, idx) => (
                                         <div className="col card_col_gap" key={data?.id ?? idx}>
-                                            <ProductCard data={data} handleLike={handleLike} priority={priorityImages && index === 0 && idx === 0} />
+                                            <ProductCard data={data} handleLike={handleLike} priority={priorityImages && index === 0 && idx < 4} />
                                         </div>
                                     ))}
                                 </div>

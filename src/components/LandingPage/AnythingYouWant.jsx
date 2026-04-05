@@ -14,12 +14,13 @@ import { placeholderImage, t } from "@/utils";
 import { settingsData } from "@/redux/reuducer/settingSlice";
 import { useSelector } from "react-redux";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";
-import LocationModal from "./LocationModal";
+import dynamic from "next/dynamic";
+const LocationModal = dynamic(() => import('./LocationModal'), { ssr: false });
 import useSearchAutocomplete from "./useSearchAutocomplete";
 import { useRouter } from "next/navigation";
 import { saveCity } from "@/redux/reuducer/locationSlice";
 import toast from "react-hot-toast";
-import SearchAutocomplete from "./SearchAutocomplete";
+const SearchAutocomplete = dynamic(() => import('./SearchAutocomplete'), { ssr: false });
 import Link from "next/link";
 
 const AnythingYouWant = () => {
