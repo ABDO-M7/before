@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
-// ✅ swiper/css is loaded lazily with the component chunk — no top-level blocking import
+import "swiper/css";
 import { RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import { t, useIsRtl } from "@/utils";
 import { categoryApi } from "@/utils/api";
