@@ -27,10 +27,11 @@ const decodeSlug = (s) => {
  * Fetches quick-searches?slug={slug}, increments clicks, applies filters to Redux, and renders Products.
  * If slug does not exist as quick search: fallback to get-items with search=slug (treat as search term).
  */
-const QuickSearchResults = ({ slug }) => {
+const QuickSearchResults = ({ slug, quickSearchData, itemsData }) => {
   const dispatch = useDispatch();
-  const [applied, setApplied] = useState(false);
-  const [label, setLabel] = useState('');
+  // If we have quickSearchData pre-fetched from server, we do not need to show the loader initially
+  const [applied, setApplied] = useState(!!quickSearchData);
+  const [label, setLabel] = useState(quickSearchData?.label || '');
 
   const displaySlug = decodeSlug(slug);
 
@@ -64,14 +65,19 @@ const QuickSearchResults = ({ slug }) => {
 
     const fetchAndApply = async () => {
       try {
-        // Pass decoded slug so API receives the actual string (Arabic/Unicode)
-        const res = await quickSearchesApi.getQuickSearchBySlug(displaySlug);
-        if (!mounted) return;
-        if (res?.data?.error === true) {
-          applySlugAsSearch();
-          return;
+        // If we already have server data, just hydrate Redux immediately without network call
+        let item = quickSearchData;
+
+        if (!item) {
+          const res = await quickSearchesApi.getQuickSearchBySlug(displaySlug);
+          if (!mounted) return;
+          if (res?.data?.error === true) {
+            applySlugAsSearch();
+            return;
+          }
+          item = res?.data?.data;
         }
-        const item = res?.data?.data;
+
         if (!item) {
           applySlugAsSearch();
           return;
@@ -109,15 +115,18 @@ const QuickSearchResults = ({ slug }) => {
           sort_by: item?.sort_by ?? '',
           custom_fields: item?.custom_fields && Object.keys(item.custom_fields).length > 0 ? item.custom_fields : {},
         }));
-        setLabel(item?.label ?? displaySlug);
-        setApplied(true);
+        
+        if (!quickSearchData) {
+            setLabel(item?.label ?? displaySlug);
+            setApplied(true);
+        }
       } catch (err) {
         if (mounted) applySlugAsSearch();
       }
     };
     fetchAndApply();
     return () => { mounted = false; };
-  }, [slug, displaySlug, dispatch]);
+  }, [slug, displaySlug, dispatch, quickSearchData]);
 
   if (!applied) {
     return (
@@ -130,6 +139,8 @@ const QuickSearchResults = ({ slug }) => {
   return (
     <Layout>
       <Products
+        initialData={itemsData?.data || []}
+        paginationData={itemsData || {}}
         breadcrumbPath={[
           { name: t("allCategory"), slug: '/products' },  
           { name: label || displaySlug, slug: `/${slug}` },

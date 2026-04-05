@@ -14,10 +14,10 @@ function decodeSlug(s) {
 }
 
 /**
- * Fetch the LCP Image URL for a given Quick Search slug
- * This allows the browser to bypass the hydration and API waterfalls completely
+ * Fetch the exact data needed for Quick Search (Config + First Page of Items + LCP Image).
+ * Fully bypasses the hydration and API waterfalls completely.
  */
-const fetchQuickSearchLcp = async (slug) => {
+const fetchQuickSearchData = async (slug) => {
     try {
         const encodedSlug = encodeURIComponent(slug);
         const res = await fetch(
@@ -25,29 +25,33 @@ const fetchQuickSearchLcp = async (slug) => {
           { next: { revalidate: 3600 } }
         );
         const json = await res.json();
-        const item = json?.data?.data;
-        if (!item) return null;
+        const quickSearchData = json?.data?.data;
+        if (!quickSearchData) return { quickSearchData: null, itemsData: null, lcpImageUrl: null };
         
         // Build search params using the exact parameters from Quick Search
         const params = new URLSearchParams();
-        if (item.search) params.append('search', item.search);
-        if (item.category_slug) params.append('category_slug', item.category_slug);
+        if (quickSearchData.search) params.append('search', quickSearchData.search);
+        if (quickSearchData.category_slug) params.append('category_slug', quickSearchData.category_slug);
         params.append('page', "1");
-        params.append('limit', "1");
 
         const itemsRes = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?${params.toString()}`,
             { next: { revalidate: 3600 } }
         );
         const itemsJson = await itemsRes.json();
-        const firstItem = itemsJson?.data?.data?.[0];
-        if (!firstItem) return null;
+        const itemsData = itemsJson?.data;
+        const firstItem = itemsData?.data?.[0];
 
-        const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
-        const normalized = serverNormalizeImageUrl(rawImg);
-        return serverGetOptimizedImageUrl(normalized, 640, 65);
+        let lcpImageUrl = null;
+        if (firstItem) {
+            const rawImg = serverGetCompressedImage(firstItem, 'small', firstItem.image);
+            const normalized = serverNormalizeImageUrl(rawImg);
+            lcpImageUrl = serverGetOptimizedImageUrl(normalized, 640, 65);
+        }
+
+        return { quickSearchData, itemsData, lcpImageUrl };
     } catch(e) {
-        return null;
+        return { quickSearchData: null, itemsData: null, lcpImageUrl: null };
     }
 };
 
@@ -57,10 +61,11 @@ export const generateMetadata = async ({ params }) => {
   if (!slug) return { title: 'Quick Search' };
 
   // Run metadata fetch and LCP fetch in parallel for zero latency cost
-  const [metadata, lcpImageUrl] = await Promise.all([
+  const [metadata, dataResponse] = await Promise.all([
      generateQuickSearchMetadata(slug),
-     fetchQuickSearchLcp(slug)
+     fetchQuickSearchData(slug)
   ]);
+  const lcpImageUrl = dataResponse?.lcpImageUrl;
 
   const decoded = decodeSlug(slug);
   const baseData = metadata?.title ? metadata : { title: `${decoded.replace(/-/g, ' ')}` };
@@ -80,7 +85,7 @@ const SlugPage = async ({ params }) => {
   const resolvedParams = await params;
   const slug = resolvedParams?.slug || '';
   
-  const lcpImageUrl = await fetchQuickSearchLcp(slug);
+  const { quickSearchData, itemsData, lcpImageUrl } = await fetchQuickSearchData(slug);
 
   return (
     <>
@@ -92,7 +97,11 @@ const SlugPage = async ({ params }) => {
               fetchPriority="high" 
           />
       )}
-      <QuickSearchResults slug={slug} />
+      <QuickSearchResults 
+        slug={slug} 
+        quickSearchData={quickSearchData} 
+        itemsData={itemsData} 
+      />
     </>
   );
 };
