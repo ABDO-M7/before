@@ -101,24 +101,7 @@ const HomePageRoute = async () => {
           }}
         >
           {/* Categories -- streams independently -- shown first for fast above-the-fold content */}
-          <div className="container main_padding">
-            <div className="row mrg_btm">
-              <div className="col-12">
-                <div className="pop_cat_header">
-                  {/* Render this immediately (not blocked by categories API call) */}
-                  <h2
-                    className="pop_cat_head text-dark"
-                    style={{
-                      fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
-                      fontWeight: 800,
-                    }}
-                  >
-                    تصفح اقسام الاعلانات
-                  </h2>
-                </div>
-              </div>
-            </div>
-          </div>
+
           <Suspense fallback={<PopularCategoriesSkeleton />}>
             <ServerPopularCategories />
           </Suspense>

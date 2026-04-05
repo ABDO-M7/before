@@ -29,5 +29,5 @@ const fetchFeaturedCategories = async () => {
 
 export default async function ServerPopularCategories() {
   const data = await fetchFeaturedCategories();
-  return <PopularCategories initialCategoriesData={data} showTitle={false} />;
+  return <PopularCategories initialCategoriesData={data} showTitle={true} />;
 }

@@ -10,7 +10,7 @@ const fetchFeaturedAiTool = async () => {
     const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
     const json = await res.json();
-    return json?.error === false && json?.data ? json.data : null;
+    return json?.data ? json.data : null;
   } catch (e) {
     console.error('Error fetching featured AI tool:', e?.message || e);
     return null;
