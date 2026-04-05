@@ -26,9 +26,9 @@ const FeaturedSections = ({ featuredData, setFeaturedData, allEmpty }) => {
                 <div className="col-12">
                     <div className="all_sections">
                     {featuredData && !allEmpty && (
-                            featuredData.map((ele, index) => (
+                            featuredData.map((ele, eleIndex) => (
                                 ele?.section_data.length > 0 && (
-                                    <div key={index} className="w-100">
+                                    <div key={eleIndex} className="w-100">
                                         <div className="pop_categ_mrg_btm w-100 d-flex justify-content-between align-items-center">
                                             <h2 className="pop_cat_head text-dark">
                                                 <i className="fas fa-star me-2"></i>
@@ -44,9 +44,9 @@ const FeaturedSections = ({ featuredData, setFeaturedData, allEmpty }) => {
                                             }
                                         </div>
                                         <div className="row row-cols-xxl-4 row-cols-lg-4 row-cols-md-3 row-cols-2 product_card_card_gap">
-                                            {ele?.section_data.slice(0, 4).map((data, index) => (
-                                                <div className="col card_col_gap" key={index}>
-                                                        <ProductCard data={data} handleLike={handleLike} />
+                                            {ele?.section_data.slice(0, 4).map((data, itemIndex) => (
+                                                <div className="col card_col_gap" key={itemIndex}>
+                                                        <ProductCard data={data} handleLike={handleLike} priority={eleIndex === 0 && itemIndex === 0} />
                                                 </div>
                                             ))}
                                         </div>
