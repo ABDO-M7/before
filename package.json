@@ -97,6 +97,9 @@
     "@next/bundle-analyzer": "^16.1.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
+    "postcss": "^8.5.8",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^11.2.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }
