@@ -9,6 +9,7 @@ import ServerPopularAiTools from '@/components/Home/ServerPopularAiTools';
 import ServerPopularCategories from '@/components/Home/ServerPopularCategories';
 import ServerFeaturedSectionsLoader from '@/components/Home/ServerFeaturedSectionsLoader';
 import ServerHomeBlogsRow from '@/components/Home/ServerHomeBlogsRow';
+import AnythingYouWant from '@/components/LandingPage/AnythingYouWant';
 
 import { generateHomeMetadata } from '@/utils/metadataHelpers';
 
@@ -87,6 +88,9 @@ const HomePageRoute = async () => {
       <JsonLd data={organizationSchema} id="organization-schema" />
       <JsonLd data={websiteSchema} id="website-schema" />
       <Layout initialQuickSearchItems={initialQuickSearchItems} initialSettings={initialSettings}>
+        
+        {/* Hero Section */}
+        <AnythingYouWant />
 
         {/* Below-the-fold sections: each streams independently */}
         <div
@@ -100,16 +104,16 @@ const HomePageRoute = async () => {
             maxWidth: "100%",
           }}
         >
-          {/* Categories -- streams independently -- shown first for fast above-the-fold content */}
+          {/* AI Tools -- Moved above categories per user request */}
+          <Suspense fallback={<AiToolsSkeleton />}>
+            <ServerPopularAiTools />
+          </Suspense>
 
+          {/* Categories */}
           <Suspense fallback={<PopularCategoriesSkeleton />}>
             <ServerPopularCategories />
           </Suspense>
 
-          {/* AI Tools -- moved below categories so page shows content immediately */}
-          <Suspense fallback={<AiToolsSkeleton />}>
-            <ServerPopularAiTools />
-          </Suspense>
 
           {/* Featured Sections (up + ad banner + middle + blogs + down) */}
           {/* All featured sections depend on the same API call, so they stream together. */}
