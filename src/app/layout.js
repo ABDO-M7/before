@@ -2,6 +2,7 @@
 
 import AppProviders from "./providers";
 import initFetchLogger from "@/utils/fetchLogger";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 // ✅ Font is fetched at build time from Google Fonts. If you see "Failed to download Cairo",
 // it's a network/build-environment issue (not related to robots.js). Ensure build can reach
 // fonts.googleapis.com/fonts.gstatic.com, or switch to next/font/local with files in public/fonts.
@@ -169,6 +170,7 @@ export default async function RootLayout({ children }) {
             {/* ✅ Defer non-critical hydration blocks */}
             <CSSLoader />
             <DeferredPrefetcher />
+            <SpeedInsights />
           </ErrorBoundary>
         </AppProviders>
       </body>
