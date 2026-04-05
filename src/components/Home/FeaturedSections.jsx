@@ -46,7 +46,7 @@ const FeaturedSections = ({ featuredData, setFeaturedData, allEmpty }) => {
                                         <div className="row row-cols-xxl-4 row-cols-lg-4 row-cols-md-3 row-cols-2 product_card_card_gap">
                                             {ele?.section_data.slice(0, 4).map((data, itemIndex) => (
                                                 <div className="col card_col_gap" key={itemIndex}>
-                                                        <ProductCard data={data} handleLike={handleLike} priority={eleIndex === 0 && itemIndex === 0} />
+                                                        <ProductCard data={data} handleLike={handleLike} priority={eleIndex === 0 && itemIndex < 4} />
                                                 </div>
                                             ))}
                                         </div>

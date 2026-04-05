@@ -67,7 +67,11 @@ export default function HTMLContentRenderer({
 
   // Prepared HTML content
   const prepareHtml = (content) => {
-    const trimmedContent = content.trim();
+    // Strip out rogue Tailwind CDN script if it exists in DB payload (to save 131KB)
+    let sanitizedContent = content.trim();
+    sanitizedContent = sanitizedContent.replace(/<script\s+src=["']https:\/\/cdn\.tailwindcss\.com["']\s*><\/script>/gi, '');
+
+    const trimmedContent = sanitizedContent;
     const isFullHtml = trimmedContent.toLowerCase().includes('<html') || trimmedContent.toLowerCase().startsWith('<!doctype');
 
     const resizeScript = `
