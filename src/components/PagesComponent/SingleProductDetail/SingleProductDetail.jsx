@@ -90,10 +90,13 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
   const [IsOpenInApp, setIsOpenInApp] = useState(false);
 
   useEffect(() => {
-    if (window.innerWidth <= 768 && isShare) {
-      setIsOpenInApp(true);
+    if (typeof window !== 'undefined') {
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+      if (isMobile && isShare) {
+        setIsOpenInApp(true);
+      }
     }
-  }, []);
+  }, [isShare]);
 
   const incrementViews = async (item_id) => {
     try {

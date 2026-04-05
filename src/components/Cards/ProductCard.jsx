@@ -98,11 +98,11 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
   
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsMobileDevice(
-        /Mobi|Android|iP(hone|od|ad)|Phone/i.test(
-          window.navigator?.userAgent || ""
-        )
-      );
+      const media = window.matchMedia('(max-width: 768px)');
+      const listener = (e) => setIsMobileDevice(e.matches);
+      setIsMobileDevice(media.matches);
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
     }
   }, []);
 

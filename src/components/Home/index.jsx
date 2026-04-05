@@ -191,7 +191,8 @@ const HomePage = ({ initialSliderData, initialFeaturedData, initialAiToolData, i
           paddingTop: "1.25rem",
           paddingBottom: "2rem",
           maxWidth: "100%",
-          minHeight: "min(2400px, 200vh)",
+          // ✅ CLS Fix: Reduced from min(2400px, 200vh) — individual sections reserve their own space
+          minHeight: "100vh",
         }}
       >
 

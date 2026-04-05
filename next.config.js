@@ -196,7 +196,10 @@ const nextConfig = {
       'react-icons', 
       'react-phone-input-2', 
       'react-hot-toast',
-      'sweetalert2'
+      'sweetalert2',
+      'axios',
+      'firebase',
+      'swiper'
     ],
   },
   // ✅ Performance optimization
@@ -340,7 +343,7 @@ const nextConfig = {
           maxAsyncRequests: 60,
           maxInitialRequests: 60,
           minSize: 5000,
-          maxSize: 80000, // ✅ Force tiny shards (was 100KB)
+          maxSize: 50000, // ✅ Force tiny shards (was 80KB)
           enforceSizeThreshold: 50000,
           cacheGroups: {
             default: false,

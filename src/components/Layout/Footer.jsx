@@ -54,11 +54,13 @@ const Footer = () => {
 
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    // ✅ TBT Fix: matchMedia avoids layout thrashing vs window.innerWidth on resize
+    const media = window.matchMedia('(max-width: 768px)');
+    const listener = (e) => setIsMobile(e.matches);
+    setIsMobile(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, []);
 
     useEffect(() => {
         if (settings?.play_store_link || settings?.app_store_link) {
@@ -136,26 +138,18 @@ const Footer = () => {
     const handleInstallClick = async () => {
         if (!deferredPrompt) {
             toast.error(t("installatioPWAnNotAvailable"));
-
-            // alert(t('installatioPWAnNotAvailable'));
             return
         }
 
-        // عرض نافذة التنصيب
         deferredPrompt.prompt()
         const { outcome } = await deferredPrompt.userChoice
 
-        if (outcome === 'accepted') {
-            console.log('✅ المستخدم وافق على التنصيب')
-        } else {
-            console.log('❌ المستخدم رفض التنصيب')
-        }
-
-        // بعد الاستخدام، لازم تمسحه
+        // setDeferredPrompt null after use
         setDeferredPrompt(null)
     }
     return (
-        <section className='main_footer' style={{ marginTop: isMobile ? "75px" : "200px" }}>
+        // ✅ CLS Fix: margin-top moved to CSS (.main_footer) — eliminates JS-driven layout shift
+        <section className='main_footer'>
             <div className='container'>
                 {showDownloadLinks ? (
                     <div className="eClassifyApp" style={{

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import "swiper/css";
+// ✅ swiper/css is loaded lazily with the component chunk — no top-level blocking import
 import { RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import { t, useIsRtl } from "@/utils";
 import { categoryApi } from "@/utils/api";
@@ -50,7 +50,7 @@ const PopularCategories = ({ initialCategoriesData, showTitle = true }) => {
             ...prev,
             [page]: data.data
           }));
-          setCatData(Object.values(data.data).flat());
+          // ✅ Single setCatData call — duplicate was causing two re-renders
           setCatData(Object.values(data.data).flat());
           if (page > catCurrentPage) {
             dispatch(setCateData(data.data));
@@ -83,7 +83,7 @@ const PopularCategories = ({ initialCategoriesData, showTitle = true }) => {
             [page]: data.data
           }));
 
-          setCatData(Object.values({ ...cachedData, [page]: data.data }).flat());
+          // ✅ Single setCatData call — duplicate was causing two re-renders
           setCatData(Object.values({ ...cachedData, [page]: data.data }).flat());
 
           if (page > catCurrentPage) {

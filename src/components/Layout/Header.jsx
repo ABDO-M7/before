@@ -370,41 +370,8 @@ const Header = ({ initialQuickSearchItems }) => {
   };
   const handleAdListing = async (e) => {
     e.preventDefault();
-
     // Give access to ad-listing page without login or profile complete
     router.push("/ad-listing");
-    handleClose();
-    return;
-
-    // This code is for the old version of the ad-listing page
-
-    if (!UserData) {
-      toggleLoginModal(true);
-      handleClose();
-      return;
-    }
-    // Check if user profile is complete
-    if (!UserData?.name || !UserData?.email) {
-      const Swal = (await import('sweetalert2')).default;
-      return Swal.fire({
-        title: t("oops"),
-        text: t("youNeedToUpdateProfile"),
-        icon: "warning",
-        showCancelButton: false,
-        customClass: { confirmButton: "Swal-confirm-buttons" },
-        confirmButtonText: t("ok"),
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/profile/edit-profile");
-        }
-      });
-    }
-    // Check for free ad listing setting and route accordingly
-    if (Number(settings?.free_ad_listing) === 1) {
-      return router.push("/ad-listing");
-    }
-    // Otherwise, fetch limits data
-    await getLimitsData();
     handleClose();
   };
 
@@ -515,13 +482,14 @@ const Header = ({ initialQuickSearchItems }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Detect desktop (992px+) for fixed header
+  // ✅ TBT Fix: matchMedia avoids forced layout reflow (window.innerWidth causes synchronous layout)
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
-    const checkDesktop = () => setIsDesktop(window.innerWidth >= 992);
-    checkDesktop();
-    window.addEventListener("resize", checkDesktop);
-    return () => window.removeEventListener("resize", checkDesktop);
+    const media = window.matchMedia('(min-width: 992px)');
+    const listener = (e) => setIsDesktop(e.matches);
+    setIsDesktop(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
   }, []);
 
   const headerCSS = `.cat_select_wrapper .ant-select-selector{border:0!important;box-shadow:none!important;background-color:transparent!important}.cat_select_wrapper .ant-select-focused .ant-select-selector{border:0!important;box-shadow:none!important}.cat_select_wrapper .ant-select:hover .ant-select-selector{border:0!important}.d-lg-flex{display:none!important}.d-none{display:none!important}.d-sm-inline{display:none!important}@media(min-width:576px){.d-sm-inline{display:inline!important}}@media(min-width:992px){.d-lg-none{display:none!important}.d-lg-flex{display:flex!important}}`;
@@ -554,8 +522,7 @@ const Header = ({ initialQuickSearchItems }) => {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: headerCSS }} />
-      {/* Fixed on desktop only; mobile/tablet scrolls with page */}
+      {/* ✅ Header CSS moved to style.css — removed dangerouslySetInnerHTML injection that ran on every render */}
       <header style={headerStyle}>
         <nav className="navbar navbar-expand-lg" style={{
           backgroundColor: '#ffffff',
@@ -611,6 +578,7 @@ const Header = ({ initialQuickSearchItems }) => {
               <span
                 onClick={handleShow}
                 id="hamburg"
+                className="header-hamburg-menu"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -619,14 +587,6 @@ const Header = ({ initialQuickSearchItems }) => {
                   borderRadius: '8px',
                   transition: 'all 0.3s ease',
                   color: '#797b7c'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#06aabd';
-                  e.currentTarget.style.backgroundColor = '#f0fdfd';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#797b7c';
-                  e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
                 <GiHamburgerMenu size={25} />

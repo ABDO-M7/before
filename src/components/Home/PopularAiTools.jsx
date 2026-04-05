@@ -73,6 +73,7 @@ const PopularAiTools = ({ initialAiToolData: initialAiToolDataProp }) => {
                 <div className="mb-4 overflow-hidden rounded-3">
                   <Image
                     priority={!!initialAiToolDataProp}
+                    fetchPriority="high"
                     loading={initialAiToolDataProp ? "eager" : "lazy"}
                     src={normalizeImageUrl(getCompressedImage(featuredTool, 'large', featuredTool.image))}
                     width={1200}
