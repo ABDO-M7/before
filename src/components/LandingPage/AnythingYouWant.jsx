@@ -62,33 +62,34 @@ const AnythingYouWant = () => {
               <Image
                 src={Img1}
                 className="upper_img"
-                // height={200}
-                // width={180}
+                height={200}
+                width={180}
                 alt="Featured listing"
                 priority
                 loading="eager"
                 onErrorCapture={placeholderImage}
-                // style={{ height: 'auto', width: 'auto' }}
+                style={{ height: 'auto', width: 'auto' }}
               />
               <Image
                 src={Img2}
                 className="center_img"
-                // height={200}
-                // width={180}
+                height={200}
+                width={180}
                 alt="Featured listing"
-                loading="lazy"
+                priority
+                loading="eager"
                 onErrorCapture={placeholderImage}
-                // style={{ height: 'auto', width: 'auto' }}
+                style={{ height: 'auto', width: 'auto' }}
               />
               <Image
                 src={Img3}
                 className="down_img"
-                // height={200}
-                // width={180}
+                height={200}
+                width={180}
                 alt="Featured listing"
                 loading="lazy"
                 onErrorCapture={placeholderImage}
-                // style={{ height: 'auto', width: 'auto' }}
+                style={{ height: 'auto', width: 'auto' }}
               />
             </div>
             <div className="center_content">
