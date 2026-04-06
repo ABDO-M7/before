@@ -79,7 +79,7 @@ const SingleBlogPage = async ({ params }) => {
         fetchBlogTagsData(),
         fetchQuickSearches()
     ]);
-    const singleBlog = rawData?.data?.[0] || null;
+    const singleBlog = rawData?.data?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
     
     // Compute LCP Image
