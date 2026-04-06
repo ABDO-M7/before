@@ -752,7 +752,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
 
                     {/* Tags Sidebar */}
                     <div className="col-12">
-                        <div className="our_blog_rightbar_wrapper" style={{ marginTop: '2rem' }}>
+                        <div className="our_blog_rightbar_wrapper" style={{ marginTop: '2rem', minHeight: blogTags?.length > 0 ? undefined : '0px' }}>
                             {blogTags && blogTags?.length > 0 &&
                                 <Tags data={blogTags} />
                             }
@@ -764,7 +764,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                         <div className="row my_prop_title_spacing">
                             <h4 className="pop_cat_head">{t('relatedArticle')}</h4>
                         </div>
-                        <div className="row product_card_card_gap home_blogs_row">
+                        <div className="row product_card_card_gap home_blogs_row" style={{ contain: 'layout' }}>
                             {relatedBlogs.map((data, index) => (
                                 <div className="col-12 col-lg-4" key={data?.id ?? data?.slug ?? index}>
                                     <OurBlogCard data={data} showMeta priority={index === 0 && !blogData?.show_image} />

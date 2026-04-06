@@ -29,11 +29,12 @@ const fetchSingleBlogData = async (slug) => {
 const fetchBlogTagsData = async () => {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}tags`, // Assuming tags endpoint
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blog-tags`, // ✅ Correct endpoint - prevents client-side refetch CLS
             { next: { revalidate: 86400 } } 
         );
         const data = await res.json();
-        return data?.data || [];
+        // ✅ blog-tags returns { data: [...] } — a direct array of tag strings
+        return Array.isArray(data?.data) ? data.data : [];
     } catch (error) {
         return [];
     }
@@ -86,7 +87,15 @@ const SingleBlogPage = async ({ params }) => {
     if (singleBlog?.image && singleBlog?.show_image !== 0 && singleBlog?.show_image !== false) {
         const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
         const normalized = serverNormalizeImageUrl(rawImg);
-        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 838, 75);
+        // Next.js Image with width={838} maps to deviceSizes: 1080
+        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 1080, 75);
+    } else if (relatedBlogs && relatedBlogs.length > 0 && relatedBlogs[0]?.image) {
+        // If no main image, first related blog image becomes LCP
+        const firstRelated = relatedBlogs[0];
+        const rawImg = serverGetCompressedImage(firstRelated, 'medium', firstRelated.image);
+        const normalized = serverNormalizeImageUrl(rawImg);
+        // Next.js Image with width={388} maps to deviceSizes: 640
+        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 640, 75);
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
