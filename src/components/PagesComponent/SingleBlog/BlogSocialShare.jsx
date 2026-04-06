@@ -1,4 +1,3 @@
-﻿
 'use client'
 import React from 'react'
 import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from 'react-share'
@@ -7,7 +6,7 @@ import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from 'react-icons/bi'
 import toast from 'react-hot-toast'
 import { t } from '@/utils'
 
-const BlogSocialShare = ({ blogUrl, blogTitle }) => {
+const BlogSocialShare = ({ blogUrl, blogTitle, CompanyName }) => {
     const handleCopyUrl = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(blogUrl);
@@ -15,32 +14,29 @@ const BlogSocialShare = ({ blogUrl, blogTitle }) => {
     }
 
     return (
-        <div className="blog_social_links">
-            <h6 className="blog_social_links_title">{t('shareInfo')} :</h6>
-            <div className="blog_social_links_wrapper">
-                <button onClick={handleCopyUrl} className="blog_single_link" style={{ background: '#F2F2F2' ,  padding: '6px' , outline: 'none' , border: 'none' , borderRadius: '50%'}}>
-                    <BiLink size={24} color="#000" />
-                </button>
-                <FacebookShareButton url={blogUrl}>
-                    <div className="blog_single_link" style={{ background: '#F2F2F2' ,  padding: '6px' , outline: 'none' , border: 'none' , borderRadius: '50%'}}>
-                        <BiLogoFacebook size={24} color="#1877F2" />
-                    </div>
-                </FacebookShareButton>
-                <TwitterShareButton url={blogUrl}>
-                    <div className="blog_single_link" style={{ background: '#F2F2F2' ,  padding: '6px' , outline: 'none' , border: 'none' , borderRadius: '50%'}}>
-                        <RiTwitterXLine size={24} color="#000" />
-                    </div>
-                </TwitterShareButton>
+        <div className="single_blog_content share_container">
+            <div className="custom_share">
+                <h6 className="tags_title">{t('shareInfo')} :</h6>
+                <div className="tags_item_wrapper blog_single_detail_tags">
+                    <button onClick={handleCopyUrl} className="blog_single_link_icon" aria-label="Copy Link">
+                        <BiLink size={24} color="#595B6C" />
+                    </button>
+                    
+                    <FacebookShareButton url={blogUrl} title={blogUrl + CompanyName} hashtag={CompanyName}>
+                        <BiLogoFacebook size={24} color="#595B6C" />
+                    </FacebookShareButton>
 
-                <WhatsappShareButton url={blogUrl} title={blogTitle}>
-                    <div className="blog_single_link" style={{ background: '#F2F2F2' ,  padding: '6px' , outline: 'none' , border: 'none' , borderRadius: '50%'}}>
-                        <BiLogoWhatsapp size={24} color="#25D366" />
-                    </div>
-                </WhatsappShareButton>
+                    <TwitterShareButton url={blogUrl}>
+                        <RiTwitterXLine size={21} color="#595B6C" />
+                    </TwitterShareButton>
+
+                    <WhatsappShareButton url={blogUrl} title={`${blogTitle || ''} - ${CompanyName}`} hashtag={CompanyName}>
+                        <BiLogoWhatsapp size={24} color="#595B6C" />
+                    </WhatsappShareButton>
+                </div>
             </div>
         </div>
     )
 }
 
 export default BlogSocialShare
-

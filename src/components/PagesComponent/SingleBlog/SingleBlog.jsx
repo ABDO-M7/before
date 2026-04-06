@@ -18,19 +18,22 @@ import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
 import toast from "react-hot-toast"
-import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from "react-share"
-import { RiTwitterXLine } from "react-icons/ri"
-import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from "react-icons/bi"
+
+
+
 // import parse, { domToReact } from 'html-react-parser';
 import Link from "next/link"
 import React from "react"
+import dynamic from 'next/dynamic'
+const BlogSocialShare = dynamic(() => import('./BlogSocialShare'), { ssr: false })
+const BlogProductsCarousel = dynamic(() => import('./BlogProductsCarousel'), { ssr: false })
 import ProductCard from "@/components/Cards/ProductCard"
 import { userSignUpData } from "@/redux/reuducer/authSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
 // import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice"
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode } from 'swiper/modules';
-import 'swiper/css';
+
+
+
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import { useIsRtl } from '@/utils';
 
@@ -217,55 +220,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
         }
     }
 
-    const swipePrev = (sectionIndex) => {
-        const ref = sectionSwiperRefs.current[`section_${sectionIndex}`];
-        if (ref?.current) {
-            ref.current.slidePrev();
-        }
-    }
-
-    const swipeNext = (sectionIndex) => {
-        const ref = sectionSwiperRefs.current[`section_${sectionIndex}`];
-        if (ref?.current) {
-            ref.current.slideNext();
-        }
-    }
-
-    const handleSectionSlideChange = (sectionIndex) => {
-        const ref = sectionSwiperRefs.current[`section_${sectionIndex}`];
-        if (ref?.current) {
-            setSectionNavStates(prev => ({
-                ...prev,
-                [`section_${sectionIndex}`]: {
-                    isBeginning: ref.current.isBeginning,
-                    isEnd: ref.current.isEnd
-                }
-            }));
-        }
-    }
-
-    const swipeMainItemsPrev = () => {
-        if (mainItemsSwiperRef.current) {
-            mainItemsSwiperRef.current.slidePrev();
-        }
-    }
-
-    const swipeMainItemsNext = () => {
-        if (mainItemsSwiperRef.current) {
-            mainItemsSwiperRef.current.slideNext();
-        }
-    }
-
-    const handleMainItemsSlideChange = () => {
-        if (mainItemsSwiperRef.current) {
-            setMainItemsNavState({
-                isBeginning: mainItemsSwiperRef.current.isBeginning,
-                isEnd: mainItemsSwiperRef.current.isEnd
-            });
-        }
-    }
-
-    // Helper function to format phone numbers and create WhatsApp link
+                            // Helper function to format phone numbers and create WhatsApp link
     const getContactInfo = (item) => {
         const itemPhone = item?.phone;
         const itemCountryCode = item?.country_code;
@@ -550,127 +505,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                                 {/* Section Items Carousel - EXACT SAME AS MAIN ITEMS */}
                                                 {section.items && section.items.length > 0 && (
                                                     <div className="blog_section_items" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                                        {section.items.length >= 2 ? (
-                                                            <div className="blog_section_swiper_container" style={{ position: 'relative' }}>
-                                                                <Swiper
-                                                                    dir={isRtl ? "rtl" : "ltr"}
-                                                                    className="blog_section_swiper"
-                                                                    slidesPerView={Math.min(2, section.items.length)}
-                                                                    spaceBetween={20}
-                                                                    breakpoints={{
-                                                                        0: { slidesPerView: 1, spaceBetween: 12 },
-                                                                        576: { slidesPerView: Math.min(2, section.items.length), spaceBetween: 16 },
-                                                                        768: { slidesPerView: Math.min(3, section.items.length), spaceBetween: 20 },
-                                                                        992: { slidesPerView: 4, spaceBetween: 24 },
-                                                                        1200: { slidesPerView: 4, spaceBetween: 30 },
-                                                                    }}
-                                                                    onSlideChange={() => handleSectionSlideChange(sectionIndex)}
-                                                                    modules={[FreeMode]}
-                                                                    freeMode={true}
-                                                                    onSwiper={(swiper) => {
-                                                                        const refKey = `section_${sectionIndex}`;
-                                                                        sectionSwiperRefs.current[refKey] = { current: swiper };
-                                                                        setSectionNavStates(prev => ({
-                                                                            ...prev,
-                                                                            [refKey]: {
-                                                                                isBeginning: swiper.isBeginning,
-                                                                                isEnd: swiper.isEnd
-                                                                            }
-                                                                        }));
-                                                                    }}
-                                                                    key={`section_${sectionIndex}_${isRtl}`}
-                                                                >
-                                                                    {section.items.map((item, itemIndex) => (
-                                                                        <SwiperSlide key={itemIndex}>
-                                                                            <ProductCard
-                                                                                data={item}
-                                                                                handleLike={(id) => handleSectionLike(sectionIndex, id)}
-                                                                            />
-                                                                        </SwiperSlide>
-                                                                    ))}
-                                                                </Swiper>
-
-                                                                {/* Navigation Arrows - Hide based on slide position */}
-                                                                <div
-                                                                    className={`blog_section_nav_arrow blog_section_nav_prev ${sectionNavStates[`section_${sectionIndex}`]?.isBeginning ? "hideArrow" : ""
-                                                                        }`}
-                                                                    onClick={() => swipePrev(sectionIndex)}
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        left: isRtl ? 'auto' : '10px',
-                                                                        right: isRtl ? '10px' : 'auto',
-                                                                        top: '50%',
-                                                                        transform: 'translateY(-50%)',
-                                                                        zIndex: 10,
-                                                                        width: '40px',
-                                                                        height: '40px',
-                                                                        borderRadius: '50%',
-                                                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        cursor: 'pointer',
-                                                                        transition: 'all 0.3s ease'
-                                                                    }}
-                                                                >
-                                                                    {isRtl ? <FaArrowRight size={20} color="#333" /> : <FaArrowLeft size={20} color="#333" />}
-                                                                </div>
-                                                                <div
-                                                                    className={`blog_section_nav_arrow blog_section_nav_next ${sectionNavStates[`section_${sectionIndex}`]?.isEnd ? "hideArrow" : ""
-                                                                        }`}
-                                                                    onClick={() => swipeNext(sectionIndex)}
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        right: isRtl ? 'auto' : '10px',
-                                                                        left: isRtl ? '10px' : 'auto',
-                                                                        top: '50%',
-                                                                        transform: 'translateY(-50%)',
-                                                                        zIndex: 10,
-                                                                        width: '40px',
-                                                                        height: '40px',
-                                                                        borderRadius: '50%',
-                                                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        cursor: 'pointer',
-                                                                        transition: 'all 0.3s ease'
-                                                                    }}
-                                                                >
-                                                                    {isRtl ? <FaArrowLeft size={20} color="#333" /> : <FaArrowRight size={20} color="#333" />}
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="blog_section_swiper_container" style={{ position: 'relative' }}>
-                                                                <Swiper
-                                                                    dir={isRtl ? "rtl" : "ltr"}
-                                                                    className="blog_section_swiper"
-                                                                    slidesPerView={1}
-                                                                    spaceBetween={12}
-                                                                    breakpoints={{
-                                                                        0: { slidesPerView: 1, spaceBetween: 12 },
-                                                                        576: { slidesPerView: 2, spaceBetween: 16 },
-                                                                        768: { slidesPerView: 3, spaceBetween: 20 },
-                                                                        992: { slidesPerView: 4, spaceBetween: 24 },
-                                                                        1200: { slidesPerView: 4, spaceBetween: 30 },
-                                                                    }}
-                                                                    modules={[FreeMode]}
-                                                                    freeMode={true}
-                                                                    allowTouchMove={false}
-                                                                    // centeredSlides={true}
-                                                                    key={`section_single_${sectionIndex}_${isRtl}`}
-                                                                >
-                                                                    <SwiperSlide>
-                                                                        <ProductCard
-                                                                            data={section.items[0]}
-                                                                            handleLike={(id) => handleSectionLike(sectionIndex, id)}
-                                                                        />
-                                                                    </SwiperSlide>
-                                                                </Swiper>
-                                                            </div>
-                                                        )}
+                                                        {<BlogProductsCarousel items={section.items}/>}
                                                     </div>
                                                 )}
                                             </div>
