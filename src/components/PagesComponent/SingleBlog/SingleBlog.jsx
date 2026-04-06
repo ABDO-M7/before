@@ -461,7 +461,8 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                 if (finalImage) {
                                     return (
                                         <Image
-                                            loading="lazy"
+                                            priority={true}
+                                            fetchPriority="high"
                                             src={normalizeImageUrl(finalImage)}
                                             width={838}
                                             height={500}
