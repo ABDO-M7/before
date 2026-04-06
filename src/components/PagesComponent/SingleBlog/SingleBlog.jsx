@@ -34,7 +34,7 @@ import { userSignUpData } from "@/redux/reuducer/authSlice"
 
 
 
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
+
 import { useIsRtl } from '@/utils';
 
 
@@ -62,10 +62,6 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
     const [blogItems, setBlogItems] = useState([])
     const [isLoadingItems, setIsLoadingItems] = useState(false)
     const [isMobileDevice, setIsMobileDevice] = useState(false)
-    const sectionSwiperRefs = useRef({})
-    const [sectionNavStates, setSectionNavStates] = useState({})
-    const mainItemsSwiperRef = useRef()
-    const [mainItemsNavState, setMainItemsNavState] = useState({ isBeginning: true, isEnd: false })
     const isRtl = useIsRtl()
 
     useEffect(() => {
@@ -351,123 +347,12 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                             <div className="loader"></div>
                                         </div>
                                     ) : (
-                                        blogItems.length >= 2 ? (
-                                            <div className="blog_main_items_swiper_container" style={{ position: 'relative' }}>
-                                                <Swiper
-                                                    dir={isRtl ? "rtl" : "ltr"}
-                                                    className="blog_main_items_swiper"
-                                                    slidesPerView={Math.min(2, blogItems.length)}
-                                                    spaceBetween={20}
-                                                    breakpoints={{
-                                                        0: { slidesPerView: 1, spaceBetween: 12 },
-                                                        576: { slidesPerView: Math.min(2, blogItems.length), spaceBetween: 16 },
-                                                        768: { slidesPerView: Math.min(3, blogItems.length), spaceBetween: 20 },
-                                                        992: { slidesPerView: 4, spaceBetween: 24 },
-                                                        1200: { slidesPerView: 4, spaceBetween: 30 },
-                                                    }}
-                                                    onSlideChange={handleMainItemsSlideChange}
-                                                    modules={[FreeMode]}
-                                                    freeMode={true}
-                                                    onSwiper={(swiper) => {
-                                                        mainItemsSwiperRef.current = swiper;
-                                                        setMainItemsNavState({
-                                                            isBeginning: swiper.isBeginning,
-                                                            isEnd: swiper.isEnd
-                                                        });
-                                                    }}
-                                                    key={`main_${isRtl}`}
-                                                >
-                                                    {blogItems.map((item, itemIndex) => (
-                                                        <SwiperSlide key={itemIndex}>
-                                                            <ProductCard
-                                                                data={item}
-                                                                handleLike={handleLike}
-                                                            />
-                                                        </SwiperSlide>
-                                                    ))}
-                                                </Swiper>
-
-                                                {/* Navigation Arrows - Hide based on slide position */}
-                                                <div
-                                                    className={`blog_main_items_nav_arrow blog_main_items_nav_prev ${mainItemsNavState.isBeginning ? "hideArrow" : ""
-                                                        }`}
-                                                    onClick={swipeMainItemsPrev}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        left: isRtl ? 'auto' : '10px',
-                                                        right: isRtl ? '10px' : 'auto',
-                                                        top: '50%',
-                                                        transform: 'translateY(-50%)',
-                                                        zIndex: 10,
-                                                        width: '40px',
-                                                        height: '40px',
-                                                        borderRadius: '50%',
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.3s ease'
-                                                    }}
-                                                >
-                                                    {isRtl ? <FaArrowRight size={20} color="#333" /> : <FaArrowLeft size={20} color="#333" />}
-                                                </div>
-                                                <div
-                                                    className={`blog_main_items_nav_arrow blog_main_items_nav_next ${mainItemsNavState.isEnd ? "hideArrow" : ""
-                                                        }`}
-                                                    onClick={swipeMainItemsNext}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        right: isRtl ? 'auto' : '10px',
-                                                        left: isRtl ? '10px' : 'auto',
-                                                        top: '50%',
-                                                        transform: 'translateY(-50%)',
-                                                        zIndex: 10,
-                                                        width: '40px',
-                                                        height: '40px',
-                                                        borderRadius: '50%',
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.3s ease'
-                                                    }}
-                                                >
-                                                    {isRtl ? <FaArrowLeft size={20} color="#333" /> : <FaArrowRight size={20} color="#333" />}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="blog_main_items_swiper_container" style={{ position: 'relative' }}>
-                                                <Swiper
-                                                    dir={isRtl ? "rtl" : "ltr"}
-                                                    className="blog_main_items_swiper"
-                                                    slidesPerView={1}
-                                                    spaceBetween={12}
-                                                    breakpoints={{
-                                                        0: { slidesPerView: 1, spaceBetween: 12 },
-                                                        576: { slidesPerView: 2, spaceBetween: 16 },
-                                                        768: { slidesPerView: 3, spaceBetween: 20 },
-                                                        992: { slidesPerView: 4, spaceBetween: 24 },
-                                                        1200: { slidesPerView: 4, spaceBetween: 30 },
-                                                    }}
-                                                    modules={[FreeMode]}
-                                                    freeMode={true}
-                                                    allowTouchMove={false}
-                                                    // centeredSlides={true}
-                                                    key={`main_single_${isRtl}`}
-                                                >
-                                                    <SwiperSlide>
-                                                        <ProductCard
-                                                            data={blogItems[0]}
-                                                            handleLike={handleLike}
-                                                        />
-                                                    </SwiperSlide>
-                                                </Swiper>
-                                            </div>
-                                        )
+                                        <BlogProductsCarousel
+                                            items={blogItems}
+                                            isRtl={isRtl}
+                                            handleLike={handleLike}
+                                            containerClassPrefix="blog_main_items"
+                                        />
                                     )}
                                 </div>
                             )}
@@ -502,10 +387,15 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                                     </div>
                                                 )}
 
-                                                {/* Section Items Carousel - EXACT SAME AS MAIN ITEMS */}
+                                                {/* Section Items Carousel */}
                                                 {section.items && section.items.length > 0 && (
                                                     <div className="blog_section_items" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                                        {<BlogProductsCarousel items={section.items}/>}
+                                                        <BlogProductsCarousel
+                                                            items={section.items}
+                                                            isRtl={isRtl}
+                                                            handleLike={(id) => handleSectionLike(sectionIndex, id)}
+                                                            containerClassPrefix="blog_section"
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
@@ -548,39 +438,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                 </div>
                                 */}
                             </div>
-
-                            <div className="link_tag_cont" style={{ marginTop: '1rem' }}>
-                                <div className="share_cont">
-                                    <p className="share_blog">{t('shareThisBlogOnSocialMedia')}</p>
-                                    <div className="share_icons_cont">
-                                        <button onClick={handleCopyUrl} className="copyClipboardBtn">
-                                            <BiLink size={24} color="#595B6C" />
-                                        </button>
-
-                                        <FacebookShareButton url={currentUrl} title={currentUrl + CompanyName} hashtag={CompanyName}>
-                                            <BiLogoFacebook size={24} color="#595B6C" />
-                                        </FacebookShareButton>
-
-
-                                        <TwitterShareButton url={currentUrl}>
-                                            <RiTwitterXLine size={21} color="#595B6C" />
-                                        </TwitterShareButton>
-
-                                        <WhatsappShareButton url={currentUrl} title={blogData?.title + "" + " - " + "" + CompanyName} hashtag={CompanyName}>
-                                            <BiLogoWhatsapp size={24} color="#595B6C" />
-                                        </WhatsappShareButton>
-                                    </div>
-                                </div>
-                                {/* {blogData?.tags &&
-                                    <div className="tags_item_wrapper single_blog_tag_wrapper">
-                                        {blogData?.tags?.map((e, index) => (
-                                            <span key={index}>
-                                                {e}
-                                            </span>
-                                        ))}
-                                    </div>
-                                } */}
-                            </div>
+                            <BlogSocialShare blogUrl={currentUrl} blogTitle={blogData?.title} CompanyName={CompanyName} />
                         </div>
                     </div>
 
