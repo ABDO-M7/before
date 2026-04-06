@@ -6,7 +6,7 @@ import { formatDate, formatPriceAbbreviated, formatSalaryRange, t, getCompressed
 import { BiBadgeCheck } from 'react-icons/bi'
 import { FaHeart } from "react-icons/fa6";
 import { manageFavouriteApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { userSignUpData } from '../../redux/reuducer/authSlice';
 import { useSelector } from "react-redux";
 import { toggleLoginModal } from '@/redux/reuducer/globalStateSlice'

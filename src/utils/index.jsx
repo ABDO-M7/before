@@ -1,5 +1,5 @@
 "use client";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { store } from "../redux/store";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";
 import { useSelector } from "react-redux";

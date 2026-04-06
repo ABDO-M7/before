@@ -4,7 +4,7 @@ import { FaAngleRight } from "react-icons/fa6";
 import razorpay from "../../../../public/assets/ic_razorpay.png";
 import { t, placeholderImage } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import useRazorpay from "react-razorpay";
 
 const RazorpayPayment = ({

@@ -18,7 +18,7 @@ import {
   getParentCategoriesApi,
   getLocationApi,
 } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { getMyItemsApi } from "@/utils/api";
 import { getIsPaidApi, settingsData } from "@/redux/reuducer/settingSlice";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";

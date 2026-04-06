@@ -15,7 +15,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import firebaseApp from "@/utils/firebaseApp";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { handleFirebaseAuthError, t } from "@/utils";
 import { getOtpApi, userSignUpApi, verifyOtpApi, SEND_RESET_PASSWORD_EMAIL,RESET_PASSWORD,LOGIN } from "@/utils/api"; // Added SEND_RESET_PASSWORD_EMAIL
 import Api from "@/api/AxiosInterceptors"; // Added Api

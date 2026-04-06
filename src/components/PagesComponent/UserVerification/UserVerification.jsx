@@ -8,7 +8,7 @@ import { HiOutlineUpload } from "react-icons/hi"
 import { MdOutlineAttachFile } from "react-icons/md"
 import Link from "next/link"
 import Image from "next/image"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent"
 import { useRouter } from "next/navigation"
 

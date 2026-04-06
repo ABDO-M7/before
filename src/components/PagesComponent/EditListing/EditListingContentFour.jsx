@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { MdClose } from "react-icons/md";
 import { MdInfoOutline } from "react-icons/md";
 import { HiOutlineUpload } from "react-icons/hi";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { useSelector } from "react-redux";
 import { settingsData } from "@/redux/reuducer/settingSlice";
 

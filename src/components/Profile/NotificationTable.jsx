@@ -3,7 +3,7 @@ import { Table, Skeleton } from 'antd';
 import Image from 'next/image';
 import { formatDateMonth, t } from '@/utils';
 import { getNotificationList } from '@/utils/api';
-import toast from 'react-hot-toast';
+import toast from "@/utils/toast";
 import { useEffect, useState, useRef } from 'react';
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice';
 import { useSelector } from 'react-redux';

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { t } from '@/utils'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 import { Modal } from 'antd'
 import { addReportReviewApi } from '@/utils/api'
 

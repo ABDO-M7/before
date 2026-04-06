@@ -12,7 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Slider } from "antd";
 import { getIsPaidApi, getMaxRange, getMinRange } from "@/redux/reuducer/settingSlice";
 import { getLocationApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import dynamic from "next/dynamic";
 const LocationWithRadius = dynamic(() =>
   import("../Layout/LocationWithRadius.jsx")

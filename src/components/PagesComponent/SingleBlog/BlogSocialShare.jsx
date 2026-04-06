@@ -3,7 +3,7 @@ import React from 'react'
 import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from 'react-share'
 import { RiTwitterXLine } from 'react-icons/ri'
 import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from 'react-icons/bi'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 import { t } from '@/utils'
 
 const BlogSocialShare = ({ blogUrl, blogTitle, CompanyName }) => {

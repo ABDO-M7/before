@@ -4,7 +4,7 @@ import { FaAngleRight } from "react-icons/fa6";
 import paystack from "../../../../public/assets/ic_paystack.png";
 import { t, placeholderImage } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 const PaystackPayment = ({ priceData, packageSettings }) => {
   const handlePayStackPayment = useCallback(async () => {

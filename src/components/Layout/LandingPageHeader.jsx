@@ -12,7 +12,7 @@ import { settingsData } from '@/redux/reuducer/settingSlice';
 import { CurrentLanguageData, setCurrentLanguage } from '@/redux/reuducer/languageSlice';
 import LanguageDropdown from '../HeaderDropdowns/LanguageDropdown';
 import { MdClose } from 'react-icons/md';
-import toast from 'react-hot-toast';
+import toast from "@/utils/toast";
 import { useRouter } from 'next/navigation';
 
 const LandingPageHeader = () => {

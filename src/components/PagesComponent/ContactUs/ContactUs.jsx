@@ -7,7 +7,7 @@ import { contactUsApi } from "@/utils/api"
 import parse, { domToReact } from 'html-react-parser';
 import Link from "next/link"
 import { useState } from "react"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import { FaFacebook, FaInstagram, FaLinkedin, FaPinterest, FaSquareXTwitter } from "react-icons/fa6"
 import { GrLocation } from "react-icons/gr"
 import { RiMailSendLine } from "react-icons/ri"

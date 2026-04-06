@@ -4,7 +4,7 @@ import { FaAngleRight } from "react-icons/fa6";
 import fluttervave from "../../../../public/assets/flutterwave.png";
 import { t, placeholderImage } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 const FlutterwavePayment = ({
   priceData,

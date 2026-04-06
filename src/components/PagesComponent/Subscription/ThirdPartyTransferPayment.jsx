@@ -6,7 +6,7 @@ import { FaAngleRight, FaPhone, FaUser } from "react-icons/fa6";
 import { MdClose, MdCheckCircle } from "react-icons/md";
 import { t, placeholderImage } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { useRouter } from "next/navigation";
 
 // Styles for instruction content are already injected by ShamCashPayment component

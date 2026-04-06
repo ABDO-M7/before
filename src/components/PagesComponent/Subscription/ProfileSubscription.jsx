@@ -15,7 +15,7 @@ import { isLogin, t, useIsRtl } from "@/utils";
 import PaymentModal from "./PaymentModal";
 import { useRouter } from "next/navigation";
 import { store } from "@/redux/store";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
 import NoData from "@/components/NoDataFound/NoDataFound";
 import SubscriptionCardSkeleton from "@/components/Skeleton/SubscriptionCardSkeleton";

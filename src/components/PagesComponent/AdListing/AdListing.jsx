@@ -12,7 +12,7 @@ import AdSuccessfulModal from './AdSuccessfulModal'
 import { useSelector } from 'react-redux'
 import { generateSlug, isLogin, isValidURL, t } from '@/utils'
 import { addItemApi, categoryApi, getAreasApi, getCitiesApi, getCoutriesApi, getCustomFieldsApi, getLocationApi, getStatesApi } from '@/utils/api'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice';
 import { getIsPaidApi, settingsData } from '@/redux/reuducer/settingSlice'
 import { getIsLoginModalOpen, getIsRegisterModalOpen, toggleLoginModal, toggleRegisterModal } from '@/redux/reuducer/globalStateSlice'

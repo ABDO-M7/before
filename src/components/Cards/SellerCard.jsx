@@ -9,7 +9,7 @@ import { Dropdown } from "antd"
 import { usePathname } from "next/navigation"
 import { FacebookIcon, FacebookShareButton, TwitterShareButton, WhatsappIcon, WhatsappShareButton, XIcon } from "react-share"
 import { CiLink } from "react-icons/ci"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import { useSelector } from "react-redux"
 import { settingsData } from "@/redux/reuducer/settingSlice"
 import Link from "next/link"

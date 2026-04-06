@@ -7,7 +7,7 @@ import { deleteUser, getAuth } from 'firebase/auth';
 import firebaseApp from '@/utils/firebaseApp';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
+import toast from "@/utils/toast";
 import { BiChat, BiDollarCircle, BiReceipt, BiTrashAlt } from 'react-icons/bi'
 import { FiUser } from 'react-icons/fi';
 import { IoMdNotificationsOutline } from 'react-icons/io'

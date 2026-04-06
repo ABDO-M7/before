@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { MdAddPhotoAlternate, MdVerifiedUser } from "react-icons/md";
 import { getVerificationStatusApi, updateProfileApi } from "@/utils/api";
 import { Fcmtoken, settingsData } from "@/redux/reuducer/settingSlice";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { loadUpdateUserData } from "../../../redux/reuducer/authSlice";
 import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";

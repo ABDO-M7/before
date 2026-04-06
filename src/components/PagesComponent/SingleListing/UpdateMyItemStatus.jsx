@@ -1,6 +1,6 @@
 "use client";
 import { chanegItemStatusApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 const UpdateMyItemStatus = ({

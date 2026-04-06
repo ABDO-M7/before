@@ -7,7 +7,7 @@ import { BiSend } from "react-icons/bi";
 import { formatDuration, formatPriceAbbreviated, isLogin, t } from "@/utils";
 import { addItemReviewApi, blockUserApi, getMessagesApi, itemOfferApi, sendMessageApi, tipsApi, unBlockUserApi } from '@/utils/api';
 import { useSelector } from 'react-redux';
-import toast from 'react-hot-toast';
+import toast from "@/utils/toast";
 import NoChatFound from '@/components/NoDataFound/NoChatFound';
 import { Rate } from 'antd';
 import ImageViewer from './ImageViewer';

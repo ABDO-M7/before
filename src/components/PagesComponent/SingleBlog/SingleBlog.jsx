@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import Link from "next/link"
 import React from "react"
 import dynamic from 'next/dynamic'

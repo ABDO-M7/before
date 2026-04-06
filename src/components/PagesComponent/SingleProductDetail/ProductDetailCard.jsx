@@ -5,7 +5,7 @@ import { exactPrice, formatProdDate, formatSalaryRange, isLogin, t } from "@/uti
 import { manageFavouriteApi } from "@/utils/api";
 import { Dropdown } from "antd";
 import { usePathname } from "next/navigation";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { FaHeart, FaRegCalendarCheck, FaRegHeart } from "react-icons/fa6";
 import { FiShare2 } from "react-icons/fi";
 

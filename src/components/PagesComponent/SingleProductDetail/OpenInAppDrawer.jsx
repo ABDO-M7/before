@@ -3,7 +3,7 @@ import { t } from "@/utils";
 import { Button, Drawer, Typography } from "antd";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 const OpenInAppDrawer = ({
   IsOpenInApp,

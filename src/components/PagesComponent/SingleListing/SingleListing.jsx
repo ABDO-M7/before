@@ -28,7 +28,7 @@ import {
   renewItemApi
 } from "@/utils/api";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { FaPlayCircle } from "react-icons/fa";
 // ✅ Lazy load ReactPlayer to reduce initial bundle size
 import dynamic from "next/dynamic";

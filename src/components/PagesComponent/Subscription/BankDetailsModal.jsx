@@ -6,7 +6,7 @@ import { createPaymentIntentApi } from "@/utils/api";
 import { Modal } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { MdClose } from "react-icons/md";
 import { useSelector } from "react-redux"
 

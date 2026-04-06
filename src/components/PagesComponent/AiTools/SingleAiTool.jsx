@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux"
 import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from "react-icons/bi"
 import { RiTwitterXLine } from "react-icons/ri"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import React from "react"
 import dynamic from "next/dynamic"
 

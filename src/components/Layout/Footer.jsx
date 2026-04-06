@@ -15,7 +15,7 @@ import { settingsData } from '@/redux/reuducer/settingSlice'
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice'
 import { useSelector } from 'react-redux'
 import pwaDownload from '../../../public/assets/pwa-icon.png';
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 
 const Footer = () => {

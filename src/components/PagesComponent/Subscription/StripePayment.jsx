@@ -7,7 +7,7 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import { t } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import PaymentModalSkeleton from "@/components/Skeleton/PaymentModalSkeleton";
 
 const StripePayment = ({

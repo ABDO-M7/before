@@ -1,7 +1,7 @@
 'use client'
 import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice"
 import { isLogin, t } from "@/utils"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import { BsExclamationOctagon } from "react-icons/bs"
 
 

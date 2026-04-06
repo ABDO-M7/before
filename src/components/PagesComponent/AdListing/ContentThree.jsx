@@ -5,7 +5,7 @@ import { Checkbox, Radio } from 'antd'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 import { FaAngleDown } from 'react-icons/fa6'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { MdOutlineAttachFile } from 'react-icons/md'

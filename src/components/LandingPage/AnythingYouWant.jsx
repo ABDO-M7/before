@@ -19,7 +19,7 @@ const LocationModal = dynamic(() => import('./LocationModal'), { ssr: false });
 import useSearchAutocomplete from "./useSearchAutocomplete";
 import { useRouter } from "next/navigation";
 import { saveCity } from "@/redux/reuducer/locationSlice";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 const SearchAutocomplete = dynamic(() => import('./SearchAutocomplete'), { ssr: false });
 import Link from "next/link";
 

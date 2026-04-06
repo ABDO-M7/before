@@ -11,7 +11,7 @@ import { RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import { getPackageApi } from "@/utils/api";
 import SubscriptionCardSkeleton from "../Skeleton/SubscriptionCardSkeleton";
 import { isLogin, t } from "@/utils";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { useRouter } from "next/navigation";
 import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice";
 

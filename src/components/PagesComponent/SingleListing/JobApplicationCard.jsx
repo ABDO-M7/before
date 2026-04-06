@@ -1,7 +1,7 @@
 import { updateJobStatusApi } from "@/utils/api";
 import Link from "next/link";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { FaTimes } from "react-icons/fa";
 import { FaCheck, FaDownload } from "react-icons/fa6";
 

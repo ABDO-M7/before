@@ -15,7 +15,7 @@ import { t, useIsRtl } from "@/utils";
 import PaymentModal from "./PaymentModal";
 import SubscriptionCardSkeleton from "@/components/Skeleton/SubscriptionCardSkeleton";
 import { store } from "@/redux/store";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { isLogin } from "@/utils";
 import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
 import Swal from "sweetalert2";

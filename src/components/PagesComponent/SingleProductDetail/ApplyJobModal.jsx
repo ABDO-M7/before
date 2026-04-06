@@ -3,7 +3,7 @@ import { t } from "@/utils"
 import { jobApplyApi } from "@/utils/api"
 import { Modal } from "antd"
 import { useRef, useState } from "react"
-import toast from "react-hot-toast"
+import toast from "@/utils/toast";
 import { MdClose } from "react-icons/md"
 import { useSelector } from "react-redux"
 

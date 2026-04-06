@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { t } from '@/utils'
 import { addReportReasonApi, getReportReasonsApi } from '@/utils/api'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 import { Modal, Radio } from 'antd'
 
 

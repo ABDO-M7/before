@@ -5,7 +5,7 @@ import PlacesSkeleton from "../Skeleton/PlacesSkeleton";
 import { useInView } from "react-intersection-observer";
 import NoData from "../NoDataFound/NoDataFound";
 import { t } from "@/utils";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import {
   getCoutriesApi,
   getStatesApi,

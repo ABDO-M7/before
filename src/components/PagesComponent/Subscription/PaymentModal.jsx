@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { FaAngleRight } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
 import stripe from "../../../../public/assets/ic_stripe.png";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import PaymentModalSkeleton from "@/components/Skeleton/PaymentModalSkeleton";
 import RazorpayPayment from "./RazorpayPayment";
 import PaystackPayment from "./PaystackPayment";

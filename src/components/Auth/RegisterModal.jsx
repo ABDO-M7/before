@@ -15,7 +15,7 @@ import {
 } from "firebase/auth";
 import firebaseApp from "@/utils/firebaseApp";
 import Api from "@/api/AxiosInterceptors"; // Added Api
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { handleFirebaseAuthError, t } from "@/utils";
 import { getOtpApi, userSignUpApi, verifyOtpApi } from "@/utils/api";
 import { useSelector } from "react-redux";

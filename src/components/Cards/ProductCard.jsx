@@ -20,7 +20,7 @@ import { BiBadgeCheck, BiPhoneCall } from "react-icons/bi";
 import { LuMapPin } from "react-icons/lu";
 import { FaHeart, FaWhatsapp } from "react-icons/fa6";
 import { manageFavouriteApi } from "@/utils/api";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { userSignUpData } from "../../redux/reuducer/authSlice";
 import { useSelector } from "react-redux";
 import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice";

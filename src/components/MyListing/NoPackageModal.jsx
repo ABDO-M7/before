@@ -4,7 +4,7 @@ import { createFeaturedItemApi } from '@/utils/api'
 import { Modal } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
+import toast from "@/utils/toast";
 
 const NoPackageModal = ({ IsNoPackageModal, OnHide, IsGranted, item_id }) => {
 

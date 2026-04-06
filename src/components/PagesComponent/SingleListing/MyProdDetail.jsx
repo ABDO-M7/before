@@ -5,7 +5,7 @@ import { deleteItemApi } from "@/utils/api";
 import { Dropdown } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { FaBriefcase, FaRegCalendarCheck } from "react-icons/fa6";
 import { FiShare2 } from "react-icons/fi";
 import { LuHeart } from "react-icons/lu";
