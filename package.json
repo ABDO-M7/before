@@ -86,12 +86,6 @@
     "node": ">=18.0.0",
     "npm": ">=10.0.0"
   },
-  "browserslist": [
-    "chrome >= 87",
-    "firefox >= 78",
-    "safari >= 14",
-    "edge >= 88"
-  ],
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^8.0.0",
     "@next/bundle-analyzer": "^16.1.1",

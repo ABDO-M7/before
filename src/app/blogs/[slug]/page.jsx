@@ -82,20 +82,18 @@ const SingleBlogPage = async ({ params }) => {
     const singleBlog = rawData?.data?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
     
-    // Compute LCP Image
-    let lcpImageUrl = null;
+    let lcpNormalizedSrc = null;
+    let isMainImage = false;
+
     if (singleBlog?.image && singleBlog?.show_image !== 0 && singleBlog?.show_image !== false) {
         const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
-        const normalized = serverNormalizeImageUrl(rawImg);
-        // Next.js Image with width={838} maps to deviceSizes: 1080
-        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 1080, 75);
+        lcpNormalizedSrc = serverNormalizeImageUrl(rawImg);
+        isMainImage = true;
     } else if (relatedBlogs && relatedBlogs.length > 0 && relatedBlogs[0]?.image) {
-        // If no main image, first related blog image becomes LCP
         const firstRelated = relatedBlogs[0];
         const rawImg = serverGetCompressedImage(firstRelated, 'medium', firstRelated.image);
-        const normalized = serverNormalizeImageUrl(rawImg);
-        // Next.js Image with width={388} maps to deviceSizes: 640
-        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 640, 75);
+        lcpNormalizedSrc = serverNormalizeImageUrl(rawImg);
+        isMainImage = false;
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
@@ -115,11 +113,16 @@ const SingleBlogPage = async ({ params }) => {
 
     return (
         <>
-            {lcpImageUrl && (
+            {lcpNormalizedSrc && (
                 <link 
                     rel="preload" 
                     as="image" 
-                    href={lcpImageUrl} 
+                    href={`/_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=${isMainImage ? 1080 : 640}&q=75`} 
+                    imageSrcSet={isMainImage 
+                        ? `/_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=828&q=75 828w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=1080&q=75 1080w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=1200&q=75 1200w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=1920&q=75 1920w`
+                        : `/_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=384&q=75 384w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=640&q=75 640w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=750&q=75 750w, /_next/image?url=${encodeURIComponent(lcpNormalizedSrc)}&w=828&q=75 828w`
+                    }
+                    imageSizes="100vw"
                     fetchPriority="high" 
                 />
             )}

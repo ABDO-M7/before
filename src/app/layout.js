@@ -15,8 +15,8 @@ if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
 
 // ✅ Cairo font for entire website (supports both Latin and Arabic)
 const cairo = Cairo({
-  subsets: ["latin", "arabic"],
-  weight: ["400", "500", "600", "700"],
+  subsets: ["arabic"],
+  weight: ["400", "700"],
   display: "swap", // ✅ Use 'swap' instead of 'optional' to eliminate the 2.14s Element Render Delay on Slow 4G (critical for LCP)
   variable: "--primary-font",
   preload: true,
