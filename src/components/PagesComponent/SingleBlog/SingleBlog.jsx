@@ -861,7 +861,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                         <div className="row product_card_card_gap home_blogs_row">
                             {relatedBlogs.map((data, index) => (
                                 <div className="col-12 col-lg-4" key={data?.id ?? data?.slug ?? index}>
-                                    <OurBlogCard data={data} showMeta />
+                                    <OurBlogCard data={data} showMeta priority={index === 0 && !blogData?.show_image} />
                                 </div>
                             ))}
                         </div>

@@ -54,11 +54,29 @@ const formatDate = (dateString) => {
 };
 
 
+// Quick searches for header (needed immediately for Layout/Header)
+const fetchQuickSearches = async () => {
+    try {
+        const url = new URL(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`
+        );
+        url.searchParams.set('featured', '1');
+        const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
+        const json = await res.json();
+        const list = json?.data?.data ?? json?.data;
+        return Array.isArray(list) ? list : [];
+    } catch (e) {
+        return [];
+    }
+};
+
 const SingleBlogPage = async ({ params }) => {
     const resolvedParams = await params;
-    const [rawData, initialTags] = await Promise.all([
+    const [rawData, initialTags, initialQuickSearchItems] = await Promise.all([
         fetchSingleBlogData(resolvedParams?.slug),
-        fetchBlogTagsData()
+        fetchBlogTagsData(),
+        fetchQuickSearches()
     ]);
     const singleBlog = rawData?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
@@ -97,7 +115,7 @@ const SingleBlogPage = async ({ params }) => {
                 />
             )}
             <JsonLd data={jsonLd} />
-            <Layout>
+            <Layout initialQuickSearchItems={initialQuickSearchItems}>
                 <SingleBlog 
                     initialBlogData={singleBlog} 
                     initialRelatedBlogs={relatedBlogs}

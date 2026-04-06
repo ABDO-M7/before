@@ -6,7 +6,7 @@ import { placeholderImage, t, getCompressedImage, normalizeImageUrl } from '@/ut
 // import { formatDateMonth } from '@/utils' // unused (only in commented date block)
 import { store } from '@/redux/store'
 
-const OurBlogCard = ({ data, showMeta = false }) => {
+const OurBlogCard = ({ data, showMeta = false, priority = false }) => {
     // Get placeholder image from settings
     const settings = store.getState()?.Settings?.data?.data;
     const placeholderImageUrl = settings?.placeholder_image || '/assets/Transperant_Placeholder.png';
@@ -25,7 +25,7 @@ const OurBlogCard = ({ data, showMeta = false }) => {
     return (
         <div className='ourblog_card'>
             <Link href={`/blogs/${encodeURIComponent(data?.slug || '')}`} className='ourblog_card_img_cont' style={{ display: 'block', cursor: 'pointer' }}>
-                <Image loading="lazy" src={imageSrc} width={388} height={200} alt={data?.title} className='blog_card_img' onErrorCapture={placeholderImage} />
+                <Image priority={priority} loading={priority ? undefined : "lazy"} src={imageSrc} width={388} height={200} alt={data?.title} className='blog_card_img' onErrorCapture={placeholderImage} />
             </Link>
             {showMeta && (firstTag /* || metaDate */) && (
                 <div className='ourblog_card_meta'>
