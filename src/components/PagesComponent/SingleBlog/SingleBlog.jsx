@@ -17,16 +17,15 @@ import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 // import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent"
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
-import { BiLink, BiLogoFacebook, BiLogoWhatsapp } from "react-icons/bi"
-// import { BiLink, BiLogoFacebook, BiLogoLinkedin, BiLogoWhatsapp, BiPhoneCall } from "react-icons/bi"
-import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from "react-share"
-import { RiTwitterXLine } from "react-icons/ri"
 import toast from "react-hot-toast"
 // import parse, { domToReact } from 'html-react-parser';
 import Link from "next/link"
 import React from "react"
 import ProductCard from "@/components/Cards/ProductCard"
 import { userSignUpData } from "@/redux/reuducer/authSlice"
+import dynamic from 'next/dynamic'
+
+const BlogSocialShare = dynamic(() => import('./BlogSocialShare'), { ssr: false })
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
 // import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice"
 import { Swiper, SwiperSlide } from 'swiper/react';
