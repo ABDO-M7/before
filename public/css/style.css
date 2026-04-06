@@ -6100,6 +6100,11 @@ h5 {
 
 .single_blog_tag_wrapper {
   padding: 0;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 
@@ -6143,6 +6148,10 @@ h5 {
 /* single blog ui  */
 
 .blog_content {
+  overflow-x: hidden;
+  max-width: 100%;
+  word-break: break-word;
+}
   display: flex;
   flex-direction: column;
   gap: 30px;

@@ -1,49 +1,32 @@
 'use client'
-import OurBlogCard from "@/components/Cards/OurBlogCard"
-import Tags from "@/components/OurBlogPage/Tags"
+import React, { useState, useEffect, useRef } from "react"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { FaEye } from "react-icons/fa6"
-import { t, truncate, getCompressedImage, normalizeImageUrl } from "@/utils"
-import { useParams, usePathname } from "next/navigation"
-import { getBlogTagsApi, getBlogsApi } from "@/utils/api"
-import { useEffect, useState } from "react"
+import { FaEye, FaArrowLeft, FaArrowRight } from "react-icons/fa6"
 import { useDispatch, useSelector } from "react-redux"
+import { settingsData } from "@/redux/reuducer/settingSlice"
 import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
-import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
-import toast from "@/utils/toast";
-import Link from "next/link"
-import React from "react"
-import dynamic from 'next/dynamic'
-import { store } from "@/redux/store"
-import { useIsRtl } from '@/utils'
+import { t, truncate } from "@/utils"
+import OurBlogCard from "../../Cards/OurBlogCard"
+import Tags from "./Tags"
+import BlogProductsCarousel from "./BlogProductsCarousel"
+import BlogSocialShare from "./BlogSocialShare"
+import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils"
 
-const BlogSocialShare = dynamic(() => import('./BlogSocialShare'), { ssr: false })
-const BlogProductsCarousel = dynamic(() => import('./BlogProductsCarousel'), { ssr: false })
-
-const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
-
+const SingleBlog = ({ blogData, relatedBlogs, blogTags, CompanyName }) => {
+    const pathname = usePathname()
     const dispatch = useDispatch()
-    const router = useParams()
-    const rawSlug = router?.slug
-    const blogSlug = typeof rawSlug === 'string' && rawSlug.includes('%')
-        ? decodeURIComponent(rawSlug)
-        : (rawSlug || '')
-    const settingsData = store.getState().Settings?.data
-    const admin = settingsData?.data?.admin
-    const path = usePathname()
-    const currentUrl = `${process.env.NEXT_PUBLIC_WEB_URL}${path}`
-    const CompanyName = settingsData?.data?.company_name
-    const CurrentLanguage = useSelector(CurrentLanguageData)
-    const placeholderImageUrl = settingsData?.data?.placeholder_image || '/assets/Transperant_Placeholder.png'
-    const isRtl = useIsRtl()
+    const systemSettings = useSelector(settingsData)
+    const [currentUrl, setCurrentUrl] = useState("")
 
-    const [blogData, setBlogData] = useState(initialBlogData || {})
-    const [blogTags, setBlogTags] = useState(initialTags || [])
-    const [relatedBlogs, setRelatedBlogs] = useState(initialRelatedBlogs || [])
-
-    // ─── Breadcrumb ───────────────────────────────────────────────────────────
     useEffect(() => {
-        const title = blogData?.title || initialBlogData?.title
+        if (typeof window !== "undefined") {
+            setCurrentUrl(window.location.href)
+        }
+    }, [])
+
+    useEffect(() => {
+        const title = blogData?.title
         if (title) {
             dispatch(setBreadcrumbPath([
                 { name: t("ourBlogs"), slug: '/blogs' },
@@ -52,210 +35,148 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
         }
     }, [blogData?.title])
 
-    // ─── Client-side fallback fetch (only if SSR data missing) ───────────────
-    useEffect(() => {
-        if (blogSlug && (!initialBlogData || Object.keys(initialBlogData).length === 0)) {
-            const getBlogsData = async () => {
-                try {
-                    const res = await getBlogsApi.getBlogs({ slug: blogSlug.trim(), hub: 'web' })
-                    const firstBlog = res?.data?.data?.data?.[0]
-                    setBlogData(firstBlog ?? {})
-                    setRelatedBlogs(res?.data?.other_blogs ?? [])
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            getBlogsData()
-        }
-    }, [blogSlug])
+    const isRtl = document.documentElement.dir === "rtl"
 
-    // ─── Blog Tags fallback ───────────────────────────────────────────────────
-    useEffect(() => {
-        if (!initialTags || initialTags.length === 0) {
-            const getBlogTagsData = async () => {
-                try {
-                    const res = await getBlogTagsApi.getBlogs({})
-                    setBlogTags(res?.data?.data)
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            getBlogTagsData()
-        }
-    }, [initialTags])
-
-    // ─── Section like handler ─────────────────────────────────────────────────
-    const handleSectionLike = (sectionIndex, itemId) => {
-        if (!blogData?.sections?.[sectionIndex]) return
-        const updatedSections = blogData.sections.map((section, idx) => {
-            if (idx !== sectionIndex || !section.items) return section
-            return {
-                ...section,
-                items: section.items.map(item =>
-                    item.id === itemId ? { ...item, is_liked: !item.is_liked } : item
-                )
-            }
-        })
-        setBlogData({ ...blogData, sections: updatedSections })
+    const handleSectionLike = (sectionIndex, id) => {
+        // Implementation for handling like in sections if needed
     }
 
-    // ─── Copy URL ─────────────────────────────────────────────────────────────
-    const handleCopyUrl = async () => {
-        try {
-            await navigator.clipboard.writeText(currentUrl)
-            toast.success(t("copyToClipboard"))
-        } catch (error) {
-            console.error("Error copying to clipboard:", error)
-        }
-    }
-
-    // ─── Contact helpers (kept for WhatsApp/call buttons in product cards) ────
-    const getContactInfo = (item) => {
-        const rawPhone = item?.phone || ""
-        const rawCode = item?.country_code || ""
-        const digitsCode = rawCode.trim().replace(/[^\d+]/g, "")
-        const digitsPhone = rawPhone.replace(/\D/g, "")
-        const telNumber = `${digitsCode}${digitsPhone}`.replace(/\s+/g, "")
-        const whatsappNumber = `${digitsCode}${digitsPhone}`.replace(/\D/g, "")
-        const applicationName = settingsData?.data?.application_name || CompanyName || "Arablaza"
-        const itemUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/product-details/${item?.slug}`
-        const intro = (t("whatsappMessageIntro") || "").replace(/\{\{appName\}\}/g, applicationName)
-        const outreachMessage = itemUrl ? `${intro}\n\n${itemUrl}` : intro
-        const whatsappLink = whatsappNumber
-            ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(outreachMessage)}`
-            : ""
-        return { telNumber, whatsappLink }
-    }
+    if (!blogData) return null
 
     return (
         <>
-            <div className="single_blog">
-                <div className="row">
-                    <div className="col-12">
-                        <div className="blog_content">
-
-                            {/* Title */}
-                            {blogData?.show_title !== 0 && blogData?.show_title !== false && (
-                                <h2 className="blog_heading" style={{ marginTop: '30px' }}>
-                                    {blogData?.title}
-                                </h2>
-                            )}
-
-                            {/* Main Image */}
-                            {blogData?.show_image !== 0 && blogData?.show_image !== false && (() => {
-                                const compressedLarge = getCompressedImage(blogData, 'large', blogData?.image)
-                                const finalImage = (compressedLarge && compressedLarge !== blogData?.image)
-                                    ? compressedLarge
-                                    : (blogData?.image || null)
-                                if (!finalImage) return null
-                                return (
-                                    <Image
-                                        priority={true}
-                                        fetchPriority="high"
-                                        src={normalizeImageUrl(finalImage)}
-                                        width={838}
-                                        height={500}
-                                        className="blog_main_img"
-                                        alt={blogData?.title || "Blog Image"}
-                                        onError={(e) => { e.target.style.display = 'none' }}
-                                    />
-                                )
-                            })()}
-
-                            {/* HTML Content */}
-                            <div
-                                className="blog_html_content"
-                                dangerouslySetInnerHTML={{ __html: blogData?.description || '' }}
-                                suppressHydrationWarning={true}
-                            />
-
-                            {/* Main Items Carousel */}
-                            {/* ✅ Pass item_ids to carousel — it handles its own fetch client-side */}
-                            {blogData?.item_ids && (
-                                <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem', minHeight: '430px', position: 'relative' }}>
-                                    <BlogProductsCarousel
-                                        itemIds={blogData.item_ids}
-                                        isRtl={isRtl}
-                                        containerClassPrefix="blog_main_items"
-                                    />
-                                </div>
-                            )}
-
-                            {/* Blog Sections */}
-                            {blogData?.sections?.length > 0 && (
-                                <div className="blog_sections_container" style={{ marginTop: '1rem' }}>
-                                    {blogData.sections.map((section, sectionIndex) => (
-                                        <div
-                                            key={sectionIndex}
-                                            className="blog_section_item"
-                                            style={{ marginBottom: '1rem', paddingBottom: '1rem' }}
-                                        >
-                                            {section.description && (
-                                                <div className="blog_section_description" style={{ marginBottom: '2rem' }}>
-                                                    <div
-                                                        className="blog_html_content"
-                                                        dangerouslySetInnerHTML={{ __html: section.description || '' }}
-                                                    />
-                                                </div>
-                                            )}
-                                            {/* ✅ Section items: pass item_ids if available, or use pre-loaded items */}
-                                            {section.items?.length > 0 && (
-                                                <div className="blog_section_items" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                                    <BlogProductsCarousel
-                                                        items={section.items}
-                                                        isRtl={isRtl}
-                                                        handleLike={(id) => handleSectionLike(sectionIndex, id)}
-                                                        containerClassPrefix="blog_section"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Views */}
-                            <div className="admin_details" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                <div className="vLine"></div>
-                                {blogData?.views !== 0 && (
-                                    <>
-                                        <div className="date_of_blog_cont">
-                                            <FaEye size={16} color="rgba(0, 0, 0, 0.64)" />
-                                            <p className="date_of_blog">{t('views')}: {blogData?.views}</p>
-                                        </div>
-                                        <div className="vLine"></div>
-                                    </>
+            <section className="single_blog" style={{ overflowX: 'hidden' }}>
+                <div className="container">
+                    <div className="row">
+                        <div className="col-12 col-lg-9 mx-auto">
+                            <div className="blog_content">
+                                {/* Title */}
+                                {blogData?.show_title !== 0 && blogData?.show_title !== false && (
+                                    <h1 className="blog_heading" style={{ marginTop: '30px', fontWeight: 'bold' }}>
+                                        {blogData?.title}
+                                    </h1>
                                 )}
-                            </div>
 
-                            <BlogSocialShare blogUrl={currentUrl} blogTitle={blogData?.title} CompanyName={CompanyName} />
-                        </div>
-                    </div>
+                                {/* Main Image */}
+                                {blogData?.show_image !== 0 && blogData?.show_image !== false && (() => {
+                                    const compressedLarge = getCompressedImage(blogData, 'large', blogData?.image)
+                                    const finalImage = (compressedLarge && compressedLarge !== blogData?.image)
+                                        ? compressedLarge
+                                        : (blogData?.image || null)
+                                    if (!finalImage) return null
+                                    return (
+                                        <Image
+                                            priority={true}
+                                            fetchPriority="high"
+                                            src={normalizeImageUrl(finalImage)}
+                                            width={838}
+                                            height={500}
+                                            className="blog_main_img"
+                                            alt={blogData?.title || "Blog Image"}
+                                            onError={(e) => { e.target.style.display = 'none' }}
+                                            style={{ width: '100%', height: 'auto', borderRadius: '12px', marginBottom: '2rem' }}
+                                        />
+                                    )
+                                })()}
 
-                    {/* Tags Sidebar */}
-                    <div className="col-12">
-                        <div className="our_blog_rightbar_wrapper" style={{ marginTop: '2rem', minHeight: blogTags?.length > 0 ? undefined : '0px' }}>
-                            {blogTags?.length > 0 && <Tags data={blogTags} />}
-                        </div>
-                    </div>
-                </div>
+                                {/* HTML Content */}
+                                <div
+                                    className="blog_html_content"
+                                    dangerouslySetInnerHTML={{ __html: blogData?.description || '' }}
+                                    suppressHydrationWarning={true}
+                                    style={{ wordBreak: 'break-word', overflowX: 'hidden' }}
+                                />
 
-                {/* Related Articles */}
-                {relatedBlogs?.length > 0 && (
-                    <>
-                        <div className="row my_prop_title_spacing">
-                            <h4 className="pop_cat_head">{t('relatedArticle')}</h4>
-                        </div>
-                        <div className="row product_card_card_gap home_blogs_row" style={{ contain: 'layout' }}>
-                            {relatedBlogs.map((data, index) => (
-                                <div className="col-12 col-lg-4" key={data?.id ?? data?.slug ?? index}>
-                                    <OurBlogCard data={data} showMeta priority={index === 0 && !blogData?.show_image} />
+                                {/* Main Items Carousel */}
+                                {blogData?.item_ids && (
+                                    <div className="blog_main_items" style={{ marginTop: '2rem', marginBottom: '2rem', minHeight: '430px', position: 'relative' }}>
+                                        <BlogProductsCarousel
+                                            itemIds={blogData.item_ids}
+                                            isRtl={isRtl}
+                                            containerClassPrefix="blog_main_items"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Blog Sections */}
+                                {blogData?.sections?.length > 0 && (
+                                    <div className="blog_sections_container" style={{ marginTop: '2rem' }}>
+                                        {blogData.sections.map((section, sectionIndex) => (
+                                            <div
+                                                key={sectionIndex}
+                                                className="blog_section_item"
+                                                style={{ marginBottom: '2rem' }}
+                                            >
+                                                {section.description && (
+                                                    <div className="blog_section_description" style={{ marginBottom: '1.5rem' }}>
+                                                        <div
+                                                            className="blog_html_content"
+                                                            dangerouslySetInnerHTML={{ __html: section.description || '' }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {section.items?.length > 0 && (
+                                                    <div className="blog_section_items">
+                                                        <BlogProductsCarousel
+                                                            items={section.items}
+                                                            isRtl={isRtl}
+                                                            handleLike={(id) => handleSectionLike(sectionIndex, id)}
+                                                            containerClassPrefix="blog_section"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Views */}
+                                <div className="admin_details" style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {blogData?.views !== 0 && (
+                                        <div className="date_of_blog_cont" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <FaEye size={16} color="rgba(0, 0, 0, 0.64)" />
+                                            <p className="date_of_blog" style={{ margin: 0 }}>{t('views')}: {blogData?.views}</p>
+                                        </div>
+                                    )}
                                 </div>
-                            ))}
+
+                                <div style={{ marginTop: '2rem' }}>
+                                    <BlogSocialShare blogUrl={currentUrl} blogTitle={blogData?.title} CompanyName={CompanyName} />
+                                </div>
+                            </div>
                         </div>
-                    </>
-                )}
-            </div>
+                    </div>
+
+                    {/* Tags Section */}
+                    {blogTags?.length > 0 && (
+                        <div className="row" style={{ marginTop: '3rem' }}>
+                            <div className="col-12 col-lg-9 mx-auto">
+                                <div className="our_blog_rightbar_wrapper">
+                                    <Tags data={blogTags} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Related Articles */}
+                    {relatedBlogs?.length > 0 && (
+                        <div className="related_articles_section" style={{ marginTop: '4rem', marginBottom: '4rem' }}>
+                            <div className="row">
+                                <div className="col-12 col-lg-9 mx-auto">
+                                    <h4 className="pop_cat_head" style={{ marginBottom: '2rem', fontWeight: 'bold' }}>{t('relatedArticle')}</h4>
+                                    <div className="row product_card_card_gap home_blogs_row">
+                                        {relatedBlogs.map((data, index) => (
+                                            <div className="col-12 col-md-6 col-lg-4 mb-4" key={data?.id ?? data?.slug ?? index}>
+                                                <OurBlogCard data={data} showMeta priority={index === 0 && !blogData?.show_image} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </section>
         </>
     )
 }
