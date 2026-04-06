@@ -23,8 +23,7 @@ const cairo = Cairo({
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../public/css/style.css";
-import dynamic from 'next/dynamic';
-const Toaster = dynamic(() => import('react-hot-toast').then((mod) => mod.Toaster), { ssr: false });
+import Toaster from "@/components/ToastProvider";
 import CSSLoader from "@/components/CSSLoader";
 import DeferredPrefetcher from "@/components/DeferredPrefetcher";
 import ErrorBoundary from "@/components/ErrorBoundary";
