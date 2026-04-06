@@ -9,7 +9,7 @@ import { FaEye, FaRegCalendarCheck } from "react-icons/fa6"
 import { formatDateMonth, t, truncate, getCompressedImage, normalizeImageUrl } from "@/utils"
 // import { formatDateMonth, placeholderImage, t, truncate, isLogin } from "@/utils"
 import { useParams, usePathname } from "next/navigation"
-import { getBlogTagsApi, getBlogsApi, allItemApi } from "@/utils/api"
+import { getBlogTagsApi, getBlogsApi } from "@/utils/api"
 import { useEffect, useState, useRef } from "react"
 import { store } from "@/redux/store"
 import { useDispatch, useSelector } from "react-redux"
@@ -17,7 +17,7 @@ import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
 // import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent"
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
-import toast from "react-hot-toast"
+
 
 
 
@@ -27,7 +27,7 @@ import React from "react"
 import dynamic from 'next/dynamic'
 const BlogSocialShare = dynamic(() => import('./BlogSocialShare'), { ssr: false })
 const BlogProductsCarousel = dynamic(() => import('./BlogProductsCarousel'), { ssr: false })
-import ProductCard from "@/components/Cards/ProductCard"
+
 import { userSignUpData } from "@/redux/reuducer/authSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
 // import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice"
@@ -59,8 +59,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
     const [blogData, setBlogData] = useState(initialBlogData || {})
     const [blogTags, setBlogTags] = useState(initialTags || [])
     const [relatedBlogs, setRelatedBlogs] = useState(initialRelatedBlogs || [])
-    const [blogItems, setBlogItems] = useState([])
-    const [isLoadingItems, setIsLoadingItems] = useState(false)
+
     const [isMobileDevice, setIsMobileDevice] = useState(false)
     const isRtl = useIsRtl()
 
@@ -113,91 +112,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
         }
     }, [blogSlug, initialBlogData])
 
-    const getBlogItems = async (itemIds) => {
-        if (!itemIds) return;
 
-        // Handle different formats: array, comma-separated string, or single value
-        let idsArray = [];
-        if (Array.isArray(itemIds)) {
-            idsArray = itemIds.filter(id => id != null && id !== '');
-        } else if (typeof itemIds === 'string') {
-            // Split comma-separated string into array
-            idsArray = itemIds.split(',').map(id => id.trim()).filter(id => id !== '');
-        } else {
-            idsArray = [String(itemIds)];
-        }
-
-        if (idsArray.length === 0) return;
-
-        setIsLoadingItems(true);
-        try {
-            // Try fetching all items at once first with comma-separated IDs
-            const idsString = idsArray.join(',');
-            const res = await allItemApi.getItems({ id: idsString, limit: 100 });
-
-            let items = [];
-            if (res?.data?.error !== true) {
-                // When using id parameter, items are directly in res.data.data (array)
-                // When using other parameters, items are in res.data.data.data
-                if (Array.isArray(res?.data?.data)) {
-                    items = res.data.data;
-                } else if (Array.isArray(res?.data?.data?.data)) {
-                    items = res.data.data.data;
-                }
-            }
-
-            // If we didn't get all items, try fetching each ID individually
-            if (items.length < idsArray.length) {
-                console.log(`Only got ${items.length} items out of ${idsArray.length} requested. Fetching individually...`);
-                const fetchedIds = new Set(items.map(item => item.id));
-                const missingIds = idsArray.filter(id => !fetchedIds.has(Number(id)));
-
-                // Fetch missing items individually
-                const individualPromises = missingIds.map(async (id) => {
-                    try {
-                        const individualRes = await allItemApi.getItems({ id: String(id) });
-                        if (individualRes?.data?.error !== true) {
-                            if (Array.isArray(individualRes?.data?.data)) {
-                                return individualRes.data.data[0] || null;
-                            } else if (Array.isArray(individualRes?.data?.data?.data)) {
-                                return individualRes.data.data.data[0] || null;
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`Error fetching item ${id}:`, error);
-                    }
-                    return null;
-                });
-
-                const individualItems = await Promise.all(individualPromises);
-                const validIndividualItems = individualItems.filter(item => item !== null);
-                items = [...items, ...validIndividualItems];
-            }
-
-            console.log(`Total items fetched: ${items.length} out of ${idsArray.length} requested`);
-            setBlogItems(items);
-        } catch (error) {
-            console.log('Error fetching blog items:', error);
-        } finally {
-            setIsLoadingItems(false);
-        }
-    }
-
-    useEffect(() => {
-        if (blogData?.item_ids) {
-            getBlogItems(blogData.item_ids);
-        } else {
-            setBlogItems([]);
-        }
-    }, [blogData?.item_ids])
-
-    const handleLike = (id) => {
-        setBlogItems(prevItems =>
-            prevItems.map(item =>
-                item.id === id ? { ...item, is_liked: !item.is_liked } : item
-            )
-        );
-    }
 
     const handleSectionLike = (sectionIndex, itemId) => {
         if (blogData?.sections && blogData.sections[sectionIndex]) {
@@ -289,6 +204,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
     const handleCopyUrl = async () => {
         try {
             await navigator.clipboard.writeText(currentUrl);
+            const { toast } = await import('react-hot-toast');
             toast.success(t("copyToClipboard"));
         } catch (error) {
             console.error("Error copying to clipboard:", error);
@@ -340,20 +256,15 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                             />
 
                             {/* Main Blog Items Slider */}
-                            {(blogData?.item_ids?.length > 0) && (
-                                <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem', minHeight: '430px', position: 'relative' }}>
-                                    {(isLoadingItems || blogItems?.length === 0) ? (
-                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                                            <div className="loader"></div>
-                                        </div>
-                                    ) : (
-                                        <BlogProductsCarousel
-                                            items={blogItems}
-                                            isRtl={isRtl}
-                                            handleLike={handleLike}
-                                            containerClassPrefix="blog_main_items"
+                            {blogData?.item_ids && blogData?.item_ids.length > 0 && (
+                                <div className="row my_prop_title_spacing">
+                                    <h4 className="pop_cat_head">{t('blogFeaturedProducts')}</h4>
+                                    <div className="col-12 mt-3">
+                                        <BlogProductsCarousel 
+                                            itemIds={blogData.item_ids} 
+                                            isRtl={isRtl} 
                                         />
-                                    )}
+                                    </div>
                                 </div>
                             )}
 
