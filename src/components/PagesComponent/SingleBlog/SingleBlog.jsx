@@ -481,6 +481,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                             <div 
                                 className="blog_html_content" 
                                 dangerouslySetInnerHTML={{ __html: blogData?.description || '' }} 
+                                suppressHydrationWarning={true}
                             />
 
                             {/* Main Blog Items Slider */}

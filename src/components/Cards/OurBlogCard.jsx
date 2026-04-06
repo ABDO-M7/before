@@ -25,7 +25,7 @@ const OurBlogCard = ({ data, showMeta = false, priority = false }) => {
     return (
         <div className='ourblog_card'>
             <Link href={`/blogs/${encodeURIComponent(data?.slug || '')}`} className='ourblog_card_img_cont' style={{ display: 'block', cursor: 'pointer' }}>
-                <Image priority={priority} loading={priority ? undefined : "lazy"} src={imageSrc} width={388} height={200} alt={data?.title} className='blog_card_img' onErrorCapture={placeholderImage} />
+                <Image priority={priority} fetchPriority={priority ? "high" : "auto"} loading={priority ? undefined : "lazy"} src={imageSrc} width={388} height={200} alt={data?.title} className='blog_card_img' onErrorCapture={placeholderImage} />
             </Link>
             {showMeta && (firstTag /* || metaDate */) && (
                 <div className='ourblog_card_meta'>
