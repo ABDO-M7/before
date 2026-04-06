@@ -87,11 +87,10 @@
     "npm": ">=10.0.0"
   },
   "browserslist": [
-    "> 0.5%",
-    "last 2 versions",
-    "Firefox ESR",
-    "not dead",
-    "not IE 11"
+    "chrome >= 87",
+    "firefox >= 78",
+    "safari >= 14",
+    "edge >= 88"
   ],
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^8.0.0",
