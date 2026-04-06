@@ -17,7 +17,7 @@ if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
 const cairo = Cairo({
   subsets: ["latin", "arabic"],
   weight: ["400", "500", "600", "700"],
-  display: "swap", // ✅ Use 'swap' so LCP text paints instantaneously with fallback font
+  display: "optional", // ✅ Use 'optional' for Arabic to completely eliminate FOIT layout shifts
   variable: "--primary-font",
   preload: true,
 });
