@@ -23,7 +23,7 @@ export async function fetchBlogBySlug(slug) {
         const encoded = encodeURIComponent(decoded.trim());
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${encoded}`,
-            { next: { revalidate: 3600 } }
+            { next: { revalidate: 86400, tags: ['blogs'] } }
         );
         if (!res.ok) return null;
         const data = await res.json();

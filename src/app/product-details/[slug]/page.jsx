@@ -80,7 +80,7 @@ const getItemData = async (slug) => {
     const slugParam = slug ? encodeURIComponent(slug) : '';
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?slug=${slugParam}`,
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: 86400, tags: ['products'] } }
     );
     const data = await res.json();
     const item = data?.data?.data?.[0];

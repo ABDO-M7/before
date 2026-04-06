@@ -13,7 +13,7 @@ import AnythingYouWant from '@/components/LandingPage/AnythingYouWant';
 
 import { generateHomeMetadata } from '@/utils/metadataHelpers';
 
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day default fallback
 
 export const generateMetadata = async () => {
   return await generateHomeMetadata();
@@ -26,7 +26,7 @@ const fetchQuickSearches = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`
     );
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['settings'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const json = await res.json();
     const list = json?.data?.data ?? json?.data;
@@ -43,7 +43,7 @@ const fetchSettings = async () => {
     const url = new URL(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
     );
-    const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['settings'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
     const json = await res.json();
     return json || null;
