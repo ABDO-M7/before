@@ -6,10 +6,73 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import ProductCard from "@/components/Cards/ProductCard";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { allItemApi } from "@/utils/api";
+import { useEffect } from 'react';
 
-const BlogProductsCarousel = ({ items, isRtl, handleLike, containerClassPrefix = "blog_main_items" }) => {
+const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_main_items" }) => {
     const swiperRef = useRef(null);
     const [navState, setNavState] = useState({ isBeginning: true, isEnd: false });
+    const [items, setItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const getBlogItems = async () => {
+            if (!itemIds) {
+                setItems([]);
+                setIsLoading(false);
+                return;
+            }
+
+            let idsArray = [];
+            if (Array.isArray(itemIds)) idsArray = itemIds.filter(id => id != null && id !== '');
+            else if (typeof itemIds === 'string') idsArray = itemIds.split(',').map(id => id.trim()).filter(id => id !== '');
+            else idsArray = [String(itemIds)];
+
+            if (idsArray.length === 0) {
+                setItems([]);
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const idsString = idsArray.join(',');
+                const res = await allItemApi.getItems({ id: idsString, limit: 100 });
+                let fetchedItems = [];
+                if (res?.data?.error !== true) {
+                    if (Array.isArray(res?.data?.data)) fetchedItems = res.data.data;
+                    else if (Array.isArray(res?.data?.data?.data)) fetchedItems = res.data.data.data;
+                }
+
+                if (fetchedItems.length < idsArray.length) {
+                    const fetchedIds = new Set(fetchedItems.map(item => item.id));
+                    const missingIds = idsArray.filter(id => !fetchedIds.has(Number(id)));
+                    const individualPromises = missingIds.map(async (id) => {
+                        try {
+                            const individualRes = await allItemApi.getItems({ id: String(id) });
+                            if (individualRes?.data?.error !== true) {
+                                if (Array.isArray(individualRes?.data?.data)) return individualRes.data.data[0] || null;
+                                else if (Array.isArray(individualRes?.data?.data?.data)) return individualRes.data.data.data[0] || null;
+                            }
+                        } catch (error) { console.warn(error); }
+                        return null;
+                    });
+                    const individualItems = (await Promise.all(individualPromises)).filter(Boolean);
+                    fetchedItems = [...fetchedItems, ...individualItems];
+                }
+                setItems(fetchedItems);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        getBlogItems();
+    }, [itemIds]);
+
+    const handleLike = (id) => {
+        setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, is_liked: !item.is_liked } : item));
+    };
 
     const handleSlideChange = useCallback(() => {
         if (swiperRef.current) {
