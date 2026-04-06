@@ -13,11 +13,15 @@ import BlogProductsCarousel from "./BlogProductsCarousel"
 import BlogSocialShare from "./BlogSocialShare"
 import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils"
 
-const SingleBlog = ({ blogData, relatedBlogs, blogTags, CompanyName }) => {
+const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, CompanyName }) => {
     const pathname = usePathname()
     const dispatch = useDispatch()
     const systemSettings = useSelector(settingsData)
     const [currentUrl, setCurrentUrl] = useState("")
+
+    const blogData = initialBlogData
+    const relatedBlogs = initialRelatedBlogs
+    const blogTags = initialTags
 
     useEffect(() => {
         if (typeof window !== "undefined") {
