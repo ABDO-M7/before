@@ -108,9 +108,7 @@ export default async function RootLayout({ children }) {
                 {/* ✅ Critical above-the-fold styles only */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
-                        body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;overflow-x:hidden;}
                         #main-content,main{min-height:70vh;}
-                        .container{width:100%;margin:0 auto;max-width:1320px;padding-left:12px;padding-right:12px;}
                         .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
                         .d-none{display:none!important;}
                         @media (max-width: 991px){#main-content,main{padding-top:0;}}
