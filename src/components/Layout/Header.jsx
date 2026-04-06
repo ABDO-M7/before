@@ -20,7 +20,7 @@ import { BiPlanet } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { MdClose } from "react-icons/md";
 import { logoutSuccess, userSignUpData } from "../../redux/reuducer/authSlice";
-import toast from "react-hot-toast";
+
 // ✅ TBT Fix: Lazy-load SweetAlert2 (only needed on logout click)
 // Usage: const Swal = (await import('sweetalert2')).default; Swal.fire(...)
 
@@ -128,7 +128,7 @@ const Header = ({ initialQuickSearchItems }) => {
       });
 
       if (res?.data?.error === true) {
-        toast.error(res?.data?.message);
+        import("react-hot-toast").then((mod) => mod.default.error(res?.data?.message));
       } else {
         if (isDrawerOpen) {
           toggleDrawer(false);
@@ -148,7 +148,7 @@ const Header = ({ initialQuickSearchItems }) => {
         type: "web",
       });
       if (res?.data?.error === true) {
-        toast.error(res?.data?.message);
+        import("react-hot-toast").then((mod) => mod.default.error(res?.data?.message));
       } else {
         dispatch(setCurrentLanguage(res?.data?.data));
       }
@@ -302,9 +302,9 @@ const Header = ({ initialQuickSearchItems }) => {
           console.error('Firebase signOut error:', e);
         }
         saveOfferData([]);
-        toast.success(t("signOutSuccess"));
+        import("react-hot-toast").then((mod) => mod.default.success(t("signOutSuccess")));
       } else {
-        toast.error(t("signOutCancelled"));
+        import("react-hot-toast").then((mod) => mod.default.error(t("signOutCancelled")));
       }
     });
   };
@@ -359,7 +359,7 @@ const Header = ({ initialQuickSearchItems }) => {
       if (res?.data?.error === false) {
         router.push("/ad-listing");
       } else {
-        toast.error(t("purchasePlan"));
+        import("react-hot-toast").then((mod) => mod.default.error(t("purchasePlan")));
         router.push("/subscription");
       }
     } catch (error) {

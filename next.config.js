@@ -184,8 +184,6 @@ const nextConfig = {
   compress: true, // Enable compression (default: true)
   // ✅ Advanced compression settings
   experimental: {
-    // Enable SWC to read .browserslistrc and drop legacy polyfills (~13 KiB savings)
-    browsersListForSwc: true,
     // Enable advanced optimizations
     optimizeCss: true, // Optimize CSS output
     // ✅ Inline CSS to eliminate render-blocking stylesheet requests (~220ms Lighthouse savings)
