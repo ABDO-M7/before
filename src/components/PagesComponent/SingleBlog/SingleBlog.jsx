@@ -37,7 +37,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import { useIsRtl } from '@/utils';
 
 
-const SingleBlog = () => {
+const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
 
     const dispatch = useDispatch()
     const router = useParams()
@@ -54,9 +54,10 @@ const SingleBlog = () => {
     const CurrentLanguage = useSelector(CurrentLanguageData)
     const userData = useSelector(userSignUpData)
     const placeholderImageUrl = settingsData?.data?.placeholder_image || '/assets/Transperant_Placeholder.png'
-    const [blogData, setBlogData] = useState({})
-    const [blogTags, setBlogTags] = useState([])
-    const [relatedBlogs, setRelatedBlogs] = useState([])
+    
+    const [blogData, setBlogData] = useState(initialBlogData || {})
+    const [blogTags, setBlogTags] = useState(initialTags || [])
+    const [relatedBlogs, setRelatedBlogs] = useState(initialRelatedBlogs || [])
     const [blogItems, setBlogItems] = useState([])
     const [isLoadingItems, setIsLoadingItems] = useState(false)
     const [isMobileDevice, setIsMobileDevice] = useState(false)
@@ -100,10 +101,20 @@ const SingleBlog = () => {
     }
 
     useEffect(() => {
-        if (blogSlug) {
+        if (blogSlug && (!initialBlogData || Object.keys(initialBlogData).length === 0)) {
             getBlogsData()
         }
-    }, [blogSlug])
+        
+        // Dispatch breadcrumb if we already have the title from initialBlogData
+        if (initialBlogData?.title) {
+            dispatch(setBreadcrumbPath([{
+                name: t("ourBlogs"),
+                slug: '/blogs'
+            }, {
+                name: truncate(initialBlogData.title, 30)
+            }]))
+        }
+    }, [blogSlug, initialBlogData])
 
     const getBlogItems = async (itemIds) => {
         if (!itemIds) return;
@@ -311,6 +322,7 @@ const SingleBlog = () => {
         window.open(contactInfo.whatsappLink, "_blank");
     };
     const getBlogTagsData = async () => {
+        if (blogTags && blogTags.length > 0) return; // Prevent network rewrite if we have server data
         try {
             const res = await getBlogTagsApi.getBlogs({})
             setBlogTags(res?.data?.data)
@@ -320,8 +332,10 @@ const SingleBlog = () => {
     }
 
     useEffect(() => {
-        getBlogTagsData()
-    }, [])
+        if (!initialTags || initialTags.length === 0) {
+            getBlogTagsData()
+        }
+    }, [initialTags])
 
     const handleCopyUrl = async () => {
         try {
@@ -449,6 +463,7 @@ const SingleBlog = () => {
                                 <HTMLContentRenderer
                                     htmlContent={blogData?.description || ''}
                                     contentId={`blog-description-${blogSlug}`}
+                                    deferIframeLoadMs={0}
                                 />
                             </div>
 

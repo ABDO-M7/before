@@ -9,17 +9,31 @@ export const generateMetadata = async ({ params }) => {
     return await generateBlogMetadata(resolvedParams?.slug);
 };
 
-const fetchSingleBlogItem = async (slug) => {
+import { serverGetCompressedImage, serverNormalizeImageUrl, serverGetOptimizedImageUrl } from "@/utils/serverImageUtils";
+
+const fetchSingleBlogData = async (slug) => {
     try {
         const slugParam = slug ? encodeURIComponent(slug) : '';
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${slugParam}`,
-            { next: { revalidate: 86400 } } // 1 day
+            { next: { revalidate: 3600 } } 
         );
         const data = await res.json();
-        return data?.data?.data?.[0] || [];
+        return data?.data || null;
     } catch (error) {
-        console.error('Error fetching Blog Item Data:', error);
+        return null;
+    }
+};
+
+const fetchBlogTagsData = async () => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}tags`, // Assuming tags endpoint
+            { next: { revalidate: 86400 } } 
+        );
+        const data = await res.json();
+        return data?.data || [];
+    } catch (error) {
         return [];
     }
 };
@@ -39,7 +53,19 @@ const formatDate = (dateString) => {
 
 const SingleBlogPage = async ({ params }) => {
     const resolvedParams = await params;
-    const singleBlog = await fetchSingleBlogItem(resolvedParams?.slug);
+    const rawData = await fetchSingleBlogData(resolvedParams?.slug);
+    const initialTags = await fetchBlogTagsData();
+    const singleBlog = rawData?.data?.[0] || null;
+    const relatedBlogs = rawData?.other_blogs || [];
+    
+    // Compute LCP Image
+    let lcpImageUrl = null;
+    if (singleBlog?.image && singleBlog?.show_image !== 0 && singleBlog?.show_image !== false) {
+        const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
+        const normalized = serverNormalizeImageUrl(rawImg);
+        lcpImageUrl = serverGetOptimizedImageUrl(normalized, 838, 75);
+    }
+
     const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
     const blogUrl = singleBlog?.slug
       ? `${baseUrl}/blogs/${encodeURIComponent(singleBlog.slug)}`
@@ -57,9 +83,21 @@ const SingleBlogPage = async ({ params }) => {
 
     return (
         <>
+            {lcpImageUrl && (
+                <link 
+                    rel="preload" 
+                    as="image" 
+                    href={lcpImageUrl} 
+                    fetchPriority="high" 
+                />
+            )}
             <JsonLd data={jsonLd} />
             <Layout>
-                <SingleBlog />
+                <SingleBlog 
+                    initialBlogData={singleBlog} 
+                    initialRelatedBlogs={relatedBlogs}
+                    initialTags={initialTags}
+                />
             </Layout>
         </>
     )
