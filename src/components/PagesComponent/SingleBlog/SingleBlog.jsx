@@ -25,7 +25,6 @@ import toast from "react-hot-toast"
 // import parse, { domToReact } from 'html-react-parser';
 import Link from "next/link"
 import React from "react"
-import HTMLContentRenderer from '@/components/DynamicHTMLContent/HTMLContentRenderer';
 import ProductCard from "@/components/Cards/ProductCard"
 import { userSignUpData } from "@/redux/reuducer/authSlice"
 // Ali has commented it cause it is not used or not have to import it - Redundant import, already imported globally
@@ -37,7 +36,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import { useIsRtl } from '@/utils';
 
 
-const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
+const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, initialBlogItems }) => {
 
     const dispatch = useDispatch()
     const router = useParams()
@@ -58,7 +57,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
     const [blogData, setBlogData] = useState(initialBlogData || {})
     const [blogTags, setBlogTags] = useState(initialTags || [])
     const [relatedBlogs, setRelatedBlogs] = useState(initialRelatedBlogs || [])
-    const [blogItems, setBlogItems] = useState([])
+    const [blogItems, setBlogItems] = useState(initialBlogItems || [])
     const [isLoadingItems, setIsLoadingItems] = useState(false)
     const [isMobileDevice, setIsMobileDevice] = useState(false)
     const sectionSwiperRefs = useRef({})
@@ -187,12 +186,12 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
     }
 
     useEffect(() => {
-        if (blogData?.item_ids) {
+        if (blogData?.item_ids && (!initialBlogItems || initialBlogItems.length === 0)) {
             getBlogItems(blogData.item_ids);
-        } else {
+        } else if (!blogData?.item_ids) {
             setBlogItems([]);
         }
-    }, [blogData?.item_ids])
+    }, [blogData?.item_ids, initialBlogItems])
 
     const handleLike = (id) => {
         setBlogItems(prevItems =>
@@ -426,6 +425,25 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                             height: 35px !important;
                         }
                     }
+                    /* CMS generated HTML styles to avoid iframe requirement */
+                    .blog_html_content img {
+                        max-width: 100% !important;
+                        height: auto !important;
+                        display: block;
+                        margin: 10px 0;
+                        border-radius: 8px;
+                    }
+                    .blog_html_content iframe {
+                        max-width: 100% !important;
+                    }
+                    .blog_html_content a {
+                        color: #0056b3;
+                        text-decoration: underline;
+                    }
+                    .blog_html_content p {
+                        margin-bottom: 15px;
+                        line-height: 1.6;
+                    }
                 `
             }} />
             <div className="single_blog">
@@ -459,13 +477,10 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                 return null;
                             })()}
 
-                            <div>
-                                <HTMLContentRenderer
-                                    htmlContent={blogData?.description || ''}
-                                    contentId={`blog-description-${blogSlug}`}
-                                    deferIframeLoadMs={0}
-                                />
-                            </div>
+                            <div 
+                                className="blog_html_content" 
+                                dangerouslySetInnerHTML={{ __html: blogData?.description || '' }} 
+                            />
 
                             {/* Main Blog Items Slider */}
                             {blogItems && blogItems.length > 0 && (
@@ -619,9 +634,9 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                                 {/* Section Description */}
                                                 {section.description && (
                                                     <div className="blog_section_description" style={{ marginBottom: '2rem' }}>
-                                                        <HTMLContentRenderer
-                                                            htmlContent={section.description || ''}
-                                                            contentId={`blog-section-${sectionIndex}-${blogSlug}`}
+                                                        <div 
+                                                            className="blog_html_content" 
+                                                            dangerouslySetInnerHTML={{ __html: section.description || '' }} 
                                                         />
                                                     </div>
                                                 )}

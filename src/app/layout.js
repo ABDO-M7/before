@@ -88,10 +88,6 @@ export default async function RootLayout({ children }) {
         )}
         <link rel="preconnect" href="https://arablaza.firebaseapp.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://arablaza.firebaseapp.com" />
-        
-        {/* Specific fonts preconnect */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* ✅ Facebook Domain Verification */}
         {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
