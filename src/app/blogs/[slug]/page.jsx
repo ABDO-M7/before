@@ -13,13 +13,14 @@ import { serverGetCompressedImage, serverNormalizeImageUrl, serverGetOptimizedIm
 
 const fetchSingleBlogData = async (slug) => {
     try {
-        const slugParam = slug ? encodeURIComponent(slug) : '';
+        const decodeSafeSlug = typeof slug === 'string' && slug.includes('%') ? decodeURIComponent(slug) : slug;
+        const slugParam = decodeSafeSlug ? encodeURIComponent(decodeSafeSlug) : '';
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${slugParam}`,
             { next: { revalidate: 3600 } } 
         );
         const data = await res.json();
-        return data?.data || null;
+        return data || null;
     } catch (error) {
         return null;
     }
