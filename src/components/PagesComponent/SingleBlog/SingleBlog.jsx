@@ -36,7 +36,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import { useIsRtl } from '@/utils';
 
 
-const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, initialBlogItems }) => {
+const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
 
     const dispatch = useDispatch()
     const router = useParams()
@@ -57,7 +57,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, initial
     const [blogData, setBlogData] = useState(initialBlogData || {})
     const [blogTags, setBlogTags] = useState(initialTags || [])
     const [relatedBlogs, setRelatedBlogs] = useState(initialRelatedBlogs || [])
-    const [blogItems, setBlogItems] = useState(initialBlogItems || [])
+    const [blogItems, setBlogItems] = useState([])
     const [isLoadingItems, setIsLoadingItems] = useState(false)
     const [isMobileDevice, setIsMobileDevice] = useState(false)
     const sectionSwiperRefs = useRef({})
@@ -186,12 +186,12 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, initial
     }
 
     useEffect(() => {
-        if (blogData?.item_ids && (!initialBlogItems || initialBlogItems.length === 0)) {
+        if (blogData?.item_ids) {
             getBlogItems(blogData.item_ids);
-        } else if (!blogData?.item_ids) {
+        } else {
             setBlogItems([]);
         }
-    }, [blogData?.item_ids, initialBlogItems])
+    }, [blogData?.item_ids])
 
     const handleLike = (id) => {
         setBlogItems(prevItems =>
@@ -483,10 +483,10 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags, initial
                             />
 
                             {/* Main Blog Items Slider */}
-                            {blogItems && blogItems.length > 0 && (
-                                <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                    {isLoadingItems ? (
-                                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            {(blogData?.item_ids?.length > 0) && (
+                                <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem', minHeight: '430px', position: 'relative' }}>
+                                    {(isLoadingItems || blogItems?.length === 0) ? (
+                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                                             <div className="loader"></div>
                                         </div>
                                     ) : (

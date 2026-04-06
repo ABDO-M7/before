@@ -38,34 +38,7 @@ const fetchBlogTagsData = async () => {
     }
 };
 
-const fetchBlogItems = async (itemIds) => {
-    if (!itemIds) return [];
-    let idsArray = [];
-    if (Array.isArray(itemIds)) {
-        idsArray = itemIds.filter(id => id != null && id !== '');
-    } else if (typeof itemIds === 'string') {
-        idsArray = itemIds.split(',').map(id => id.trim()).filter(id => id !== '');
-    } else {
-        idsArray = [String(itemIds)];
-    }
-    if (idsArray.length === 0) return [];
-
-    try {
-        const idsString = idsArray.join(',');
-        const params = new URLSearchParams();
-        params.append('id', idsString);
-        params.append('limit', '100');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?${params.toString()}`, { next: { revalidate: 3600 } });
-        const resJson = await res.json();
-        
-        let items = [];
-        if (resJson?.error !== true) {
-            if (Array.isArray(resJson?.data)) items = resJson.data;
-            else if (Array.isArray(resJson?.data?.data)) items = resJson.data.data;
-        }
-        return items;
-    } catch(e) { return [] }
-};
+// Removed fetchBlogItems from server side to unblock HTML generation
 
 
 const stripHtml = (html) => {
@@ -82,11 +55,12 @@ const formatDate = (dateString) => {
 
 const SingleBlogPage = async ({ params }) => {
     const resolvedParams = await params;
-    const rawData = await fetchSingleBlogData(resolvedParams?.slug);
-    const initialTags = await fetchBlogTagsData();
+    const [rawData, initialTags] = await Promise.all([
+        fetchSingleBlogData(resolvedParams?.slug),
+        fetchBlogTagsData()
+    ]);
     const singleBlog = rawData?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
-    const initialBlogItems = singleBlog?.item_ids ? await fetchBlogItems(singleBlog.item_ids) : [];
     
     // Compute LCP Image
     let lcpImageUrl = null;
@@ -127,7 +101,6 @@ const SingleBlogPage = async ({ params }) => {
                     initialBlogData={singleBlog} 
                     initialRelatedBlogs={relatedBlogs}
                     initialTags={initialTags}
-                    initialBlogItems={initialBlogItems}
                 />
             </Layout>
         </>
