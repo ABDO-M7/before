@@ -1,9 +1,10 @@
+import ar from '@/utils/locale/ar.json';
+import en from '@/utils/locale/en.json';
 import Layout from '@/components/Layout/Layout';
 import SingleBlog from '@/components/PagesComponent/SingleBlog/SingleBlog';
 import JsonLd from '@/components/SEO/JsonLd';
-import ReactDOM from 'react-dom';
 import { fetchBlogBySlug, buildBlogMetadata } from '@/utils/blogDataFetcher';
-import { serverGetCompressedImage, serverNormalizeImageUrl } from '@/utils/serverImageUtils';
+import { serverNormalizeImageUrl } from '@/utils/serverImageUtils';
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 // ✅ Uses the same fetch URL as the page — Next.js deduplicates it (zero extra request)
@@ -43,8 +44,8 @@ const fetchQuickSearches = async () => {
     }
 };
 
-const stripHtml = (html) => html.replace(/<[^>]*>/g, '');
-const formatDate = (dateString) => dateString.slice(0, 19) + 'Z';
+const stripHtml = (html) => (html || '').replace(/<[^>]*>/g, '');
+const formatDate = (dateString) => (dateString || '').slice(0, 19) + 'Z';
 
 const fetchSettings = async () => {
     try {
@@ -81,7 +82,7 @@ const SingleBlogPage = async ({ params }) => {
     // ملاحظة: يمكنك تحسين هذا لاحقاً بالكشف عن اللغة الحقيقية من الميدل وير
     const isRtl = true; 
     const langCode = 'ar';
-    const translations = langCode === 'ar' ? require('@/utils/locale/ar.json') : require('@/utils/locale/en.json');
+    const translations = langCode === 'ar' ? ar : en;
     
     // قاموس الترجمات المطلوبة لهذه الصفحة
     const t = {
@@ -105,30 +106,6 @@ const SingleBlogPage = async ({ params }) => {
                 </div>
             </Layout>
         );
-    }
-
-    // ─── LCP Preload via ReactDOM.preload() ───────────────────────────────────
-    if (singleBlog?.image && singleBlog?.show_image !== 0) {
-      const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
-      const normalized = serverNormalizeImageUrl(rawImg);
-      
-      if (normalized) {
-        // ✅ استخدم /_next/image عشان يتطابق مع اللي Next.js هيرسمه فعلاً
-        const optimizedUrl = `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75`;
-        ReactDOM.preload(optimizedUrl, {
-          as: 'image',
-          fetchPriority: 'high',
-          imageSizes: '(max-width: 768px) 100vw, 838px',
-        });
-        
-        // ✅ preconnect للدومين الخارجي (اختياري لكن مفيد لو الصورة من دومين تاني)
-        if (normalized.startsWith('http')) {
-          try {
-            const domain = new URL(normalized).origin;
-            ReactDOM.preconnect(domain, { crossOrigin: 'anonymous' });
-          } catch {}
-        }
-      }
     }
 
     // ─── JSON-LD ──────────────────────────────────────────────────────────────
