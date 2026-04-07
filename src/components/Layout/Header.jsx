@@ -1122,22 +1122,6 @@ const Header = ({ initialQuickSearchItems }) => {
                 <span>{t("adListing")}</span>
               </button>
             </li>
-            <li
-              className="drawer_menu_item drawer_menu_item--actionable"
-              onClick={openLocationEditModal}
-              role="button"
-              tabIndex={0}
-              onKeyDown={handleLocationKeyDown}
-            >
-              <span className="drawer_menu_icon">
-                <LuMapPin size={20} />
-              </span>
-              <div className="drawer_menu_info">
-                <span className="drawer_menu_title">{t("currentLocation")}</span>
-                <span className="drawer_menu_subtitle">{locationDisplay}</span>
-              </div>
-              <span className="drawer_menu_action_text">{t("change")}</span>
-            </li>
 
             <li
               className="drawer_menu_item drawer_menu_item--actionable"

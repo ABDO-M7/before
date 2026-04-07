@@ -50,7 +50,7 @@ const AnythingYouWant = () => {
     if (selectedLocation && (selectedLocation?.lat || selectedLocation?.areaId)) {
       saveCity(selectedLocation);
     }
-    router.push("/home");
+    router.push("/products");
   };
 
   return (
@@ -138,7 +138,7 @@ const AnythingYouWant = () => {
               {/* Main CTA Buttons */}
               <div className="hero_cta_buttons">
                 <a 
-                  href="/home" 
+                  href="/products" 
                   className="hero_cta_btn hero_cta_btn_explore"
                   onClick={handleExploreAds}
                 >
