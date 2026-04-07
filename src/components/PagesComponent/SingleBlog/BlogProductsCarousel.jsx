@@ -8,15 +8,20 @@ import ProductCard from "@/components/Cards/ProductCard";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { allItemApi } from "@/utils/api";
 import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer'; // ✅ Defer fetching until in view
 
-const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_main_items" }) => {
+const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_main_items", aboveFold = false }) => {
     const swiperRef = useRef(null);
+    const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
     const [navState, setNavState] = useState({ isBeginning: true, isEnd: false });
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const getBlogItems = async () => {
+            // ✅ Only fetch if above fold OR in view
+            if (!aboveFold && !inView) return;
+            
             if (!itemIds) {
                 setItems([]);
                 setIsLoading(false);
@@ -68,7 +73,7 @@ const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_mai
             }
         };
         getBlogItems();
-    }, [itemIds]);
+    }, [itemIds, inView, aboveFold]);
 
     const handleLike = (id) => {
         setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, is_liked: !item.is_liked } : item));
@@ -91,11 +96,28 @@ const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_mai
         if (swiperRef.current) swiperRef.current.slideNext();
     }, []);
 
-    if (!items || items.length === 0) return null;
+    if (!aboveFold && !inView) {
+        return (
+            <div ref={ref} className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative', minHeight: '430px' }}>
+                <div className="carousel-skeleton" style={{ minHeight: '430px', background: '#f5f5f5', borderRadius: '12px' }} />
+            </div>
+        );
+    }
+
+    if (!items || items.length === 0) {
+        if (isLoading) {
+            return (
+                <div ref={ref} className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative', minHeight: '430px' }}>
+                    <div className="carousel-skeleton" style={{ minHeight: '430px', background: '#f5f5f5', borderRadius: '12px' }} />
+                </div>
+            );
+        }
+        return null;
+    }
 
     if (items.length < 2) {
         return (
-            <div className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative' }}>
+            <div ref={ref} className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative' }}>
                 <Swiper
                     dir={isRtl ? "rtl" : "ltr"}
                     className={`${containerClassPrefix}_swiper`}
@@ -122,7 +144,7 @@ const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_mai
     }
 
     return (
-        <div className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative' }}>
+        <div ref={ref} className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative' }}>
             <Swiper
                 dir={isRtl ? "rtl" : "ltr"}
                 className={`${containerClassPrefix}_swiper`}

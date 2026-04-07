@@ -61,45 +61,44 @@ const SingleBlogPage = async ({ params }) => {
     const singleBlog = rawData?.data?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
 
+    // ✅ إذا لم توجد بيانات، أعد 404 فوراً (لا تحمل Client Component فارغ)
+    if (!singleBlog) {
+        return (
+            <Layout initialQuickSearchItems={initialQuickSearchItems}>
+                <div className="container" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <h3>Blog not found</h3>
+                </div>
+            </Layout>
+        );
+    }
+
     // ─── LCP Preload via ReactDOM.preload() ───────────────────────────────────
-    // ReactDOM.preload() is the ONLY reliable method in Next.js App Router
-    // that injects a preload link into <head>. A <link> tag in JSX return
-    // always ends up in <body> and is ignored by browsers for preloading.
-    if (singleBlog?.image && singleBlog?.show_image !== 0 && singleBlog?.show_image !== false) {
-        const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
-        const normalized = serverNormalizeImageUrl(rawImg);
-
-        if (normalized) {
-            // ✅ تطابق تام مع ما يولده next/image: w=828 هو الأقرب لـ 838px
-            const imageUrl = `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75`
-
-            ReactDOM.preload(
-                imageUrl,
-                {
-                    as: 'image',
-                    fetchPriority: 'high',
-                    // ✅ srcset يتطابق مع deviceSizes في next.config.js
-                    imageSrcSet: [
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=640&q=75 640w`,
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75 828w`,
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=1080&q=75 1080w`,
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=1200&q=75 1200w`,
-                    ].join(', '),
-                    // ✅ sizes يتطابق مع صورة الـ SingleBlog.jsx
-                    imageSizes: '(max-width: 768px) 100vw, 838px',
-                }
-            )
-
-            // ✅ DNS Prefetch للدومين الخارجي للصور (لو موجود)
-            if (normalized.startsWith('http')) {
-                try {
-                    const domain = new URL(normalized).origin;
-                    ReactDOM.preconnect(domain, { crossOrigin: 'anonymous' });
-                } catch (e) {
-                    // Ignore URL errors
-                }
-            }
+    if (singleBlog?.image && singleBlog?.show_image !== 0) {
+      const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
+      const normalized = serverNormalizeImageUrl(rawImg);
+      
+      if (normalized) {
+        // ✅ استخدم الرابط الأصلي مباشرة (أسرع)
+        ReactDOM.preload(normalized, {
+          as: 'image',
+          fetchPriority: 'high',
+          // ✅ srcset متوافق مع next.config.js deviceSizes
+          imageSrcSet: [
+            `${normalized}?w=640&q=75 640w`,
+            `${normalized}?w=828&q=75 828w`, 
+            `${normalized}?w=1080&q=75 1080w`,
+          ].join(', '),
+          imageSizes: '(max-width: 768px) 100vw, 838px',
+        });
+        
+        // ✅ preconnect للدومين الخارجي
+        if (normalized.startsWith('http')) {
+          try {
+            const domain = new URL(normalized).origin;
+            ReactDOM.preconnect(domain, { crossOrigin: 'anonymous' });
+          } catch {}
         }
+      }
     }
 
     // ─── JSON-LD ──────────────────────────────────────────────────────────────

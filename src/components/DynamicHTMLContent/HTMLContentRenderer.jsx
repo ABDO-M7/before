@@ -230,7 +230,8 @@ export default function HTMLContentRenderer({
         <iframe
           key={`${contentId}-${key}`}
           srcDoc={preparedHtml}
-          loading="lazy"
+          loading="eager" // ✅ Changed to eager for faster dynamic content rendering
+          fetchpriority="high" // ✅ High priority for dynamic HTML content
           style={{
             width: '100%',
             height: iframeHeight,

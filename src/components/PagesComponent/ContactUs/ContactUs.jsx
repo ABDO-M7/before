@@ -240,8 +240,10 @@ const ContactUs = () => {
                                 {settings?.google_map_iframe_link &&
                                     <iframe
                                         src={settings?.google_map_iframe_link}
-                                        loading="lazy"
+                                        loading="eager" // ✅ Eager load map for faster contact page performance
+                                        fetchpriority="high" // ✅ High priority for map content
                                         className='contact_loc_map'
+                                        title={t('googleMap')}
                                     ></iframe>
                                 }
                             </div>

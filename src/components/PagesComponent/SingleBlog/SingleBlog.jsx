@@ -4,8 +4,7 @@ import Tags from "@/components/OurBlogPage/Tags"
 import Image from "next/image"
 import { FaEye } from "react-icons/fa6"
 import { t, truncate, getCompressedImage, normalizeImageUrl } from "@/utils"
-import { useParams, usePathname } from "next/navigation"
-import { getBlogTagsApi, getBlogsApi } from "@/utils/api"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setBreadcrumbPath } from "@/redux/reuducer/breadCrumbSlice"
@@ -45,11 +44,6 @@ const RelatedArticles = dynamic(
 const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
 
     const dispatch = useDispatch()
-    const router = useParams()
-    const rawSlug = router?.slug
-    const blogSlug = typeof rawSlug === 'string' && rawSlug.includes('%')
-        ? decodeURIComponent(rawSlug)
-        : (rawSlug || '')
     const settingsData = store.getState().Settings?.data
     const admin = settingsData?.data?.admin
     const path = usePathname()
@@ -73,38 +67,6 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
             ]))
         }
     }, [blogData?.title])
-
-    // ─── Client-side fallback fetch (only if SSR data missing) ───────────────
-    useEffect(() => {
-        if (blogSlug && (!initialBlogData || Object.keys(initialBlogData).length === 0)) {
-            const getBlogsData = async () => {
-                try {
-                    const res = await getBlogsApi.getBlogs({ slug: blogSlug.trim(), hub: 'web' })
-                    const firstBlog = res?.data?.data?.data?.[0]
-                    setBlogData(firstBlog ?? {})
-                    setRelatedBlogs(res?.data?.other_blogs ?? [])
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            getBlogsData()
-        }
-    }, [blogSlug])
-
-    // ─── Blog Tags fallback ───────────────────────────────────────────────────
-    useEffect(() => {
-        if (!initialTags || initialTags.length === 0) {
-            const getBlogTagsData = async () => {
-                try {
-                    const res = await getBlogTagsApi.getBlogs({})
-                    setBlogTags(res?.data?.data)
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            getBlogTagsData()
-        }
-    }, [initialTags])
 
     // ─── Section like handler ─────────────────────────────────────────────────
     const handleSectionLike = (sectionIndex, itemId) => {
@@ -171,24 +133,21 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                     : (blogData?.image || null)
                                 if (!finalImage) return null
 
-                                // ✅ توليد blur placeholder بسيط (يمكنك استبداله بصورة base64 حقيقية لاحقاً)
-                                const blurDataURL = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=="
-
                                 return (
                                     <Image
                                         priority={true}
                                         fetchPriority="high"
                                         placeholder="blur"
-                                        blurDataURL={blurDataURL}
+                                        blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=" // ✅ blur أصغر
                                         src={normalizeImageUrl(finalImage)}
                                         width={838}
                                         height={500}
                                         className="blog_main_img"
                                         alt={blogData?.title || "Blog Image"}
-                                        onError={(e) => { e.target.style.display = 'none' }}
+                                        onError={(e) => { e.target.style.display = 'none'; e.target.src = placeholderImageUrl; }}
                                         // ✅ تحسينات إضافية
                                         loading="eager"
-                                        quality={75}
+                                        quality={85} // ✅ رفع الجودة قليلاً لتقليل إعادة التحميل
                                         sizes="(max-width: 768px) 100vw, 838px"
                                     />
                                 )
@@ -215,6 +174,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                         itemIds={blogData.item_ids}
                                         isRtl={isRtl}
                                         containerClassPrefix="blog_main_items"
+                                        aboveFold={true}
                                     />
                                 </div>
                             )}

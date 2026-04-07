@@ -194,18 +194,18 @@ const nextConfig = {
     
     // ✅ تحسين Tree-shaking للمكتبات الثقيلة
     optimizePackageImports: [
+        'react-icons',
+        'react-share', 
+        'swiper',
+        'html-react-parser',
         '@mui/material',
         'antd',
         '@mui/icons-material',
-        'react-icons',
         'react-phone-input-2',
         'react-hot-toast',
         'sweetalert2',
         'axios',
-        'firebase',
-        'swiper',
-        'react-share',
-        'html-react-parser'
+        'firebase'
     ],
     
     // ✅ تحسينات إضافية آمنة لـ Turbopack
@@ -335,50 +335,20 @@ const nextConfig = {
         usedExports: true,
         sideEffects: false,
         minimize: true,
-        // ✅ Advanced code splitting
+        // ✅ Optimized code splitting (reduce fragments)
         splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 30,
-          maxInitialRequests: 30,
-          minSize: 20000,
-          maxSize: 250000, // Revert to reasonable chunk size
-          enforceSizeThreshold: 50000,
+          maxAsyncRequests: 20, // قلل الرقم ده لتقليل عدد الـ Requests
+          maxInitialRequests: 20, // قلل الرقم ده
+          minSize: 40000, // ارفع الحجم الأدنى لتقليل عدد الملفات الصغيرة
           cacheGroups: {
             default: false,
             vendors: false,
-            // ✅ Force all heavy icons into a single parallel-loading chunk
-            icons: {
-              name: 'icons',
-              test: /[\\/]node_modules[\\/](@ant-design|react-icons|@mui\/icons-material)[\\/]/,
-              chunks: 'all',
-              priority: 40,
-              enforce: true,
-              reuseExistingChunk: true,
-            },
-            // ✅ Dedicated vendor chunk for framework core
-            vendor: {
-              name: 'vendor',
-              chunks: 'all',
+            // ✅ ادمج الـ vendors الأساسية فقط في ملف واحد (framework)
+            framework: {
+              name: 'framework',
               test: /[\\/]node_modules[\\/](react|react-dom|next|@reduxjs|react-redux|redux-persist)[\\/]/,
-              priority: 30,
-              enforce: true,
-              reuseExistingChunk: true,
-            },
-            // ✅ Ant Design Styles & Components
-            antd: {
-              name: 'antd',
-              test: /[\\/]node_modules[\\/]antd[\\/]/,
-              chunks: 'all',
-              priority: 25,
-              enforce: true,
-              reuseExistingChunk: true,
-            },
-            // ✅ Common chunks for everything else
-            common: {
-              name: 'common',
-              minChunks: 1,
-              chunks: 'all',
-              priority: 10,
+              priority: 40,
               enforce: true,
               reuseExistingChunk: true,
             },
