@@ -79,7 +79,7 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
     return (
-        <html lang="ar" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
+        <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
             <head>
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#000000" />
@@ -108,8 +108,9 @@ export default async function RootLayout({ children }) {
                 {/* ✅ Critical above-the-fold styles only */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
-                        html,body{overflow-x:hidden;max-width:100vw;margin:0;}
-                        #main-content,main{min-height:70vh;overflow-x:hidden;}
+                        body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;overflow-x:hidden;}
+                        #main-content,main{min-height:70vh;}
+                        .container{width:100%;margin:0 auto;max-width:1320px;padding-left:12px;padding-right:12px;}
                         .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
                         .d-none{display:none!important;}
                         @media (max-width: 991px){#main-content,main{padding-top:0;}}
