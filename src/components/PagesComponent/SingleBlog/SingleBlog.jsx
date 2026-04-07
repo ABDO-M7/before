@@ -99,6 +99,7 @@ const SingleBlog = ({
                                         deferIframeLoadMs={200}
                                         iframeLoading="lazy"
                                         iframeFetchPriority="auto"
+                                        injectGoogleFonts={false}
                                     />
                                 </div>
 

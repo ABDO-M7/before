@@ -22,6 +22,7 @@ export default function HTMLContentRenderer({
   placeholderMinHeightPx = 200,
   iframeLoading = 'lazy',
   iframeFetchPriority = 'auto',
+  injectGoogleFonts = true,
   onLoadComplete
 }) {
   const [iframeHeight, setIframeHeight] = useState(`${placeholderMinHeightPx}px`);
@@ -156,7 +157,8 @@ export default function HTMLContentRenderer({
       </script>
     `;
 
-    const fontInjection = `
+    const fontInjection = injectGoogleFonts
+      ? `
       <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
       <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -165,7 +167,8 @@ export default function HTMLContentRenderer({
         body { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
         * { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
       </style>
-    `;
+    `
+      : `${baseInjection}`;
 
     if (isFullHtml) {
       let result = trimmedContent;
@@ -191,9 +194,10 @@ export default function HTMLContentRenderer({
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          ${injectGoogleFonts ? `
           <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-          <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">` : ''}
           ${baseInjection}
           <style>
             body { 

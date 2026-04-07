@@ -555,6 +555,7 @@ const Header = ({ initialQuickSearchItems }) => {
                       display: 'block'
                     }}
                     priority
+                    fetchPriority="high"
                   />
                 ) : (
                   <div style={{
@@ -614,6 +615,7 @@ const Header = ({ initialQuickSearchItems }) => {
                         display: 'block'
                       }}
                       priority
+                      fetchPriority="high"
                     />
                   ) : (
                     <div style={{
