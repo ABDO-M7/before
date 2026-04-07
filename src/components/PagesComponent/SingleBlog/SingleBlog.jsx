@@ -50,6 +50,14 @@ const SingleBlog = ({
             return undefined;
         })();
 
+        const blogDescriptionHtml = blogData?.description ? String(blogData.description) : '';
+        const shouldUseIframeRenderer = (() => {
+            const html = blogDescriptionHtml;
+            if (!html) return false;
+            // Use iframe when the content relies on scripts/embeds or common heavy third-party libs.
+            return /<script\b|<iframe\b|cdn\.tailwindcss\.com|chart\.js/i.test(html);
+        })();
+
         return (
             <>
                 {/* ✅ Side Effect Handler (Client Component) */}
@@ -99,19 +107,26 @@ const SingleBlog = ({
 
                                 {/* HTML Content */}
                                 <div className="blog_html_content" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}>
-                                    <HTMLContentRenderer
-                                        htmlContent={blogData?.description ? String(blogData.description) : ''}
-                                        contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
-                                        baseHref={blogBaseHref}
-                                        assetOrigin={blogAssetOrigin}
-                                        placeholderMinHeightPx={800}
-                                        deferIframeLoadMs={200}
-                                        iframeLoading="lazy"
-                                        iframeFetchPriority="auto"
-                                        injectGoogleFonts={false}
-                                        deferUntilInView={true}
-                                        inViewRootMarginPx={800}
-                                    />
+                                    {shouldUseIframeRenderer ? (
+                                        <HTMLContentRenderer
+                                            htmlContent={blogDescriptionHtml}
+                                            contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
+                                            baseHref={blogBaseHref}
+                                            assetOrigin={blogAssetOrigin}
+                                            placeholderMinHeightPx={800}
+                                            deferIframeLoadMs={200}
+                                            iframeLoading="lazy"
+                                            iframeFetchPriority="auto"
+                                            injectGoogleFonts={false}
+                                            deferUntilInView={true}
+                                            inViewRootMarginPx={800}
+                                        />
+                                    ) : (
+                                        <div
+                                            dangerouslySetInnerHTML={{ __html: blogDescriptionHtml }}
+                                            suppressHydrationWarning={true}
+                                        />
+                                    )}
                                 </div>
 
                                 {/* Main Items Carousel */}
