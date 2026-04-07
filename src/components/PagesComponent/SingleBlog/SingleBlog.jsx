@@ -95,7 +95,10 @@ const SingleBlog = ({
                                         htmlContent={blogData?.description ? String(blogData.description) : ''}
                                         contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
                                         baseHref={blogBaseHref}
-                                        placeholderMinHeightPx={300}
+                                        placeholderMinHeightPx={800}
+                                        deferIframeLoadMs={200}
+                                        iframeLoading="lazy"
+                                        iframeFetchPriority="auto"
                                     />
                                 </div>
 
@@ -157,19 +160,24 @@ const SingleBlog = ({
                                     )}
                                 </div>
 
-                                <BlogSocialShare 
-                                    blogUrl={String(currentUrl)} 
-                                    blogTitle={String(blogData?.title)} 
-                                    CompanyName={CompanyName} 
-                                    tShare={t.shareInfo}
-                                    tCopySuccess={t.linkCopied}
-                                />
+                                <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 80px' }}>
+                                    <BlogSocialShare 
+                                        blogUrl={String(currentUrl)} 
+                                        blogTitle={String(blogData?.title)} 
+                                        CompanyName={CompanyName} 
+                                        tShare={t.shareInfo}
+                                        tCopySuccess={t.linkCopied}
+                                    />
+                                </div>
                             </div>
                         </div>
 
                         {/* Tags Sidebar */}
                         <div className="col-12">
-                            <div className="our_blog_rightbar_wrapper" style={{ marginTop: '2rem', minHeight: blogTags?.length > 0 ? undefined : '0px' }}>
+                            <div
+                                className="our_blog_rightbar_wrapper"
+                                style={{ marginTop: '2rem', minHeight: blogTags?.length > 0 ? '120px' : '0px' }}
+                            >
                                 {blogTags?.length > 0 && <Tags data={blogTags} tTags={t.tags} tAll={t.all} />}
                             </div>
                         </div>

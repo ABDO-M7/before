@@ -20,9 +20,11 @@ export default function HTMLContentRenderer({
   deferIframeLoadMs = 0,
   // While the iframe is deferred / loading, reserve space to reduce CLS.
   placeholderMinHeightPx = 200,
+  iframeLoading = 'lazy',
+  iframeFetchPriority = 'auto',
   onLoadComplete
 }) {
-  const [iframeHeight, setIframeHeight] = useState('0px');
+  const [iframeHeight, setIframeHeight] = useState(`${placeholderMinHeightPx}px`);
   const [isLoading, setIsLoading] = useState(true);
   const [key, setKey] = useState(0);
   const [shouldRenderIframe, setShouldRenderIframe] = useState(deferIframeLoadMs <= 0);
@@ -30,10 +32,10 @@ export default function HTMLContentRenderer({
   // Reset loading state and force re-mount when content changes
   useEffect(() => {
     setIsLoading(true);
-    setIframeHeight('0px');
+    setIframeHeight(`${placeholderMinHeightPx}px`);
     setKey(prev => prev + 1);
     if (deferIframeLoadMs > 0) setShouldRenderIframe(false);
-  }, [htmlContent]);
+  }, [htmlContent, placeholderMinHeightPx, deferIframeLoadMs]);
 
   // Defer mounting the iframe to avoid critical-path blocking.
   useEffect(() => {
@@ -243,11 +245,11 @@ export default function HTMLContentRenderer({
         <iframe
           key={`${contentId}-${key}`}
           srcDoc={preparedHtml}
-          loading="eager" // ✅ Changed to eager for faster dynamic content rendering
-          fetchpriority="high" // ✅ High priority for dynamic HTML content
+          loading={iframeLoading}
+          fetchPriority={iframeFetchPriority}
           style={{
             width: '100%',
-            height: iframeHeight,
+            height: isLoading ? `${placeholderMinHeightPx}px` : iframeHeight,
             border: 'none',
             overflow: 'hidden',
             display: 'block',
