@@ -113,17 +113,15 @@ const SingleBlogPage = async ({ params }) => {
       const normalized = serverNormalizeImageUrl(rawImg);
       
       if (normalized) {
-        // ✅ استخدم الرابط الأصلي مباشرة (مش /_next/image)
-        // Next.js هيتعامل مع التحسين تلقائياً لما الصورة تتحمل في الـ <Image>
-        ReactDOM.preload(normalized, {
+        // ✅ استخدم /_next/image عشان يتطابق مع اللي Next.js هيرسمه فعلاً
+        const optimizedUrl = `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75`;
+        ReactDOM.preload(optimizedUrl, {
           as: 'image',
           fetchPriority: 'high',
-          // ✅ srcset بسيط عشان نضمن التحميل السريع
-          imageSrcSet: `${normalized}?w=828&q=75 828w`,
-          imageSizes: '838px',
+          imageSizes: '(max-width: 768px) 100vw, 838px',
         });
         
-        // ✅ preconnect للدومين الخارجي
+        // ✅ preconnect للدومين الخارجي (اختياري لكن مفيد لو الصورة من دومين تاني)
         if (normalized.startsWith('http')) {
           try {
             const domain = new URL(normalized).origin;
