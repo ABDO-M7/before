@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 export default function HTMLContentRenderer({
   htmlContent,
   contentId = 'html-content',
+  baseHref,
   // Used to keep iframe-heavy HTML (e.g. tailwind CDN) out of the critical path on the home page.
   // When > 0, the iframe is mounted after this delay (ms).
   deferIframeLoadMs = 0,
@@ -69,6 +70,16 @@ export default function HTMLContentRenderer({
   const prepareHtml = (content) => {
     const trimmedContent = content.trim();
     const isFullHtml = trimmedContent.toLowerCase().includes('<html') || trimmedContent.toLowerCase().startsWith('<!doctype');
+
+    const resolvedBaseHref = (() => {
+      if (typeof baseHref === 'string' && baseHref.trim()) return baseHref.trim().replace(/\/$/, '') + '/';
+      if (typeof window !== 'undefined' && window.location?.origin) return window.location.origin.replace(/\/$/, '') + '/';
+      return null;
+    })();
+
+    const baseInjection = resolvedBaseHref
+      ? `<base href="${resolvedBaseHref}">`
+      : '';
 
     const resizeScript = `
       <script>
@@ -147,6 +158,7 @@ export default function HTMLContentRenderer({
       <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
       <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+      ${baseInjection}
       <style>
         body { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
         * { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
@@ -180,6 +192,7 @@ export default function HTMLContentRenderer({
           <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
           <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+          ${baseInjection}
           <style>
             body { 
               margin: 0; 

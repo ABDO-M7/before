@@ -5,6 +5,7 @@ import { truncate } from "@/utils/textUtils"
 import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils"
 import Link from "next/link"
 import React from "react"
+import HTMLContentRenderer from "@/components/DynamicHTMLContent/HTMLContentRenderer"
 import { 
   BlogSocialShareWrapper as BlogSocialShare,
   BlogProductsCarouselWrapper as BlogProductsCarousel,
@@ -28,6 +29,18 @@ const SingleBlog = ({
         const blogTags = Array.isArray(initialTags) ? initialTags : []
         const relatedBlogs = Array.isArray(initialRelatedBlogs) ? initialRelatedBlogs : []
         const CompanyName = String(settings?.company_name || "Arablaza")
+
+        const blogBaseHref = (() => {
+            try {
+                // Prefer currentUrl (canonical) if available; fallback to env.
+                if (currentUrl) return new URL(String(currentUrl)).origin;
+            } catch {}
+            try {
+                const envUrl = process.env.NEXT_PUBLIC_WEB_URL;
+                if (envUrl) return new URL(String(envUrl)).origin;
+            } catch {}
+            return undefined;
+        })();
 
         return (
             <>
@@ -76,17 +89,15 @@ const SingleBlog = ({
                                     }
                                 })()}
 
-                                {/* HTML Content - Rendered on Server */}
-                                <div
-                                    className="blog_html_content"
-                                    dangerouslySetInnerHTML={{ 
-                                        __html: blogData?.description 
-                                            ? String(blogData.description).replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') 
-                                            : '' 
-                                    }}
-                                    suppressHydrationWarning={true}
-                                    style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}
-                                />
+                                {/* HTML Content */}
+                                <div className="blog_html_content" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}>
+                                    <HTMLContentRenderer
+                                        htmlContent={blogData?.description ? String(blogData.description) : ''}
+                                        contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
+                                        baseHref={blogBaseHref}
+                                        placeholderMinHeightPx={300}
+                                    />
+                                </div>
 
                                 {/* Main Items Carousel */}
                                 {blogData?.item_ids && (
