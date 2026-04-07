@@ -23,7 +23,7 @@ export async function fetchBlogBySlug(slug) {
         const encoded = encodeURIComponent(decoded.trim());
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${encoded}`,
-            { next: { revalidate: 86400, tags: ['blogs', decoded] } }
+            { next: { revalidate: 86400, tags: ['blogs', String(encoded)] } }
         );
         if (!res.ok) return null;
         const data = await res.json();
@@ -41,7 +41,7 @@ export async function fetchBlogBySlug(slug) {
 export function buildBlogMetadata(singleBlog, slug) {
     if (!singleBlog) return { title: SITE_NAME, description: DEFAULT_DESCRIPTION };
 
-    const plainDesc = (singleBlog.description || '').replace(/<[^>]*>/g, '').slice(0, 160) || DEFAULT_DESCRIPTION;
+    const plainDesc = String(singleBlog.description || '').replace(/<[^>]*>/g, '').slice(0, 160) || DEFAULT_DESCRIPTION;
     const title = singleBlog.title || SITE_NAME;
     const canonicalSlug = singleBlog.slug || slug || '';
     const canonicalUrl = `${SITE_URL}/blogs/${encodeURIComponent(canonicalSlug)}`;

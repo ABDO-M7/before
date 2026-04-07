@@ -9,10 +9,21 @@ import { serverNormalizeImageUrl } from '@/utils/serverImageUtils';
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 // ✅ Uses the same fetch URL as the page — Next.js deduplicates it (zero extra request)
 export const generateMetadata = async ({ params }) => {
-    const { slug } = await params;
-    const rawData = await fetchBlogBySlug(slug);
-    const singleBlog = rawData?.data?.data?.[0] || null;
-    return buildBlogMetadata(singleBlog, slug);
+    try {
+        const { slug } = await params;
+        
+        // Safety: handle encoded/decoded Arabic slugs
+        const decodedSlug = typeof slug === 'string' && slug.includes('%') 
+            ? decodeURIComponent(slug) 
+            : slug;
+
+        const rawData = await fetchBlogBySlug(decodedSlug);
+        const singleBlog = rawData?.data?.data?.[0] || null;
+        return buildBlogMetadata(singleBlog, decodedSlug);
+    } catch (error) {
+        console.error("Error in generateMetadata for blog:", error);
+        return buildBlogMetadata(null, "");
+    }
 };
 
 // ─── Data Fetching ────────────────────────────────────────────────────────────
@@ -65,100 +76,119 @@ const fetchSettings = async () => {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const SingleBlogPage = async ({ params }) => {
-    const { slug } = await params;
+    let slug = '';
+    try {
+        const resolvedParams = await params;
+        slug = resolvedParams?.slug || '';
+        
+        // Safety: handle encoded/decoded Arabic slugs
+        const decodedSlug = typeof slug === 'string' && slug.includes('%') 
+            ? decodeURIComponent(slug) 
+            : slug;
 
-    // ✅ fetchBlogBySlug is deduplicated with generateMetadata's call — one network request
-    const [rawData, initialTags, initialQuickSearchItems, settingsData] = await Promise.all([
-        fetchBlogBySlug(slug),
-        fetchBlogTagsData(),
-        fetchQuickSearches(),
-        fetchSettings()
-    ]);
+        // ✅ fetchBlogBySlug is deduplicated with generateMetadata's call — one network request
+        const [rawData, initialTags, initialQuickSearchItems, settingsData] = await Promise.all([
+            fetchBlogBySlug(decodedSlug),
+            fetchBlogTagsData(),
+            fetchQuickSearches(),
+            fetchSettings()
+        ]);
 
-    const singleBlog = rawData?.data?.data?.[0] || null;
-    const relatedBlogs = rawData?.other_blogs || [];
-    
-    // ✅ تحضير الترجمات والإعدادات للسيرفر
-    // ملاحظة: يمكنك تحسين هذا لاحقاً بالكشف عن اللغة الحقيقية من الميدل وير
-    const isRtl = true; 
-    const langCode = 'ar';
-    const translations = langCode === 'ar' ? ar : en;
-    
-    // قاموس الترجمات المطلوبة لهذه الصفحة
-    const t = {
-        ourBlogs: translations.ourBlogs || "Property Insights",
-        views: translations.views || "Views",
-        relatedArticle: translations.relatedArticle || "Related Article",
-        whatsappMessageIntro: translations.whatsappMessageIntro || "Hello...",
-        copyToClipboard: translations.copyToClipboard || "Copied to clipboard",
-        googleMap: translations.googleMap || "Google Map",
-        shareInfo: translations.shareThisBlogOnSocialMedia || translations.shareThisOnSocialMedia || "Share",
-        linkCopied: translations.copyToClipboard || "Link copied",
-        tags: translations.tags || "Tags",
-        all: translations.all || "All"
-    };
-    // ✅ إذا لم توجد بيانات، أعد 404 فوراً (لا تحمل Client Component فارغ)
-    if (!singleBlog) {
+        const singleBlog = rawData?.data?.data?.[0] || null;
+        const relatedBlogs = rawData?.other_blogs || [];
+        
+        // ✅ تحضير الترجمات والإعدادات للسيرفر
+        const isRtl = true; 
+        const langCode = 'ar';
+        const translations = (langCode === 'ar' ? ar : en) || {};
+        
+        // قاموس الترجمات المطلوبة لهذه الصفحة
+        const t = {
+            ourBlogs: translations.ourBlogs || "Property Insights",
+            views: translations.views || "Views",
+            relatedArticle: translations.relatedArticle || "Related Article",
+            whatsappMessageIntro: translations.whatsappMessageIntro || "Hello...",
+            copyToClipboard: translations.copyToClipboard || "Copied to clipboard",
+            googleMap: translations.googleMap || "Google Map",
+            shareInfo: translations.shareThisBlogOnSocialMedia || translations.shareThisOnSocialMedia || "Share",
+            linkCopied: translations.copyToClipboard || "Link copied",
+            tags: translations.tags || "Tags",
+            all: translations.all || "All"
+        };
+
+        // ✅ إذا لم توجد بيانات، أعد 404 فوراً
+        if (!singleBlog) {
+            return (
+                <Layout initialQuickSearchItems={initialQuickSearchItems}>
+                    <div className="container" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <h3>{translations.blogNotFound || "Blog not found"}</h3>
+                    </div>
+                </Layout>
+            );
+        }
+
+        // ─── JSON-LD ──────────────────────────────────────────────────────────────
+        const baseUrl = (process.env.NEXT_PUBLIC_WEB_URL || '').replace(/\/$/, '');
+        const blogUrl = `${baseUrl}/blogs/${encodeURIComponent(String(singleBlog?.slug || slug || ''))}`;
+        const CompanyName = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
+
+        const jsonLd = {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: String(singleBlog?.title || ''),
+            description: singleBlog?.description ? stripHtml(String(singleBlog.description)).slice(0, 500) : '',
+            url: blogUrl,
+            image: singleBlog?.image ? [serverNormalizeImageUrl(String(singleBlog.image))] : undefined,
+            datePublished: singleBlog?.created_at ? formatDate(String(singleBlog.created_at)) : '',
+            dateModified: singleBlog?.updated_at ? formatDate(String(singleBlog.updated_at)) : formatDate(String(singleBlog?.created_at)),
+            author: {
+                '@type': 'Organization',
+                name: String(CompanyName || 'Arablaza')
+            },
+            publisher: {
+                '@type': 'Organization',
+                name: String(CompanyName || 'Arablaza'),
+                logo: {
+                    '@type': 'ImageObject',
+                    url: `${baseUrl}/icon-512.png`
+                }
+            },
+            keywords: Array.isArray(singleBlog?.tags) ? singleBlog.tags.join(', ') : (singleBlog?.tags || ''),
+            mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id': blogUrl
+            }
+        };
+
         return (
-            <Layout initialQuickSearchItems={initialQuickSearchItems}>
-                <div className="container" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <h3>Blog not found</h3>
+            <>
+                <JsonLd data={jsonLd} />
+                <Layout initialQuickSearchItems={initialQuickSearchItems}>
+                    <SingleBlog
+                        initialBlogData={singleBlog}
+                        initialRelatedBlogs={relatedBlogs}
+                        initialTags={initialTags}
+                        settings={settingsData?.data}
+                        isRtl={isRtl}
+                        t={t}
+                        currentUrl={blogUrl}
+                    />
+                </Layout>
+            </>
+        );
+    } catch (error) {
+        console.error(`Serious error rendering blog ${slug}:`, error);
+        // Fallback to avoid complete crash
+        return (
+            <Layout initialQuickSearchItems={[]}>
+                <div className="container" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+                    <h3>حدث خطأ أثناء تحميل المقال</h3>
+                    <p style={{ opacity: 0.7 }}>يرجى المحاولة مرة أخرى لاحقاً</p>
+                    <a href="/" style={{ color: 'var(--primary-color)', textDecoration: 'underline' }}>العودة للرئيسية</a>
                 </div>
             </Layout>
         );
     }
-
-    // ─── JSON-LD ──────────────────────────────────────────────────────────────
-    const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
-    const blogUrl = `${baseUrl}/blogs/${encodeURIComponent(singleBlog?.slug || slug || '')}`;
-
-    const CompanyName = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
-
-    const jsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: singleBlog?.title,
-        description: singleBlog?.description ? stripHtml(singleBlog.description).slice(0, 500) : '',
-        url: blogUrl,
-        image: singleBlog?.image ? [serverNormalizeImageUrl(singleBlog.image)] : undefined,
-        datePublished: singleBlog?.created_at ? formatDate(singleBlog.created_at) : '',
-        dateModified: singleBlog?.updated_at ? formatDate(singleBlog.updated_at) : formatDate(singleBlog?.created_at),
-        author: {
-            '@type': 'Organization',
-            name: CompanyName || 'Arablaza'
-        },
-        publisher: {
-            '@type': 'Organization',
-            name: CompanyName || 'Arablaza',
-            logo: {
-                '@type': 'ImageObject',
-                url: `${baseUrl}/icon-512.png`
-            }
-        },
-        keywords: singleBlog?.tags ? singleBlog.tags.join(', ') : '',
-        // ✅ تحسين الظهور في البحث
-        mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': blogUrl
-        }
-    };
-
-    return (
-        <>
-            <JsonLd data={jsonLd} />
-            <Layout initialQuickSearchItems={initialQuickSearchItems}>
-                <SingleBlog
-                    initialBlogData={singleBlog}
-                    initialRelatedBlogs={relatedBlogs}
-                    initialTags={initialTags}
-                    settings={settingsData?.data}
-                    isRtl={isRtl}
-                    t={t}
-                    currentUrl={blogUrl}
-                />
-            </Layout>
-        </>
-    );
 };
 
 export default SingleBlogPage;
