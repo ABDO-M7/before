@@ -58,6 +58,14 @@ const SingleBlog = ({
             return /<script\b|<iframe\b|cdn\.tailwindcss\.com|chart\.js/i.test(html);
         })();
 
+        const shouldInjectTailwindInIframe = (() => {
+            const html = blogDescriptionHtml;
+            if (!html) return false;
+            if (/cdn\.tailwindcss\.com/i.test(html)) return false;
+            // Heuristic: Tailwind utility classes commonly used by AI-generated blocks.
+            return /class\s*=\s*['"][^'"]*\b(bg-|text-|rounded-|shadow-|grid\b|flex\b|items-center\b|justify-)/i.test(html);
+        })();
+
         return (
             <>
                 {/* ✅ Side Effect Handler (Client Component) */}
@@ -118,6 +126,7 @@ const SingleBlog = ({
                                             iframeLoading="lazy"
                                             iframeFetchPriority="auto"
                                             injectGoogleFonts={false}
+                                            injectTailwindCdn={shouldInjectTailwindInIframe}
                                             deferUntilInView={true}
                                             inViewRootMarginPx={800}
                                         />

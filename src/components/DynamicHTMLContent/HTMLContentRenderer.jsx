@@ -24,6 +24,7 @@ export default function HTMLContentRenderer({
   iframeLoading = 'lazy',
   iframeFetchPriority = 'auto',
   injectGoogleFonts = true,
+  injectTailwindCdn = false,
   deferUntilInView = false,
   inViewRootMarginPx = 300,
   onLoadComplete
@@ -203,6 +204,10 @@ export default function HTMLContentRenderer({
       ? `<base href="${resolvedBaseHref}">`
       : '';
 
+    const tailwindInjection = injectTailwindCdn
+      ? `<script src="https://cdn.tailwindcss.com"></script>`
+      : '';
+
     const resizeScript = `
       <script>
         (function() {
@@ -282,12 +287,13 @@ export default function HTMLContentRenderer({
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
       <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
       ${baseInjection}
+      ${tailwindInjection}
       <style>
         body { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
         * { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
       </style>
     `
-      : `${baseInjection}`;
+      : `${baseInjection}${tailwindInjection}`;
 
     if (isFullHtml) {
       let result = trimmedContent;
@@ -318,6 +324,7 @@ export default function HTMLContentRenderer({
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
           <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">` : ''}
           ${baseInjection}
+          ${tailwindInjection}
           <style>
             body { 
               margin: 0; 
