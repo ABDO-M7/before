@@ -66,7 +66,6 @@ const SingleBlog = ({
                                                 height={500}
                                                 className="blog_main_img"
                                                 alt={String(blogData?.title || "Blog Image")}
-                                                onError={(e) => { e.target.style.display = 'none'; }}
                                                 loading="eager"
                                                 quality={75}
                                                 sizes="(max-width: 768px) 100vw, 838px"
