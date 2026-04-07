@@ -15,6 +15,7 @@ export default function HTMLContentRenderer({
   htmlContent,
   contentId = 'html-content',
   baseHref,
+  assetOrigin,
   // Used to keep iframe-heavy HTML (e.g. tailwind CDN) out of the critical path on the home page.
   // When > 0, the iframe is mounted after this delay (ms).
   deferIframeLoadMs = 0,
@@ -110,8 +111,41 @@ export default function HTMLContentRenderer({
 
   // Prepared HTML content
   const prepareHtml = (content) => {
-    const trimmedContent = content.trim();
+    let trimmedContent = content.trim();
     const isFullHtml = trimmedContent.toLowerCase().includes('<html') || trimmedContent.toLowerCase().startsWith('<!doctype');
+
+    const resolvedAssetOrigin = (() => {
+      if (typeof assetOrigin === 'string' && assetOrigin.trim()) return assetOrigin.trim().replace(/\/$/, '');
+      return null;
+    })();
+
+    // Fix common CMS asset paths that are root-relative (e.g. /storage/...) but hosted on a different origin.
+    if (resolvedAssetOrigin) {
+      const prefixUrl = (p) => `${resolvedAssetOrigin}${p.startsWith('/') ? '' : '/'}${p}`;
+      const replaceQuoted = (attr, pathPrefix) => {
+        const re = new RegExp(`(${attr}\\s*=\\s*["'])(${pathPrefix.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&')}[^"']*)(["'])`, 'gi');
+        trimmedContent = trimmedContent.replace(re, (_m, p1, p2, p3) => {
+          if (/^https?:\/\//i.test(p2) || /^data:/i.test(p2)) return `${p1}${p2}${p3}`;
+          return `${p1}${prefixUrl(p2)}${p3}`;
+        });
+      };
+
+      // Root-relative paths
+      replaceQuoted('src', '/storage/');
+      replaceQuoted('href', '/storage/');
+      replaceQuoted('src', '/uploads/');
+      replaceQuoted('href', '/uploads/');
+      replaceQuoted('src', '/assets/');
+      replaceQuoted('href', '/assets/');
+
+      // Also handle non-leading-slash variants (storage/...)
+      replaceQuoted('src', 'storage/');
+      replaceQuoted('href', 'storage/');
+      replaceQuoted('src', 'uploads/');
+      replaceQuoted('href', 'uploads/');
+      replaceQuoted('src', 'assets/');
+      replaceQuoted('href', 'assets/');
+    }
 
     const resolvedBaseHref = (() => {
       if (typeof baseHref === 'string' && baseHref.trim()) return baseHref.trim().replace(/\/$/, '') + '/';

@@ -42,6 +42,14 @@ const SingleBlog = ({
             return undefined;
         })();
 
+        const blogAssetOrigin = (() => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                if (apiUrl) return new URL(String(apiUrl)).origin;
+            } catch {}
+            return undefined;
+        })();
+
         return (
             <>
                 {/* ✅ Side Effect Handler (Client Component) */}
@@ -95,6 +103,7 @@ const SingleBlog = ({
                                         htmlContent={blogData?.description ? String(blogData.description) : ''}
                                         contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
                                         baseHref={blogBaseHref}
+                                        assetOrigin={blogAssetOrigin}
                                         placeholderMinHeightPx={800}
                                         deferIframeLoadMs={200}
                                         iframeLoading="lazy"
