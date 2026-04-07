@@ -101,7 +101,7 @@ const SingleBlog = ({
 
                                 {/* Main Items Carousel */}
                                 {blogData?.item_ids && (
-                                    <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem', minHeight: '430px', position: 'relative' }}>
+                                    <div className="blog_main_items" style={{ marginTop: '1rem', marginBottom: '1rem', position: 'relative' }}>
                                         <BlogProductsCarousel
                                             itemIds={blogData.item_ids}
                                             isRtl={isRtl}
