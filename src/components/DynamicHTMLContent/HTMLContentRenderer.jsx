@@ -23,23 +23,32 @@ export default function HTMLContentRenderer({
   iframeLoading = 'lazy',
   iframeFetchPriority = 'auto',
   injectGoogleFonts = true,
+  deferUntilInView = false,
+  inViewRootMarginPx = 300,
   onLoadComplete
 }) {
   const [iframeHeight, setIframeHeight] = useState(`${placeholderMinHeightPx}px`);
   const [isLoading, setIsLoading] = useState(true);
   const [key, setKey] = useState(0);
-  const [shouldRenderIframe, setShouldRenderIframe] = useState(deferIframeLoadMs <= 0);
+  const [shouldRenderIframe, setShouldRenderIframe] = useState(deferIframeLoadMs <= 0 && !deferUntilInView);
+  const [containerEl, setContainerEl] = useState(null);
 
   // Reset loading state and force re-mount when content changes
   useEffect(() => {
     setIsLoading(true);
     setIframeHeight(`${placeholderMinHeightPx}px`);
     setKey(prev => prev + 1);
-    if (deferIframeLoadMs > 0) setShouldRenderIframe(false);
-  }, [htmlContent, placeholderMinHeightPx, deferIframeLoadMs]);
+    if (deferUntilInView || deferIframeLoadMs > 0) setShouldRenderIframe(false);
+  }, [htmlContent, placeholderMinHeightPx, deferIframeLoadMs, deferUntilInView]);
 
   // Defer mounting the iframe to avoid critical-path blocking.
   useEffect(() => {
+    // If we defer until in-view, IntersectionObserver will control mounting.
+    if (deferUntilInView) {
+      setShouldRenderIframe(false);
+      return;
+    }
+
     if (deferIframeLoadMs <= 0) {
       setShouldRenderIframe(true);
       return;
@@ -47,7 +56,37 @@ export default function HTMLContentRenderer({
     setShouldRenderIframe(false);
     const t = setTimeout(() => setShouldRenderIframe(true), deferIframeLoadMs);
     return () => clearTimeout(t);
-  }, [deferIframeLoadMs, htmlContent]);
+  }, [deferIframeLoadMs, htmlContent, deferUntilInView]);
+
+  // Defer mounting until the container is near the viewport (reduces TBT for heavy HTML).
+  useEffect(() => {
+    if (!deferUntilInView) return;
+    if (!containerEl) return;
+    if (typeof window === 'undefined') return;
+    if (typeof IntersectionObserver === 'undefined') {
+      // Fallback: mount after a small delay.
+      const t = setTimeout(() => setShouldRenderIframe(true), Math.max(0, deferIframeLoadMs));
+      return () => clearTimeout(t);
+    }
+
+    let timeoutId = null;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (!entries?.[0]?.isIntersecting) return;
+        obs.disconnect();
+        const delay = Math.max(0, deferIframeLoadMs);
+        if (delay <= 0) setShouldRenderIframe(true);
+        else timeoutId = setTimeout(() => setShouldRenderIframe(true), delay);
+      },
+      { root: null, rootMargin: `${Number(inViewRootMarginPx) || 0}px`, threshold: 0.01 }
+    );
+
+    obs.observe(containerEl);
+    return () => {
+      obs.disconnect();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [deferUntilInView, containerEl, deferIframeLoadMs, inViewRootMarginPx]);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -223,6 +262,7 @@ export default function HTMLContentRenderer({
   return (
     <div
       className={`html-content-wrapper html-content-wrapper-${contentId}`}
+      ref={setContainerEl}
       style={{
         position: 'relative',
         width: '100%',

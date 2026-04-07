@@ -100,6 +100,8 @@ const SingleBlog = ({
                                         iframeLoading="lazy"
                                         iframeFetchPriority="auto"
                                         injectGoogleFonts={false}
+                                        deferUntilInView={true}
+                                        inViewRootMarginPx={800}
                                     />
                                 </div>
 
