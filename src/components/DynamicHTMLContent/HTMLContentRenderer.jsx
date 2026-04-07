@@ -130,6 +130,30 @@ export default function HTMLContentRenderer({
         });
       };
 
+      const replaceUnquoted = (attr, pathPrefix) => {
+        const re = new RegExp(`(${attr}\\s*=\\s*)(${pathPrefix.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&')}[^\\s>]+)`, 'gi');
+        trimmedContent = trimmedContent.replace(re, (_m, p1, p2) => {
+          if (/^https?:\/\//i.test(p2) || /^data:/i.test(p2)) return `${p1}${p2}`;
+          return `${p1}${prefixUrl(p2)}`;
+        });
+      };
+
+      const replaceCssUrl = (pathPrefix) => {
+        const escaped = pathPrefix.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&');
+        // url(/storage/x.png)
+        const re1 = new RegExp(`url\\(\\s*(${escaped}[^)"']*)\\s*\\)`, 'gi');
+        trimmedContent = trimmedContent.replace(re1, (_m, p1) => {
+          if (/^https?:\/\//i.test(p1) || /^data:/i.test(p1)) return `url(${p1})`;
+          return `url(${prefixUrl(p1)})`;
+        });
+        // url('/storage/x.png') or url("/storage/x.png")
+        const re2 = new RegExp(`url\\(\\s*(["'])(${escaped}[^"']*)\\1\\s*\\)`, 'gi');
+        trimmedContent = trimmedContent.replace(re2, (_m, q, p2) => {
+          if (/^https?:\/\//i.test(p2) || /^data:/i.test(p2)) return `url(${q}${p2}${q})`;
+          return `url(${q}${prefixUrl(p2)}${q})`;
+        });
+      };
+
       // Root-relative paths
       replaceQuoted('src', '/storage/');
       replaceQuoted('href', '/storage/');
@@ -138,6 +162,17 @@ export default function HTMLContentRenderer({
       replaceQuoted('src', '/assets/');
       replaceQuoted('href', '/assets/');
 
+      replaceUnquoted('src', '/storage/');
+      replaceUnquoted('href', '/storage/');
+      replaceUnquoted('src', '/uploads/');
+      replaceUnquoted('href', '/uploads/');
+      replaceUnquoted('src', '/assets/');
+      replaceUnquoted('href', '/assets/');
+
+      replaceCssUrl('/storage/');
+      replaceCssUrl('/uploads/');
+      replaceCssUrl('/assets/');
+
       // Also handle non-leading-slash variants (storage/...)
       replaceQuoted('src', 'storage/');
       replaceQuoted('href', 'storage/');
@@ -145,6 +180,17 @@ export default function HTMLContentRenderer({
       replaceQuoted('href', 'uploads/');
       replaceQuoted('src', 'assets/');
       replaceQuoted('href', 'assets/');
+
+      replaceUnquoted('src', 'storage/');
+      replaceUnquoted('href', 'storage/');
+      replaceUnquoted('src', 'uploads/');
+      replaceUnquoted('href', 'uploads/');
+      replaceUnquoted('src', 'assets/');
+      replaceUnquoted('href', 'assets/');
+
+      replaceCssUrl('storage/');
+      replaceCssUrl('uploads/');
+      replaceCssUrl('assets/');
     }
 
     const resolvedBaseHref = (() => {
