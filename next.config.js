@@ -188,51 +188,42 @@ const nextConfig = {
   compress: true, // Enable compression (default: true)
   // ✅ Advanced compression settings
   experimental: {
-    // Enable advanced optimizations
-    optimizeCss: true, // Optimize CSS output
-    // ✅ Inline CSS to eliminate render-blocking stylesheet requests (~220ms Lighthouse savings)
+    // ✅ تحسينات متوافقة مع Turbopack
+    optimizeCss: true,
     inlineCss: true,
-    // ✅ Automate tree-shaking for heavy libraries
+    
+    // ✅ تحسين Tree-shaking للمكتبات الثقيلة
     optimizePackageImports: [
-      '@mui/material', 
-      'antd', 
-      '@mui/icons-material', 
-      'react-icons', 
-      'react-phone-input-2', 
-      'react-hot-toast',
-      'sweetalert2',
-      'axios',
-      'firebase',
-      'swiper',
-      'react-share', // ✅ Optimized share buttons for blog pages
-      'html-react-parser' // ✅ Optimized HTML parsing for blog content
+        '@mui/material',
+        'antd',
+        '@mui/icons-material',
+        'react-icons',
+        'react-phone-input-2',
+        'react-hot-toast',
+        'sweetalert2',
+        'axios',
+        'firebase',
+        'swiper',
+        'react-share',
+        'html-react-parser'
     ],
-    // ✅ Support modern ES modules while maintaining compatibility
-    esmExternals: 'loose',
-    // ✅ Optimized font loading for better performance
-    fontLoaders: [{ loader: '@next/font', options: { subsets: ['arabic', 'latin'] } }],
+    
+    // ✅ تحسينات إضافية آمنة لـ Turbopack
+    turbo: {
+        resolveAlias: {
+            apexcharts: path.resolve(__dirname, "./node_modules/apexcharts-clevision"),
+        },
+        // ✅ تعطيل الـ minify في التطوير لتسريع الـ HMR
+        minify: process.env.NODE_ENV === 'production',
+    },
   },
   // ✅ Performance optimization
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching
   // ✅ Output configuration for better performance
   output: 'standalone', // Optimize for production deployment (smaller output)
-  // ✅ Turbopack configuration for Next.js 16 (used in development)
-  // Turbopack provides 10x faster builds and better caching
-  turbopack: {
-    // ✅ Resolve aliases (similar to webpack resolve.alias)
-    // Note: Use relative paths from project root, not path.resolve()
-    resolveAlias: {
-      // Custom alias for apexcharts - maps to apexcharts-clevision package
-      apexcharts: path.resolve(
-        __dirname,
-        "./node_modules/apexcharts-clevision"
-      ),
-    },
-    // Note: Code splitting, tree-shaking, and optimizations are automatic in Turbopack
-    // No need to configure splitChunks - Turbopack handles this intelligently
-    // Turbopack automatically optimizes bundle size and performance
-  },
+  // Note: Output standalone is already set above
+
   async redirects() {
     return [];
   },
