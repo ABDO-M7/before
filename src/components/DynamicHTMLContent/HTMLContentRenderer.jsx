@@ -25,6 +25,8 @@ export default function HTMLContentRenderer({
   iframeFetchPriority = 'auto',
   injectGoogleFonts = true,
   injectTailwindCdn = false,
+  injectDefaultTableStyles = false,
+  extraCss = '',
   deferUntilInView = false,
   inViewRootMarginPx = 300,
   onLoadComplete
@@ -208,6 +210,24 @@ export default function HTMLContentRenderer({
       ? `<script src="https://cdn.tailwindcss.com"></script>`
       : '';
 
+    const resolvedExtraCss = typeof extraCss === 'string' ? extraCss : '';
+    const tableCss = injectDefaultTableStyles
+      ? `
+        /* Default table styling for iframe-rendered blog content */
+        table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 12px 30px rgba(16,24,40,.12)}
+        thead tr{background:#0b1220;color:#fff}
+        thead th{padding:14px 16px;font-weight:700;font-size:14px;white-space:nowrap}
+        tbody td{padding:14px 16px;border-top:1px solid rgba(15,23,42,.08);font-size:14px;vertical-align:middle}
+        tbody tr:nth-child(even){background:#f8fafc}
+        td,th{text-align:right}
+        @media(max-width:768px){thead th,tbody td{padding:12px 10px;font-size:13px}}
+      `
+      : '';
+
+    const extraCssInjection = (tableCss || resolvedExtraCss)
+      ? `<style>${tableCss}\n${resolvedExtraCss}</style>`
+      : '';
+
     const resizeScript = `
       <script>
         (function() {
@@ -288,12 +308,13 @@ export default function HTMLContentRenderer({
       <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
       ${baseInjection}
       ${tailwindInjection}
+      ${extraCssInjection}
       <style>
         body { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
         * { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
       </style>
     `
-      : `${baseInjection}${tailwindInjection}`;
+      : `${baseInjection}${tailwindInjection}${extraCssInjection}`;
 
     if (isFullHtml) {
       let result = trimmedContent;
@@ -325,6 +346,7 @@ export default function HTMLContentRenderer({
           <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">` : ''}
           ${baseInjection}
           ${tailwindInjection}
+          ${extraCssInjection}
           <style>
             body { 
               margin: 0; 

@@ -66,6 +66,19 @@ const SingleBlog = ({
             return /class\s*=\s*['"][^'"]*\b(bg-|text-|rounded-|shadow-|grid\b|flex\b|items-center\b|justify-)/i.test(html);
         })();
 
+        const shouldInjectDefaultTableStylesInIframe = (() => {
+            const html = blogDescriptionHtml;
+            if (!html) return false;
+            // If the content contains tables but doesn't appear to bring its own framework,
+            // inject a minimal, good-looking table style so it doesn't render as raw HTML.
+            const hasTable = /<table\b/i.test(html);
+            if (!hasTable) return false;
+            const alreadyStyled = /<style\b|<link\b[^>]*rel\s*=\s*['"]stylesheet['"]/i.test(html);
+            return !alreadyStyled;
+        })();
+
+        const shouldRenderInIframe = shouldUseIframeRenderer || shouldInjectTailwindInIframe || /<table\b/i.test(blogDescriptionHtml);
+
         return (
             <>
                 {/* ✅ Side Effect Handler (Client Component) */}
@@ -115,7 +128,7 @@ const SingleBlog = ({
 
                                 {/* HTML Content */}
                                 <div className="blog_html_content" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}>
-                                    {shouldUseIframeRenderer ? (
+                                    {shouldRenderInIframe ? (
                                         <HTMLContentRenderer
                                             htmlContent={blogDescriptionHtml}
                                             contentId={`blog-desc-${blogData?.id || blogData?.slug || 'default'}`}
@@ -127,6 +140,7 @@ const SingleBlog = ({
                                             iframeFetchPriority="auto"
                                             injectGoogleFonts={false}
                                             injectTailwindCdn={shouldInjectTailwindInIframe}
+                                            injectDefaultTableStyles={shouldInjectDefaultTableStylesInIframe}
                                             deferUntilInView={true}
                                             inViewRootMarginPx={800}
                                         />
@@ -161,9 +175,17 @@ const SingleBlog = ({
                                             >
                                                 {section.description && (
                                                     <div className="blog_section_description" style={{ marginBottom: '2rem' }}>
-                                                        <div
-                                                            className="blog_html_content"
-                                                            dangerouslySetInnerHTML={{ __html: String(section.description || '') }}
+                                                        <HTMLContentRenderer
+                                                            htmlContent={String(section.description || '')}
+                                                            contentId={`blog-section-${blogData?.id || blogData?.slug || 'default'}-${sectionIndex}`}
+                                                            baseHref={blogBaseHref}
+                                                            assetOrigin={blogAssetOrigin}
+                                                            placeholderMinHeightPx={800}
+                                                            deferIframeLoadMs={200}
+                                                            iframeLoading="lazy"
+                                                            iframeFetchPriority="auto"
+                                                            deferUntilInView={true}
+                                                            inViewRootMarginPx={800}
                                                         />
                                                     </div>
                                                 )}
