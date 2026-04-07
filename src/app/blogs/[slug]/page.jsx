@@ -46,21 +46,56 @@ const fetchQuickSearches = async () => {
 const stripHtml = (html) => html.replace(/<[^>]*>/g, '');
 const formatDate = (dateString) => dateString.slice(0, 19) + 'Z';
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const fetchSettings = async () => {
+    try {
+        const url = new URL(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
+        );
+        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['settings'] } });
+        if (!res.ok) return null;
+        const json = await res.json();
+        return json || null;
+    } catch (e) {
+        console.error('Error fetching settings:', e?.message || e);
+        return null;
+    }
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const SingleBlogPage = async ({ params }) => {
     const { slug } = await params;
 
     // ✅ fetchBlogBySlug is deduplicated with generateMetadata's call — one network request
-    const [rawData, initialTags, initialQuickSearchItems] = await Promise.all([
+    const [rawData, initialTags, initialQuickSearchItems, settingsData] = await Promise.all([
         fetchBlogBySlug(slug),
         fetchBlogTagsData(),
         fetchQuickSearches(),
+        fetchSettings()
     ]);
 
     const singleBlog = rawData?.data?.data?.[0] || null;
     const relatedBlogs = rawData?.other_blogs || [];
-
+    
+    // ✅ تحضير الترجمات والإعدادات للسيرفر
+    // ملاحظة: يمكنك تحسين هذا لاحقاً بالكشف عن اللغة الحقيقية من الميدل وير
+    const isRtl = true; 
+    const langCode = 'ar';
+    const translations = langCode === 'ar' ? require('@/utils/locale/ar.json') : require('@/utils/locale/en.json');
+    
+    // قاموس الترجمات المطلوبة لهذه الصفحة
+    const t = {
+        ourBlogs: translations.ourBlogs || "Property Insights",
+        views: translations.views || "Views",
+        relatedArticle: translations.relatedArticle || "Related Article",
+        whatsappMessageIntro: translations.whatsappMessageIntro || "Hello...",
+        copyToClipboard: translations.copyToClipboard || "Copied to clipboard",
+        googleMap: translations.googleMap || "Google Map",
+        shareInfo: translations.shareThisBlogOnSocialMedia || translations.shareThisOnSocialMedia || "Share",
+        linkCopied: translations.copyToClipboard || "Link copied",
+        tags: translations.tags || "Tags",
+        all: translations.all || "All"
+    };
     // ✅ إذا لم توجد بيانات، أعد 404 فوراً (لا تحمل Client Component فارغ)
     if (!singleBlog) {
         return (
@@ -78,17 +113,14 @@ const SingleBlogPage = async ({ params }) => {
       const normalized = serverNormalizeImageUrl(rawImg);
       
       if (normalized) {
-        // ✅ استخدم الرابط الأصلي مباشرة (أسرع)
+        // ✅ استخدم الرابط الأصلي مباشرة (مش /_next/image)
+        // Next.js هيتعامل مع التحسين تلقائياً لما الصورة تتحمل في الـ <Image>
         ReactDOM.preload(normalized, {
           as: 'image',
           fetchPriority: 'high',
-          // ✅ srcset متوافق مع next.config.js deviceSizes
-          imageSrcSet: [
-            `${normalized}?w=640&q=75 640w`,
-            `${normalized}?w=828&q=75 828w`, 
-            `${normalized}?w=1080&q=75 1080w`,
-          ].join(', '),
-          imageSizes: '(max-width: 768px) 100vw, 838px',
+          // ✅ srcset بسيط عشان نضمن التحميل السريع
+          imageSrcSet: `${normalized}?w=828&q=75 828w`,
+          imageSizes: '838px',
         });
         
         // ✅ preconnect للدومين الخارجي
@@ -144,6 +176,10 @@ const SingleBlogPage = async ({ params }) => {
                     initialBlogData={singleBlog}
                     initialRelatedBlogs={relatedBlogs}
                     initialTags={initialTags}
+                    settings={settingsData?.data}
+                    isRtl={isRtl}
+                    t={t}
+                    currentUrl={blogUrl}
                 />
             </Layout>
         </>

@@ -311,6 +311,26 @@ const nextConfig = {
       ),
     };
 
+    // ✅ PurgeCSS for production
+    if (!dev) {
+      const purgecssConfig = require('./purgecss.config.js');
+      const withPurgeCSS = require('@fullhuman/postcss-purgecss')(purgecssConfig);
+      
+      config.module.rules.push({
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [withPurgeCSS]
+              }
+            }
+          }
+        ]
+      });
+    }
+
     // ✅ Production optimizations (only applied in production builds)
     if (!dev && !isServer) {
       // Strip console.log/warn/error in production to reduce main-thread work

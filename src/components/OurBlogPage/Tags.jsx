@@ -1,10 +1,9 @@
-
+'use client'
 import { searchedTag, setSearchTag } from "@/redux/reuducer/searchSlice"
-import { t } from "@/utils"
 import { useRouter } from "next/navigation"
 import { useDispatch, useSelector } from "react-redux"
 
-const Tags = ({ data }) => {
+const Tags = ({ data, tTags, tAll }) => {
     const tag = useSelector(searchedTag)
     const router = useRouter()
     const dispatch = useDispatch()
@@ -23,13 +22,13 @@ const Tags = ({ data }) => {
 
     return (
         <div className="tags">
-            <h6 className="tags_title">{t('tags')}</h6>
+            <h6 className="tags_title">{tTags}</h6>
             <div className="tags_item_wrapper">
                 <button
                     className={selectedTag === "" ? "active" : ""}
                     onClick={(e) => handleGetAllTagsBlogs(e)}
                 >
-                    {t('all')}
+                    {tAll}
                 </button>
                 {data?.map((tag, index) => (
                     <button
