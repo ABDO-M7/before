@@ -8,7 +8,7 @@ export const generateMetadata = async () => {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=subscription`,
             {
-                next: { revalidate: 3600 }, // Revalidate every 1 hour
+                next: { revalidate: 3600, tags: ['seo-settings'] }, // Revalidate every 1 hour
             }
         );
 

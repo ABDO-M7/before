@@ -7,7 +7,7 @@ export const generateMetadata = async () => {
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=blogs`,
-      { next: { revalidate: 3600 } } // Optional: Add ISR if using in generateMetadata
+      { next: { revalidate: 3600, tags: ['seo-settings'] } } // Optional: Add ISR if using in generateMetadata
     );
 
     const data = await res.json();
@@ -43,7 +43,7 @@ const fetchBlogItems = async () => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs`,
-      { next: { revalidate: 86400 } } // 1 day in seconds
+      { next: { revalidate: 86400, tags: ['blogs'] } } // 1 day in seconds
     );
     const data = await res.json();
     return data?.data?.data || [];

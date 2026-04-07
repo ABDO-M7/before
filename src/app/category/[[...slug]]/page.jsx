@@ -17,7 +17,7 @@ export const generateMetadata = async ({ params }) => {
         
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-categories?slug=${resolvedParams.slug[0]}`,
-            { next: { revalidate: 3600 } } // 1 hour
+            { next: { revalidate: 3600, tags: ['categories', resolvedParams.slug[0]] } } // 1 hour
         );
 
         const data = await response.json();
@@ -78,7 +78,7 @@ const getCategoryItems = async (slug) => {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1&category_slug=${slug}`,
-            { next: { revalidate: 86400 } } // 1 day
+            { next: { revalidate: 86400, tags: ['items', slug] } } // 1 day
         );
 
         const data = await res.json();

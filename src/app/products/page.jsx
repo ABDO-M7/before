@@ -7,7 +7,7 @@ const fetchLcpData = async () => {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1&limit=1`,
-            { next: { revalidate: 3600 } }
+            { next: { revalidate: 3600, tags: ['items'] } }
         );
         const json = await res.json();
         const firstItem = json?.data?.data?.[0];
@@ -26,7 +26,7 @@ export const generateMetadata = async () => {
     try {
         // Fetch both SEO settings and the first item (to get LCP image) in parallel
         const [seoRes, lcpImageUrl] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=ad-listing`, { next: { revalidate: 3600 } }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=ad-listing`, { next: { revalidate: 3600, tags: ['seo-settings'] } }),
             fetchLcpData()
         ]);
 
@@ -60,7 +60,7 @@ const getAllItems = async () => {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1`,
             {
-                next: { revalidate: 86400 }, // Revalidate every 1 DAY
+                next: { revalidate: 86400, tags: ['items'] }, // Revalidate every 1 DAY
             }
         );
         if (!res.ok) {

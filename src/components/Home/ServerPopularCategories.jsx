@@ -11,7 +11,7 @@ const fetchFeaturedCategories = async () => {
     url.searchParams.set('page', '1');
     url.searchParams.set('featured', '1');
     const res = await fetch(url.toString(), {
-      next: { revalidate: 86400 },
+      next: { revalidate: 86400, tags: ['categories'] },
       headers: { 'Content-Language': DEFAULT_LANG },
     });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;

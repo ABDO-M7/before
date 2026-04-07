@@ -7,7 +7,7 @@ const fetchFeaturedAiTool = async () => {
     );
     url.searchParams.set('hub', 'web');
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['ai-tools'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
     const json = await res.json();
     return json?.data ? json.data : null;

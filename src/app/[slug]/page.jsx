@@ -22,7 +22,7 @@ const fetchQuickSearchData = async (slug) => {
         const encodedSlug = encodeURIComponent(slug);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches?slug=${encodedSlug}`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['quick-searches'] } }
         );
         const json = await res.json();
         const quickSearchData = json?.data?.data;
@@ -36,7 +36,7 @@ const fetchQuickSearchData = async (slug) => {
 
         const itemsRes = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?${params.toString()}`,
-            { next: { revalidate: 3600 } }
+            { next: { revalidate: 3600, tags: ['items'] } }
         );
         const itemsJson = await itemsRes.json();
         const itemsData = itemsJson?.data;

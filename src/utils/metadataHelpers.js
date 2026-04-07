@@ -104,7 +104,7 @@ export async function generateHomeMetadata() {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=home`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['seo-settings'] } }
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -150,7 +150,7 @@ export async function generateProductMetadata(slug) {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['items', slug] } }
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -207,7 +207,7 @@ export async function generateBlogMetadata(slug) {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['blogs', slug] } }
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -266,7 +266,7 @@ export async function generateQuickSearchMetadata(slug) {
         const encodedSlug = encodeURIComponent(slug);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches?slug=${encodedSlug}`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['quick-searches'] } }
         );
 
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -318,7 +318,7 @@ export async function generateAiToolMetadata(slug) {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}ai-tools?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['ai-tools', slug] } }
         );
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
         const data = await res.json();
@@ -361,7 +361,7 @@ export async function generateSystemMetadata() {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`,
-          { next: { revalidate: 3600 } }
+          { next: { revalidate: 3600, tags: ['seo-settings'] } }
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {

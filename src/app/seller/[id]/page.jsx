@@ -9,7 +9,7 @@ export const generateMetadata = async ({ params }) => {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-seller?id=${resolvedParams?.id}`,
             {
-                next: { revalidate: 3600 }, // Revalidate every 1 hour
+                next: { revalidate: 3600, tags: ['items', resolvedParams?.id] }, // Revalidate every 1 hour
             }
         );
 // seller data
@@ -42,7 +42,7 @@ const getSellerItems = async (id) => {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1&user_id=${id}`,
             {
-                next: { revalidate: 86400 }, // Revalidate every 1 day
+                next: { revalidate: 86400, tags: ['items', id] }, // Revalidate every 1 day
             }
         );
         const data = await res.json();

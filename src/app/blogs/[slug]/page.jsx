@@ -20,7 +20,7 @@ const fetchBlogTagsData = async () => {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blog-tags`,
-            { next: { revalidate: 86400 } }
+            { next: { revalidate: 86400, tags: ['blogs'] } }
         );
         const data = await res.json();
         return Array.isArray(data?.data) ? data.data : [];
@@ -33,7 +33,7 @@ const fetchQuickSearches = async () => {
     try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`);
         url.searchParams.set('featured', '1');
-        const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['quick-searches'] } });
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
         const json = await res.json();
         const list = json?.data?.data ?? json?.data;

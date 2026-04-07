@@ -26,7 +26,7 @@ const fetchQuickSearches = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`
     );
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['settings'] } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['quick-searches'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const json = await res.json();
     const list = json?.data?.data ?? json?.data;
@@ -39,18 +39,35 @@ const fetchQuickSearches = async () => {
 
 // System settings (needed immediately for Layout -- logo, theme color, footer)
 const fetchSettings = async () => {
-  try {
-    const url = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
-    );
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['settings'] } });
-    if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
-    const json = await res.json();
-    return json || null;
-  } catch (e) {
-    console.error('Error fetching settings:', e?.message || e);
-    return null;
-  }
+    try {
+        const url = new URL(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
+        );
+        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['seo-settings'] } });
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
+        const json = await res.json();
+        return json || null;
+    } catch (e) {
+        console.error('Error fetching settings:', e?.message || e);
+        return null;
+    }
+};
+
+// Sliders for Home Page
+const fetchSliders = async () => {
+    try {
+        const url = new URL(
+            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-slider`
+        );
+        url.searchParams.set('hub', 'web');
+        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders'] } });
+        if (!res.ok) return [];
+        const json = await res.json();
+        return Array.isArray(json?.data) ? json.data : [];
+    } catch (e) {
+        console.error('Error fetching sliders:', e?.message || e);
+        return [];
+    }
 };
 
 const organizationSchema = {

@@ -29,7 +29,7 @@ export default async function sitemap() {
     try {
         const res = await fetch(
             `${apiUrl}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1`,
-            { next: { revalidate: 604800 } } // Revalidate weekly
+            { next: { revalidate: 604800, tags: ['items'] } } // Revalidate weekly
         );
 
         if (res.ok) {
@@ -51,7 +51,7 @@ export default async function sitemap() {
     try {
         const res = await fetch(
             `${apiUrl}${process.env.NEXT_PUBLIC_END_POINT}get-categories?page=1`,
-            { next: { revalidate: 604800 } } // Revalidate weekly
+            { next: { revalidate: 604800, tags: ['categories'] } } // Revalidate weekly
         );
 
         if (res.ok) {
@@ -73,7 +73,7 @@ export default async function sitemap() {
     try {
         const res = await fetch(
             `${apiUrl}${process.env.NEXT_PUBLIC_END_POINT}blogs?page=1`,
-            { next: { revalidate: 604800 } } // Revalidate weekly
+            { next: { revalidate: 604800, tags: ['blogs'] } } // Revalidate weekly
         );
 
         if (res.ok) {
@@ -95,7 +95,7 @@ export default async function sitemap() {
     try {
         const res = await fetch(
             `${apiUrl}${process.env.NEXT_PUBLIC_END_POINT}ai-tools?page=1&limit=50`,
-            { next: { revalidate: 604800 } }
+            { next: { revalidate: 604800, tags: ['ai-tools'] } }
         );
         if (res.ok) {
             const json = await res.json();

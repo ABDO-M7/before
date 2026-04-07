@@ -8,7 +8,7 @@ const fetchBlogsForHome = async () => {
     url.searchParams.set('sort_by', 'new-to-old');
     url.searchParams.set('hub', 'web');
     url.searchParams.set('limit', '3');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['blogs'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const json = await res.json();
     const list = json?.data?.data?.data ?? json?.data?.data ?? [];

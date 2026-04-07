@@ -7,7 +7,7 @@ export const generateMetadata = async ({ params }) => {
         const resolvedParams = await params;
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-featured-section?slug=${resolvedParams?.slug}`,
-            { next: { revalidate: 3600 } } // 1 hour
+            { next: { revalidate: 3600, tags: ['sliders', 'tips', resolvedParams?.slug] } } // 1 hour
         );
 
         const data = await res.json();
@@ -68,7 +68,7 @@ export const fetchProductItems = async (slug) => {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1&featured_section_slug=${slug}`,
-            { next: { revalidate: 86400 } } // Revalidate after 1 day
+            { next: { revalidate: 86400, tags: ['items', slug] } } // Revalidate after 1 day
         );
         const data = await res.json();
         return data?.data?.data || [];

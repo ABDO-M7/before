@@ -6,7 +6,7 @@ export const generateMetadata = async () => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=privacy-policy`,
-      { next: { revalidate: 3600 } } // Revalidate every 1 hour
+      { next: { revalidate: 3600, tags: ['seo-settings'] } } // Revalidate every 1 hour
     );
     const data = await res.json();
     const privacyPolicy = data?.data?.[0];
