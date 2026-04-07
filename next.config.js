@@ -189,8 +189,8 @@ const nextConfig = {
   // ✅ Advanced compression settings
   experimental: {
     // ✅ تحسينات متوافقة مع Turbopack
-    optimizeCss: true,
-    inlineCss: true,
+    optimizeCss: false,
+    inlineCss: false,
     
     // ✅ تحسين Tree-shaking للمكتبات الثقيلة
     optimizePackageImports: [

@@ -21,9 +21,8 @@ const cairo = Cairo({
     adjustFontFallback: true, // reduces CLS by adjusting fallback metrics
 });
 
-// CSS imports removed to be loaded asynchronously in the <head>
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import "../../public/css/style.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../../public/css/style.css";
 import Toaster from "@/components/ToastProvider";
 import CSSLoader from "@/components/CSSLoader";
 import DeferredPrefetcher from "@/components/DeferredPrefetcher";
@@ -102,23 +101,6 @@ export default async function RootLayout({ children }) {
                 <link rel="preconnect" href="https://arablaza.firebaseapp.com" crossOrigin="anonymous" />
                 <link rel="dns-prefetch" href="https://arablaza.firebaseapp.com" />
 
-                {/* ✅ Deferred CSS loading — significantly improves FCP by unblocking the main thread */}
-                <link
-                    rel="preload"
-                    href="/css/bootstrap.min.css"
-                    as="style"
-                    onLoad="this.onload=null;this.rel='stylesheet'"
-                />
-                <link
-                    rel="preload"
-                    href="/css/style.css"
-                    as="style"
-                    onLoad="this.onload=null;this.rel='stylesheet'"
-                />
-                <noscript>
-                    <link rel="stylesheet" href="/css/bootstrap.min.css" />
-                    <link rel="stylesheet" href="/css/style.css" />
-                </noscript>
 
                 {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
                     <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />

@@ -1,10 +1,7 @@
 module.exports = {
   content: [
-    './src/app/blogs/[slug]/page.jsx',
-    './src/components/PagesComponent/SingleBlog/**/*.{jsx,js}',
-    './src/components/Cards/OurBlogCard.jsx',
-    './src/components/Cards/ProductCard.jsx',
-    './src/components/Layout/**/*.{jsx,js}',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './public/**/*.html',
   ],
   css: ['./public/css/style.css'],
   safelist: {
