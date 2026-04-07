@@ -5,33 +5,13 @@ import { truncate } from "@/utils/textUtils"
 import { getCompressedImage, normalizeImageUrl } from "@/utils/imageUtils"
 import Link from "next/link"
 import React from "react"
-import dynamic from 'next/dynamic'
+import { 
+  BlogSocialShareWrapper as BlogSocialShare,
+  BlogProductsCarouselWrapper as BlogProductsCarousel,
+  RelatedArticlesWrapper as RelatedArticles
+} from './BlogClientWrappers'
 import BlogBreadcrumbHandler from './BlogBreadcrumbHandler'
 import BlogCopyUrl from './BlogCopyUrl'
-
-const BlogSocialShare = dynamic(
-    () => import('./BlogSocialShare'), 
-    { 
-        ssr: false,
-        loading: () => <div style={{ minHeight: '40px' }} />
-    }
-)
-
-const BlogProductsCarousel = dynamic(
-    () => import('./BlogProductsCarousel'), 
-    { 
-        ssr: false,
-        loading: () => <div className="carousel-skeleton" style={{ minHeight: '430px', background: '#f5f5f5' }} />
-    }
-)
-
-const RelatedArticles = dynamic(
-    () => import('@/components/Cards/OurBlogCard'),
-    { 
-        ssr: false,
-        loading: () => null 
-    }
-)
 
 const SingleBlog = ({ 
     initialBlogData, 
