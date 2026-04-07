@@ -65,48 +65,40 @@ const SingleBlogPage = async ({ params }) => {
     // ReactDOM.preload() is the ONLY reliable method in Next.js App Router
     // that injects a preload link into <head>. A <link> tag in JSX return
     // always ends up in <body> and is ignored by browsers for preloading.
-    //
-    // Width math:
-    //   next.config deviceSizes: [640, 750, 828, 1080, 1200, ...]
-    //   <Image width={838}> → Next.js generates srcset with 828w, 1080w, etc.
-    //   Lighthouse test device (Moto G Power) = 360px CSS width, 1x DPR
-    //   → browser picks 828w from srcset (smallest bucket >= 838*1 = 838 → 828 is closest)
-    //   So preload href must be w=828 to match what the browser fetches.
     if (singleBlog?.image && singleBlog?.show_image !== 0 && singleBlog?.show_image !== false) {
         const rawImg = serverGetCompressedImage(singleBlog, 'large', singleBlog.image);
         const normalized = serverNormalizeImageUrl(rawImg);
+
         if (normalized) {
+            // ✅ تطابق تام مع ما يولده next/image: w=828 هو الأقرب لـ 838px
+            const imageUrl = `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75`
+
             ReactDOM.preload(
-                `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75`,
+                imageUrl,
                 {
                     as: 'image',
                     fetchPriority: 'high',
+                    // ✅ srcset يتطابق مع deviceSizes في next.config.js
                     imageSrcSet: [
+                        `/_next/image?url=${encodeURIComponent(normalized)}&w=640&q=75 640w`,
                         `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75 828w`,
                         `/_next/image?url=${encodeURIComponent(normalized)}&w=1080&q=75 1080w`,
                         `/_next/image?url=${encodeURIComponent(normalized)}&w=1200&q=75 1200w`,
                     ].join(', '),
-                    imageSizes: '100vw',
+                    // ✅ sizes يتطابق مع صورة الـ SingleBlog.jsx
+                    imageSizes: '(max-width: 768px) 100vw, 838px',
                 }
-            );
-        }
-    } else if (relatedBlogs?.length > 0 && relatedBlogs[0]?.image) {
-        const firstRelated = relatedBlogs[0];
-        const rawImg = serverGetCompressedImage(firstRelated, 'medium', firstRelated.image);
-        const normalized = serverNormalizeImageUrl(rawImg);
-        if (normalized) {
-            ReactDOM.preload(
-                `/_next/image?url=${encodeURIComponent(normalized)}&w=640&q=75`,
-                {
-                    as: 'image',
-                    fetchPriority: 'high',
-                    imageSrcSet: [
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=640&q=75 640w`,
-                        `/_next/image?url=${encodeURIComponent(normalized)}&w=828&q=75 828w`,
-                    ].join(', '),
-                    imageSizes: '(max-width: 768px) 100vw, 33vw',
+            )
+
+            // ✅ DNS Prefetch للدومين الخارجي للصور (لو موجود)
+            if (normalized.startsWith('http')) {
+                try {
+                    const domain = new URL(normalized).origin;
+                    ReactDOM.preconnect(domain, { crossOrigin: 'anonymous' });
+                } catch (e) {
+                    // Ignore URL errors
                 }
-            );
+            }
         }
     }
 
@@ -114,15 +106,35 @@ const SingleBlogPage = async ({ params }) => {
     const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || '';
     const blogUrl = `${baseUrl}/blogs/${encodeURIComponent(singleBlog?.slug || slug || '')}`;
 
+    const CompanyName = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
+
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: singleBlog?.title,
         description: singleBlog?.description ? stripHtml(singleBlog.description).slice(0, 500) : '',
         url: blogUrl,
-        image: singleBlog?.image ? [singleBlog.image] : undefined,
+        image: singleBlog?.image ? [serverNormalizeImageUrl(singleBlog.image)] : undefined,
         datePublished: singleBlog?.created_at ? formatDate(singleBlog.created_at) : '',
+        dateModified: singleBlog?.updated_at ? formatDate(singleBlog.updated_at) : formatDate(singleBlog?.created_at),
+        author: {
+            '@type': 'Organization',
+            name: CompanyName || 'Arablaza'
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: CompanyName || 'Arablaza',
+            logo: {
+                '@type': 'ImageObject',
+                url: `${baseUrl}/icon-512.png`
+            }
+        },
         keywords: singleBlog?.tags ? singleBlog.tags.join(', ') : '',
+        // ✅ تحسين الظهور في البحث
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': blogUrl
+        }
     };
 
     return (

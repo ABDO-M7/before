@@ -9,7 +9,9 @@ const purgecss = [
     defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
     safelist: {
       standard: [
-        "html", "body", "active", "disabled", "show", "fade", "container", "row"
+        "html", "body", "active", "disabled", "show", "fade", "container", "row",
+        // ✅ عناصر صفحة البلوج
+        "blog_main_img", "blog_html_content", "blog_heading", "single_blog", "blog_content"
       ],
       deep: [
         /^col-/,
@@ -26,11 +28,18 @@ const purgecss = [
         /^leaflet-/,
         /^modal/,
         /^drawer/,
-        /^header-hamburg-menu/
+        /^header-hamburg-menu/,
+        // ✅ أنماط محتوى البلوج الديناميكي
+        /^blog_/,
+        /^single_blog_/,
+        /^our_blog_/
       ],
       greedy: [
         /slick-/,
-        /rc-slider/
+        /rc-slider/,
+        // ✅ مكتبات قد تُستخدم في محتوى البلوج
+        /hljs-/,  // Syntax highlighting لو في كود
+        /youtube-/, // لو في فيديوهات
       ]
     }
   }

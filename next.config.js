@@ -153,6 +153,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compiler: {
+    // ✅ Remove console logs in production for cleaner production builds and slightly better performance
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
     // ✅ Next.js built-in image optimization re-enabled for mobile performance
     // WebP/AVIF conversion + responsive srcset + automatic resizing
@@ -199,8 +203,14 @@ const nextConfig = {
       'sweetalert2',
       'axios',
       'firebase',
-      'swiper'
+      'swiper',
+      'react-share', // ✅ Optimized share buttons for blog pages
+      'html-react-parser' // ✅ Optimized HTML parsing for blog content
     ],
+    // ✅ Support modern ES modules while maintaining compatibility
+    esmExternals: 'loose',
+    // ✅ Optimized font loading for better performance
+    fontLoaders: [{ loader: '@next/font', options: { subsets: ['arabic', 'latin'] } }],
   },
   // ✅ Performance optimization
   poweredByHeader: false, // Remove X-Powered-By header for security

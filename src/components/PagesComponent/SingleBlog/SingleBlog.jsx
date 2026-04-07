@@ -1,5 +1,5 @@
 'use client'
-import OurBlogCard from "@/components/Cards/OurBlogCard"
+// import OurBlogCard from "@/components/Cards/OurBlogCard" (Replaced with dynamic import below)
 import Tags from "@/components/OurBlogPage/Tags"
 import Image from "next/image"
 import { FaEye } from "react-icons/fa6"
@@ -17,8 +17,30 @@ import dynamic from 'next/dynamic'
 import { store } from "@/redux/store"
 import { useIsRtl } from '@/utils'
 
-const BlogSocialShare = dynamic(() => import('./BlogSocialShare'), { ssr: false })
-const BlogProductsCarousel = dynamic(() => import('./BlogProductsCarousel'), { ssr: false })
+const BlogSocialShare = dynamic(
+    () => import('./BlogSocialShare'), 
+    { 
+        ssr: false,
+        loading: () => <div style={{ minHeight: '40px' }} /> // ✅ Skeleton بسيط
+    }
+)
+
+const BlogProductsCarousel = dynamic(
+    () => import('./BlogProductsCarousel'), 
+    { 
+        ssr: false,
+        loading: () => <div className="carousel-skeleton" style={{ minHeight: '430px', background: '#f5f5f5' }} />
+    }
+)
+
+// ✅ أضف هذا للمكونات اللي تحت الـ fold (مثل المقالات ذات الصلة)
+const RelatedArticles = dynamic(
+    () => import('@/components/Cards/OurBlogCard'),
+    { 
+        ssr: false,
+        loading: () => null 
+    }
+)
 
 const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
 
@@ -148,25 +170,41 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                                     ? compressedLarge
                                     : (blogData?.image || null)
                                 if (!finalImage) return null
+
+                                // ✅ توليد blur placeholder بسيط (يمكنك استبداله بصورة base64 حقيقية لاحقاً)
+                                const blurDataURL = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=="
+
                                 return (
                                     <Image
                                         priority={true}
                                         fetchPriority="high"
+                                        placeholder="blur"
+                                        blurDataURL={blurDataURL}
                                         src={normalizeImageUrl(finalImage)}
                                         width={838}
                                         height={500}
                                         className="blog_main_img"
                                         alt={blogData?.title || "Blog Image"}
                                         onError={(e) => { e.target.style.display = 'none' }}
+                                        // ✅ تحسينات إضافية
+                                        loading="eager"
+                                        quality={75}
+                                        sizes="(max-width: 768px) 100vw, 838px"
                                     />
                                 )
                             })()}
 
-                            {/* HTML Content */}
+                            {/* HTML Content - مع تحسين الأداء */}
                             <div
                                 className="blog_html_content"
-                                dangerouslySetInnerHTML={{ __html: blogData?.description || '' }}
+                                dangerouslySetInnerHTML={{ 
+                                    __html: blogData?.description 
+                                        ? blogData.description.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // ✅ إزالة السكربتات
+                                        : '' 
+                                }}
                                 suppressHydrationWarning={true}
+                                // ✅ إضافة content-visibility لتسريع rendering المحتوى الطويل
+                                style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}
                             />
 
                             {/* Main Items Carousel */}
@@ -249,7 +287,7 @@ const SingleBlog = ({ initialBlogData, initialRelatedBlogs, initialTags }) => {
                         <div className="row product_card_card_gap home_blogs_row" style={{ contain: 'layout' }}>
                             {relatedBlogs.map((data, index) => (
                                 <div className="col-12 col-lg-4" key={data?.id ?? data?.slug ?? index}>
-                                    <OurBlogCard data={data} showMeta priority={index === 0 && !blogData?.show_image} />
+                                    <RelatedArticles data={data} showMeta priority={index === 0 && !blogData?.show_image} />
                                 </div>
                             ))}
                         </div>
