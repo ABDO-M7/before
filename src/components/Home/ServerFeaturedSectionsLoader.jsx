@@ -6,7 +6,7 @@ const fetchFeaturedSectionsWithItems = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-featured-section`
     );
     url.searchParams.set('hub', 'web');
-    url.searchParams.set('limit', '4');
+    url.searchParams.set('limit', '5');
     const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders', 'tips'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const data = await res.json();

@@ -20,7 +20,7 @@ import toast from "@/utils/toast";
 
 const Footer = () => {
     const [showDownloadLinks, setShowDownloadLinks] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false)
     const [hoveredContact, setHoveredContact] = useState(null) // Track which contact is hovered
     const systemSettingsData = useSelector(settingsData)
     const settings = systemSettingsData?.data
@@ -55,9 +55,9 @@ const Footer = () => {
 
     useEffect(() => {
     // ✅ TBT Fix: matchMedia avoids layout thrashing vs window.innerWidth on resize
-    const media = window.matchMedia('(max-width: 768px)');
-    const listener = (e) => setIsMobile(e.matches);
-    setIsMobile(media.matches);
+    const media = window.matchMedia('(max-width: 1024px)');
+    const listener = (e) => setIsMobileOrTablet(e.matches);
+    setIsMobileOrTablet(media.matches);
     media.addEventListener('change', listener);
     return () => media.removeEventListener('change', listener);
   }, []);
@@ -174,7 +174,7 @@ const Footer = () => {
                                 }
 
                                 {/* {!isAppInstalled && !isSafari && isUserInSyria && !isInPWA && ( */}
-                                {!isSafari && !isInPWA && (
+                                {!isSafari && !isInPWA && isMobileOrTablet && (
                                     <Link
                                         href="#"
                                         onClick={(e) => {

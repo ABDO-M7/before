@@ -88,7 +88,7 @@ const QuickSearchRow = ({ mobile = false, items: itemsProp = null }) => {
         overflow: mobile ? 'hidden' : 'visible',
       }}
     >
-      <span
+      {/* <span
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -101,7 +101,7 @@ const QuickSearchRow = ({ mobile = false, items: itemsProp = null }) => {
       >
         <HiFire size={mobile ? 14 : 16} style={{ color: '#f59e0b' }} aria-hidden />
         {t('quickSearch') || 'بحث سريع:'}
-      </span>
+      </span> */}
       <div
         style={{
           display: 'flex',

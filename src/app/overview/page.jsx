@@ -66,7 +66,7 @@ const OverviewPage = async () => {
 
     return (
         <Layout initialQuickSearchItems={initialQuickSearchItems} initialSettings={initialSettings}>
-            <LandingPage />
+            <LandingPage initialQuickSearchItems={initialQuickSearchItems} />
         </Layout>
     )
 }

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "dev:webpack": "next dev --webpack",
     "hostdev": "next dev --hostname 0.0.0.0",
     "build": "next build",
@@ -93,7 +93,7 @@
     "@types/react": "^19.2.2",
     "postcss": "^8.5.8",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^11.2.0",
+    "postcss-preset-env": "^9.6.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }

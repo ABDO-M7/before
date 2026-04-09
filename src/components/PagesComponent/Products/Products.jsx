@@ -64,6 +64,12 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
     const [IsLoadMore, setIsLoadMore] = useState(false)
     const initialUrlParamsRef = useRef(null)
 
+    const INITIAL_RENDER_COUNT = 6;
+    const [renderCount, setRenderCount] = useState(() => {
+        const initialLen = Array.isArray(initialData) ? initialData.length : 0;
+        return Math.max(0, Math.min(INITIAL_RENDER_COUNT, initialLen));
+    });
+
     const getProducts = async (page) => {
         let data = "";
         try {
@@ -374,6 +380,42 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
         setIsFetchSingleCatItem((prev) => !prev)
     }
 
+    // Progressive render: reduce initial main-thread work by delaying below-the-fold cards.
+    useEffect(() => {
+        if (!Array.isArray(searchedData) || searchedData.length === 0) {
+            setRenderCount(0);
+            return;
+        }
+
+        // Always show at least the first N quickly.
+        setRenderCount((prev) => {
+            const next = Math.max(prev, Math.min(INITIAL_RENDER_COUNT, searchedData.length));
+            return next;
+        });
+
+        const schedule = (cb) => {
+            if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+                return window.requestIdleCallback(cb, { timeout: 1200 });
+            }
+            return window.setTimeout(cb, 450);
+        };
+
+        const cancel = (id) => {
+            if (typeof window === 'undefined') return;
+            if (typeof window.cancelIdleCallback === 'function') {
+                window.cancelIdleCallback(id);
+            } else {
+                window.clearTimeout(id);
+            }
+        };
+
+        const id = schedule(() => {
+            setRenderCount(searchedData.length);
+        });
+
+        return () => cancel(id);
+    }, [searchedData.length]);
+
     return (
         <>
            <BreadcrumbComponent />
@@ -502,7 +544,7 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
                                             ) : searchedData && searchedData.length > 0 ? (
                                                 <>
                                                     <div className={`row ${view === 'grid' ? 'row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xxl-3 product_card_card_gap' : ''}`}>
-                                                        {searchedData?.map((item, index) => (
+                                                        {searchedData?.slice(0, renderCount || INITIAL_RENDER_COUNT).map((item, index) => (
                                                             view === "list" ? (
                                                                 <div className="col-12" key={item.id || index}>
                                                                     <Link href={userData?.id === item?.user_id ? `/my-listing/${encodeURIComponent(item?.slug || '')}` : `/product-details/${encodeURIComponent(item?.slug || '')}`} prefetch={false} target="_blank">

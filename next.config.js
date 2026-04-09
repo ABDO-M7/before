@@ -208,15 +208,23 @@ const nextConfig = {
         'firebase'
     ],
     
-    // ✅ تحسينات إضافية آمنة لـ Turbopack
-    turbo: {
-        resolveAlias: {
-            apexcharts: path.resolve(__dirname, "./node_modules/apexcharts-clevision"),
-        },
-        // ✅ تعطيل الـ minify في التطوير لتسريع الـ HMR
-        minify: process.env.NODE_ENV === 'production',
-    },
+    // // ✅ تحسينات إضافية آمنة لـ Turbopack
+    // turbo: {
+    //     resolveAlias: {
+    //         apexcharts: path.resolve(__dirname, "./node_modules/apexcharts-clevision"),
+    //     },
+    //     // ✅ تعطيل الـ minify في التطوير لتسريع الـ HMR
+    //     // minify: process.env.NODE_ENV === 'production',
+    // },
   },
+  // ✅ تحسينات إضافية آمنة لـ Turbopack
+  turbopack: {
+    resolveAlias: {
+        apexcharts: path.resolve(__dirname, "./node_modules/apexcharts-clevision"),
+    },
+    // ✅ تعطيل الـ minify في التطوير لتسريع الـ HMR
+    // minify: process.env.NODE_ENV === 'production',
+},
   // ✅ Performance optimization
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching

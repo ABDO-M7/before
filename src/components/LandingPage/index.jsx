@@ -5,10 +5,10 @@ import QuickAnswers from './QuickAnswers'
 // import LandingCta from './LandingCta'
 
 
-const LandingPage = () => {
+const LandingPage = ({ initialQuickSearchItems }) => {
   return (
     <>
-      <AnythingYouWant />
+      <AnythingYouWant initialQuickSearchItems={initialQuickSearchItems} />
       <WorkProcess />
       <OurBlogs />
       <QuickAnswers />

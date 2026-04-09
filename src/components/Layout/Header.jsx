@@ -94,6 +94,7 @@ const Header = ({ initialQuickSearchItems }) => {
   const cityData = useSelector((state) => state?.Location?.cityData);
   const CurrentLanguage = useSelector(CurrentLanguageData);
   const headerCatSelected = getSlug(pathname);
+  const isHomePath = pathname === "/" || pathname === "/home";
   const [isAdListingClicked, setIsAdListingClicked] = useState(false);
   const [quickSearchItems, setQuickSearchItems] = useState(null);
   const systemSettingsData = useSelector((state) => state?.Settings);
@@ -338,15 +339,15 @@ const Header = ({ initialQuickSearchItems }) => {
 
   const handleSearchNav = (e) => {
     e.preventDefault();
-    // ✅ Use startTransition for non-urgent navigation - keeps UI responsive
+    const q = searchQuery.trim();
     startTransition(() => {
-      if (catId) {
-        dispatch(setSearch(searchQuery));
-        router.push(`/category/${slug}`);
-      } else {
-        dispatch(setSearch(searchQuery));
-        router.push(`/products`);
+      if (!q) {
+        dispatch(setSearch(""));
+        router.push("/products");
+        return;
       }
+      dispatch(setSearch(q));
+      router.push(`/${encodeURIComponent(q)}`);
     });
   };
 
@@ -596,7 +597,7 @@ const Header = ({ initialQuickSearchItems }) => {
 
             {/* Desktop: Logo, Search, Nav Items + Quick Search row under search */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0', width: '100%' }} className="d-none d-lg-flex">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', width: '100%', minHeight: '60px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '40px', placeContent: 'center', width: '100%', minHeight: '60px' }}>
                 {/* Logo - Before Search Container */}
                 <Link href="/" prefetch={true} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', minWidth: '140px' }}>
                   {settings?.header_logo2 ? (
@@ -690,6 +691,7 @@ const Header = ({ initialQuickSearchItems }) => {
                 </Link>
 
                 {/* Search Container with Category, Input, Location Icon */}
+                {!isHomePath && (
                 <div className="select_search_cont search_lg" style={{
                   flex: '1',
                   maxWidth: '650px',
@@ -728,7 +730,7 @@ const Header = ({ initialQuickSearchItems }) => {
                   {t("categorySelect") || "Select a category to filter products"}
                 </span>
               </div> */}
-                  <form className="search_cont" onSubmit={handleSearchNav} role="search" aria-label={t("searchAd") || "Search"} style={{ flex: '1', display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '8px', padding: '4px' }}>
+                  <form className="search_cont" onSubmit={handleSearchNav} role="search" aria-label={t("searchPropertiesLabel") || "Search properties"} style={{ flex: '1', display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '8px', padding: '4px' }}>
                     <div className="srchIconinput_cont" style={{ flex: '1', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <BiPlanet size={16} color="#595B6C" className="planet" aria-hidden="true" />
                       <input
@@ -736,13 +738,13 @@ const Header = ({ initialQuickSearchItems }) => {
                         placeholder={t("searchAd")}
                         onChange={(e) => handleSearch(e)}
                         value={searchQuery}
-                        aria-label={t("searchAd") || "Search input"}
+                        aria-label={t("searchPropertiesLabel") || "Search properties"}
                         aria-describedby="search-description"
                         autoComplete="off"
                         style={{ border: 'none', outline: 'none', padding: '6px 8px', width: '100%', backgroundColor: 'transparent', fontSize: '14px' }}
                       />
                       <span id="search-description" className="sr-only">
-                        {t("searchAd") || "Enter search terms to find products"}
+                        {t("searchInputDescription")}
                       </span>
                     </div>
                     <button
@@ -812,6 +814,7 @@ const Header = ({ initialQuickSearchItems }) => {
                     <LuMapPin size={18} />
                   </button>
                 </div>
+                )}
 
                 {/* Navigation Items - Desktop Only (Login, Ad listing, Language) — min-height to avoid CLS when auth/lang load */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, minHeight: '48px' }}>
@@ -890,9 +893,9 @@ const Header = ({ initialQuickSearchItems }) => {
                         transition: 'all 0.3s ease',
                         flexShrink: 0
                       }}>
-                        <FaUserCircle size={16} />
+                        <FaUserCircle size={14} />
                       </div>
-                      <span>{t("login")}</span>
+                      <span style={{ fontSize: "14px" }}>{t("login")}</span>
                     </a>
                   )}
 
@@ -930,12 +933,11 @@ const Header = ({ initialQuickSearchItems }) => {
 
                 </div>
               </div>
-              {/* Quick Search row - full width below search bar (single fetch shared with mobile) */}
-              <QuickSearchRow items={quickSearchItems} />
             </div>
 
             {/* Second Line: Search Container for Tablet/Mobile */}
             {/* Mobile Search Container - Second Line */}
+            {!isHomePath && (
             <div className="d-lg-none" style={{ width: '100%' }}>
               <div className="select_search_cont search_xs_xl" style={{
                 width: '100%',
@@ -996,7 +998,7 @@ const Header = ({ initialQuickSearchItems }) => {
                     className="search_cont"
                     onSubmit={handleSearchNav}
                     role="search"
-                    aria-label={t("searchAd") || "Search"}
+                    aria-label={t("searchPropertiesLabel") || "Search properties"}
                     style={{
                       flex: '1',
                       display: 'flex',
@@ -1014,7 +1016,7 @@ const Header = ({ initialQuickSearchItems }) => {
                       placeholder={t("searchAd")}
                       onChange={(e) => handleSearch(e)}
                       value={searchQuery}
-                      aria-label={t("searchAd") || "Search input"}
+                      aria-label={t("searchPropertiesLabel") || "Search properties"}
                       aria-describedby="search-description-mobile"
                       autoComplete="off"
                       style={{
@@ -1028,6 +1030,9 @@ const Header = ({ initialQuickSearchItems }) => {
                         flex: 1
                       }}
                     />
+                    <span id="search-description-mobile" className="sr-only">
+                      {t("searchInputDescription")}
+                    </span>
                   </form>
 
                   {/* Search Button - Compact */}
@@ -1057,10 +1062,7 @@ const Header = ({ initialQuickSearchItems }) => {
                 </div>
               </div>
             </div>
-            {/* Quick Search row for Mobile/Tablet - swipeable (uses same data as desktop) */}
-            <div className="d-lg-none" style={{ width: '100%' }}>
-              <QuickSearchRow mobile items={quickSearchItems} />
-            </div>
+            )}
           </div>
         </nav>
       </header>

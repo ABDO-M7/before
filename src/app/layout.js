@@ -84,12 +84,6 @@ export default async function RootLayout({ children }) {
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#000000" />
 
-                {/* ✅ Preconnect to Google Fonts CDN — eliminates the 8-font CLS delay */}
-                {/* next/font/google fetches at build time, but subset files still stream from gstatic */}
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-
                 {/* ✅ Preconnect to API/image CDN — reduces LCP resource load delay */}
                 {API_ORIGIN && (
                     <>
@@ -97,10 +91,6 @@ export default async function RootLayout({ children }) {
                         <link rel="dns-prefetch" href={API_ORIGIN} />
                     </>
                 )}
-
-                <link rel="preconnect" href="https://arablaza.firebaseapp.com" crossOrigin="anonymous" />
-                <link rel="dns-prefetch" href="https://arablaza.firebaseapp.com" />
-
 
                 {process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION && (
                     <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />
