@@ -64,8 +64,10 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
       const translation = cat.translations.find((t) => Number(t.language_id) === Number(langId));
       if (translation?.name) return translation.name;
     }
+    const isArabic = currentLanguage?.code === 'ar';
+    if (isArabic && typeof cat.name_ar === 'string' && cat.name_ar.trim()) return cat.name_ar;
     return cat.translated_name || cat.name || null;
-  }, [data?.category, data?.category?.translations, data?.category?.translated_name, data?.category?.name, currentLanguage?.id]);
+  }, [data?.category, data?.category?.translations, data?.category?.translated_name, data?.category?.name, data?.category?.name_ar, currentLanguage?.id, currentLanguage?.code]);
 
   // Get placeholder image from settings
   const placeholderImageUrl = useMemo(() => {

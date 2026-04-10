@@ -14,7 +14,7 @@ export default function DeferredAnalytics() {
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production' || typeof window === 'undefined') return;
 
-    const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+    const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_MEASUREMENT_ID;
     const fbPixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
     const injectScripts = () => {

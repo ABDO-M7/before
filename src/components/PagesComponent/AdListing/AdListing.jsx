@@ -618,7 +618,7 @@ const AdListing = () => {
   const translateCategories = (categories) => {
     return categories.map((category) => {
       const translation = category.translations?.find(
-        (trans) => trans.language_id === CurrentLanguage.id
+        (trans) => Number(trans.language_id) === Number(CurrentLanguage?.id)
       );
       return {
         ...category,
@@ -695,7 +695,7 @@ const AdListing = () => {
     if (CurrentPath.length > 0 && CurrentLanguage?.id) {
       const updatedPath = CurrentPath.map((category) => {
         const translation = category.translations?.find(
-          (trans) => trans.language_id === CurrentLanguage.id
+          (trans) => Number(trans.language_id) === Number(CurrentLanguage?.id)
         );
         return {
           ...category,
@@ -716,7 +716,7 @@ const AdListing = () => {
   const handleCategoryTabClick = async (category) => {
     // Ensure category has translated_name before adding to path
     const translation = category.translations?.find(
-      (trans) => trans.language_id === CurrentLanguage.id
+      (trans) => Number(trans.language_id) === Number(CurrentLanguage?.id)
     );
     const categoryWithTranslation = {
       ...category,
