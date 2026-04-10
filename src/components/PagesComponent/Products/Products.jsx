@@ -70,6 +70,8 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
         return Math.max(0, Math.min(INITIAL_RENDER_COUNT, initialLen));
     });
 
+    const loadMoreRenderSentinelRef = useRef(null);
+
     const getProducts = async (page) => {
         let data = "";
         try {
@@ -380,41 +382,38 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
         setIsFetchSingleCatItem((prev) => !prev)
     }
 
-    // Progressive render: reduce initial main-thread work by delaying below-the-fold cards.
+    // Progressive render: reduce initial main-thread work without hurting LCP.
+    // Render the first N immediately, then increase only when user scrolls near the end.
     useEffect(() => {
         if (!Array.isArray(searchedData) || searchedData.length === 0) {
             setRenderCount(0);
             return;
         }
 
-        // Always show at least the first N quickly.
-        setRenderCount((prev) => {
-            const next = Math.max(prev, Math.min(INITIAL_RENDER_COUNT, searchedData.length));
-            return next;
-        });
+        // Ensure we always show at least the first N.
+        setRenderCount((prev) => Math.max(prev, Math.min(INITIAL_RENDER_COUNT, searchedData.length)));
+    }, [searchedData, searchedData.length]);
 
-        const schedule = (cb) => {
-            if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
-                return window.requestIdleCallback(cb, { timeout: 1200 });
-            }
-            return window.setTimeout(cb, 450);
-        };
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (!Array.isArray(searchedData) || searchedData.length === 0) return;
+        if (renderCount >= searchedData.length) return;
 
-        const cancel = (id) => {
-            if (typeof window === 'undefined') return;
-            if (typeof window.cancelIdleCallback === 'function') {
-                window.cancelIdleCallback(id);
-            } else {
-                window.clearTimeout(id);
-            }
-        };
+        const target = loadMoreRenderSentinelRef.current;
+        if (!target) return;
 
-        const id = schedule(() => {
-            setRenderCount(searchedData.length);
-        });
+        const obs = new IntersectionObserver(
+            (entries) => {
+                const first = entries?.[0];
+                if (!first?.isIntersecting) return;
+                setRenderCount((prev) => Math.min(prev + 12, searchedData.length));
+            },
+            { root: null, rootMargin: '1200px 0px', threshold: 0.01 }
+        );
 
-        return () => cancel(id);
-    }, [searchedData.length]);
+        obs.observe(target);
+        return () => obs.disconnect();
+    }, [renderCount, searchedData]);
 
     return (
         <>
@@ -558,6 +557,12 @@ const Products = ({ breadcrumbPath: breadcrumbPathProp, initialData = [], pagina
                                                             )
                                                         ))}
                                                     </div>
+
+                                                    {/* Progressive render sentinel */}
+                                                    {renderCount < searchedData.length && (
+                                                        <div ref={loadMoreRenderSentinelRef} style={{ height: '1px', width: '100%' }} />
+                                                    )}
+
                                                     {IsLoadMore ? (
                                                         <div className="loader adListingLoader"></div>
                                                     ) : (
