@@ -82,14 +82,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "browserslist": [
-    "last 2 Chrome versions",
-    "last 2 Firefox versions",
-    "last 2 Safari versions",
-    "last 2 Edge versions",
-    "not IE 11",
-    "not dead"
-  ],
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=10.0.0"
