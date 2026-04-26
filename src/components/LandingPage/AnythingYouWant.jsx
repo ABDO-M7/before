@@ -250,10 +250,10 @@ const AnythingYouWant = ({ initialQuickSearchItems = null, playStoreLink = "#", 
               <p className="hero_download_label">{t("downloadNow")}</p>
               <div className="hero_cta_buttons">
                 <Link href={playStoreLink} target="_blank" rel="noopener noreferrer">
-                  <Image src={googleDownload} alt="Download on Google Play" width={240} height={80} style={{ width: "100%", height: "auto" }} />
+                  <Image src={googleDownload} alt="Download on Google Play" width={240} height={80} loading="lazy" style={{ width: "100%", height: "auto" }} />
                 </Link>
                 <Link href={appStoreLink} target="_blank" rel="noopener noreferrer">
-                  <Image src={appleDownload} alt="Download on App Store" width={240} height={80} style={{ width: "100%", height: "auto" }} />
+                  <Image src={appleDownload} alt="Download on App Store" width={240} height={80} loading="lazy" style={{ width: "100%", height: "auto" }} />
                 </Link>
               </div>
             </div>
