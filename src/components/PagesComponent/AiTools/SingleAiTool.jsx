@@ -113,6 +113,7 @@ const SingleAiTool = () => {
                                     <HTMLContentRenderer
                                         htmlContent={toolData?.description || ''}
                                         contentId={`tool-description-${toolSlug}`}
+                                        injectGoogleFonts={false}
                                         onLoadComplete={() => setIsIframeLoaded(true)}
                                     />
                                 </div>

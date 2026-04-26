@@ -23,7 +23,7 @@ export default function HTMLContentRenderer({
   placeholderMinHeightPx = 200,
   iframeLoading = 'lazy',
   iframeFetchPriority = 'auto',
-  injectGoogleFonts = true,
+  injectGoogleFonts = false,
   injectTailwindCdn = false,
   injectDefaultTableStyles = false,
   extraCss = '',

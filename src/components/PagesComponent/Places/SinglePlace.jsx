@@ -123,6 +123,7 @@ const SinglePlace = () => {
                             <HTMLContentRenderer
                                 htmlContent={placeData?.description || ''}
                                 contentId={`place-description-${placeSlug}`}
+                                injectGoogleFonts={false}
                                 onLoadComplete={() => setIsIframeLoaded(true)}
                             />
                         </div>
@@ -152,6 +153,7 @@ const SinglePlace = () => {
                                                 <HTMLContentRenderer
                                                     htmlContent={String(section.description || '')}
                                                     contentId={`place-section-${placeData?.id || placeData?.slug || 'default'}-${sectionIndex}`}
+                                                    injectGoogleFonts={false}
                                                     onLoadComplete={() => setIsIframeLoaded(true)}
                                                 />
                                             </div>
