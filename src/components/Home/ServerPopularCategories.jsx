@@ -1,10 +1,4 @@
-import dynamic from 'next/dynamic';
-import PopularCategoriesSkeleton from "../Skeleton/PopularCategoriesSkeleton";
-
-const PopularCategories = dynamic(() => import('./PopularCategories'), {
-  ssr: false,
-  loading: () => <PopularCategoriesSkeleton />
-});
+import PopularCategoriesClient from './PopularCategoriesClient';
 
 // Default language for server-side fetch so categories come in correct locale (matches app default)
 const DEFAULT_LANG = 'ar';
@@ -35,5 +29,5 @@ const fetchFeaturedCategories = async () => {
 
 export default async function ServerPopularCategories() {
   const data = await fetchFeaturedCategories();
-  return <PopularCategories initialCategoriesData={data} showTitle={true} />;
+  return <PopularCategoriesClient initialCategoriesData={data} showTitle={true} />;
 }

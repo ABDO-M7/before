@@ -1,10 +1,4 @@
-import dynamic from 'next/dynamic';
-import AiToolsSkeleton from "../Skeleton/AiToolsSkeleton";
-
-const PopularAiTools = dynamic(() => import('./PopularAiTools'), {
-  ssr: false,
-  loading: () => <AiToolsSkeleton />
-});
+import PopularAiToolsClient from './PopularAiToolsClient';
 
 const fetchFeaturedAiTool = async () => {
   try {
@@ -65,7 +59,7 @@ export default async function ServerPopularAiTools() {
       {lcpImage && (
         <link rel="preload" as="image" href={lcpImage} fetchPriority="high" />
       )}
-      <PopularAiTools initialAiToolData={data} />
+      <PopularAiToolsClient initialAiToolData={data} />
     </>
   );
 }
