@@ -1,5 +1,11 @@
 import FeaturedSectionsBlock from "./ServerFeaturedSections";
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 const fetchFeaturedSectionsWithItems = async () => {
   try {
     const url = new URL(
@@ -7,7 +13,7 @@ const fetchFeaturedSectionsWithItems = async () => {
     );
     url.searchParams.set('hub', 'web');
     url.searchParams.set('limit', '5');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders', 'tips', 'featured-sections', 'items'] } });
+    const res = await fetchWithTimeout(url.toString(), { next: { revalidate: 86400, tags: ['sliders', 'tips', 'featured-sections', 'items'] } }, 8000);
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const data = await res.json();
     const sections = data?.data || [];

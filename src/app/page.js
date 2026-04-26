@@ -15,6 +15,12 @@ import { generateHomeMetadata } from '@/utils/metadataHelpers';
 
 export const revalidate = 86400; // 1 day default fallback
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 export const generateMetadata = async () => {
   return await generateHomeMetadata();
 };
@@ -26,7 +32,7 @@ const fetchQuickSearches = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches`
     );
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['quick-searches'] } });
+    const res = await fetchWithTimeout(url.toString(), { next: { revalidate: 86400, tags: ['quick-searches'] } }, 8000);
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const json = await res.json();
     const list = json?.data?.data ?? json?.data;
@@ -43,30 +49,13 @@ const fetchSettings = async () => {
         const url = new URL(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`
         );
-        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['seo-settings'] } });
+        const res = await fetchWithTimeout(url.toString(), { next: { revalidate: 86400, tags: ['seo-settings'] } }, 8000);
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
         const json = await res.json();
         return json || null;
     } catch (e) {
         console.error('Error fetching settings:', e?.message || e);
         return null;
-    }
-};
-
-// Sliders for Home Page
-const fetchSliders = async () => {
-    try {
-        const url = new URL(
-            `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-slider`
-        );
-        url.searchParams.set('hub', 'web');
-        const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders'] } });
-        if (!res.ok) return [];
-        const json = await res.json();
-        return Array.isArray(json?.data) ? json.data : [];
-    } catch (e) {
-        console.error('Error fetching sliders:', e?.message || e);
-        return [];
     }
 };
 

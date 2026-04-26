@@ -1,5 +1,11 @@
 import HomeBlogsRow from "./HomeBlogsRow";
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 const fetchBlogsForHome = async () => {
   try {
     const url = new URL(
@@ -8,7 +14,7 @@ const fetchBlogsForHome = async () => {
     url.searchParams.set('sort_by', 'new-to-old');
     url.searchParams.set('hub', 'web');
     url.searchParams.set('limit', '3');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['blogs'] } });
+    const res = await fetchWithTimeout(url.toString(), { next: { revalidate: 86400, tags: ['blogs'] } }, 8000);
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const json = await res.json();
     const list = json?.data?.data?.data ?? json?.data?.data ?? [];

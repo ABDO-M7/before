@@ -1,5 +1,11 @@
 import PopularAiToolsClient from './PopularAiToolsClient';
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 const fetchFeaturedAiTool = async () => {
   try {
     const url = new URL(
@@ -7,7 +13,7 @@ const fetchFeaturedAiTool = async () => {
     );
     url.searchParams.set('hub', 'web');
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['ai-tools'] } });
+    const res = await fetchWithTimeout(url.toString(), { next: { revalidate: 86400, tags: ['ai-tools'] } }, 8000);
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
     const json = await res.json();
     return json?.data ? json.data : null;

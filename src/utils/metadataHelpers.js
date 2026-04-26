@@ -6,6 +6,12 @@
 
 import { getCachedMetadata, setCachedMetadata } from './metadataCache';
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 const SITE_URL = (process.env.NEXT_PUBLIC_WEB_URL || 'https://arablaza.com').replace(/\/$/, '');
 const SITE_NAME = process.env.NEXT_PUBLIC_META_TITLE || 'Arablaza';
 
@@ -102,9 +108,10 @@ export async function generateHomeMetadata() {
     'home',
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=home`,
-          { next: { revalidate: 3600, tags: ['seo-settings'] } }
+          { next: { revalidate: 3600, tags: ['seo-settings'] } },
+          8000
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -148,9 +155,10 @@ export async function generateProductMetadata(slug) {
     slug,
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600, tags: ['items', slug] } }
+          { next: { revalidate: 3600, tags: ['items', slug] } },
+          8000
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -205,9 +213,10 @@ export async function generateBlogMetadata(slug) {
     slug,
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600, tags: ['blogs', slug] } }
+          { next: { revalidate: 3600, tags: ['blogs', slug] } },
+          8000
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -264,9 +273,10 @@ export async function generateQuickSearchMetadata(slug) {
     async () => {
       try {
         const encodedSlug = encodeURIComponent(slug);
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}quick-searches?slug=${encodedSlug}`,
-          { next: { revalidate: 3600, tags: ['quick-searches'] } }
+          { next: { revalidate: 3600, tags: ['quick-searches'] } },
+          8000
         );
 
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
@@ -316,9 +326,10 @@ export async function generateAiToolMetadata(slug) {
     slug,
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}ai-tools?slug=${encodeURIComponent(slug || '')}`,
-          { next: { revalidate: 3600, tags: ['ai-tools', slug] } }
+          { next: { revalidate: 3600, tags: ['ai-tools', slug] } },
+          8000
         );
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
         const data = await res.json();
@@ -360,9 +371,10 @@ export async function generatePlaceMetadata(slug) {
     slug,
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}places?slug=${encodeURIComponent(slug || '')}&hub=web`,
-          { next: { revalidate: 3600, tags: ['places', slug] } }
+          { next: { revalidate: 3600, tags: ['places', slug] } },
+          8000
         );
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
         const data = await res.json();
@@ -404,9 +416,10 @@ export async function generateSystemMetadata() {
     'settings',
     async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-system-settings`,
-          { next: { revalidate: 3600, tags: ['seo-settings'] } }
+          { next: { revalidate: 3600, tags: ['seo-settings'] } },
+          8000
         );
         
         if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {

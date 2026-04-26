@@ -12,6 +12,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 // ✅ Optimized PWA configuration for better caching and performance
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",                 // مجلد ملفات الخدمة
+  publicExcludes: ["static-page.html"], // Exclude heavy fallback page from precaching
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,

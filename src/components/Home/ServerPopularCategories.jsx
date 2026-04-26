@@ -1,5 +1,11 @@
 import PopularCategoriesClient from './PopularCategoriesClient';
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 // Default language for server-side fetch so categories come in correct locale (matches app default)
 const DEFAULT_LANG = 'ar';
 
@@ -10,10 +16,10 @@ const fetchFeaturedCategories = async () => {
     );
     url.searchParams.set('page', '1');
     url.searchParams.set('featured', '1');
-    const res = await fetch(url.toString(), {
+    const res = await fetchWithTimeout(url.toString(), {
       next: { revalidate: 86400, tags: ['categories'] },
       headers: { 'Content-Language': DEFAULT_LANG },
-    });
+    }, 8000);
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
     const json = await res.json();
     const inner = json?.data;
