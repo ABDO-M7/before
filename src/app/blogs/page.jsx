@@ -2,12 +2,18 @@ import Layout from '@/components/Layout/Layout';
 import Blogs from '@/components/PagesComponent/Blogs/Blogs'
 import JsonLd from '@/components/SEO/JsonLd';
 
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 export const generateMetadata = async () => {
   try {
-
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=blogs`,
-      { next: { revalidate: 3600, tags: ['seo-settings'] } } // Optional: Add ISR if using in generateMetadata
+      { next: { revalidate: 3600, tags: ['seo-settings'] } },
+      8000
     );
 
     const data = await res.json();
@@ -41,9 +47,10 @@ const formatDate = (dateString) => {
 
 const fetchBlogItems = async () => {
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs`,
-      { next: { revalidate: 86400, tags: ['blogs'] } } // 1 day in seconds
+      { next: { revalidate: 86400, tags: ['blogs'] } },
+      8000
     );
     const data = await res.json();
     return data?.data?.data || [];

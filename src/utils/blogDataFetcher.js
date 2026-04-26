@@ -15,15 +15,22 @@ const DEFAULT_DESCRIPTION = process.env.NEXT_PUBLIC_META_DESCRIPTION || 'Arablaz
  * Used by both generateMetadata and the page component.
  * Next.js caches identical fetch() URLs within the same request — zero double-fetch.
  */
+const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+};
+
 export async function fetchBlogBySlug(slug) {
     if (!slug) return null;
     try {
         // ✅ Normalize slug ONCE here — both metadata and page use this function
         const decoded = typeof slug === 'string' && slug.includes('%') ? decodeURIComponent(slug) : slug;
         const encoded = encodeURIComponent(decoded.trim());
-        const res = await fetch(
+        const res = await fetchWithTimeout(
             `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}blogs?slug=${encoded}`,
-            { next: { revalidate: 86400, tags: ['blogs', String(encoded)] } }
+            { next: { revalidate: 86400, tags: ['blogs', String(encoded)] } },
+            8000
         );
         if (!res.ok) return null;
         const data = await res.json();
