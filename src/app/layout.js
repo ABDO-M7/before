@@ -77,6 +77,10 @@ export const metadata = {
     },
 };
 
+const DeferredWebVitals = process.env.NODE_ENV === 'development'
+    ? (await import('@/components/DeferredWebVitals')).default
+    : null;
+
 export default async function RootLayout({ children }) {
     return (
         <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
@@ -96,10 +100,27 @@ export default async function RootLayout({ children }) {
                     <meta name="facebook-domain-verification" content={process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION} />
                 )}
 
+                {/*
+                    COMMENTED OUT — Early gtag queue (not needed in current setup)
+
+                    Only restore this if you add gtag('event', ...) calls in page/component code
+                    that runs BEFORE DeferredAnalytics mounts. In that case, events fired before
+                    the real GA script loads would be lost without this queue.
+
+                    Currently safe to omit because:
+                    - DeferredAnalytics defines window.gtag itself when GA script loads
+                    - No page/component code calls gtag() early
+                    - Keeping it as a parser-blocking <script> in <head> hurts TBT for no gain
+
+                    {process.env.NODE_ENV === 'production' && (
+                        <script dangerouslySetInnerHTML={{__html: `window.dataLayer=window.dataLayer||[];window.gtag=function(){window.dataLayer.push(arguments);};`}} />
+                    )}
+                */}
+
                 {/* ✅ Critical above-the-fold styles only */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
-                        body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;overflow-x:hidden;}
+                        body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;}
                         #main-content,main{min-height:70vh;}
                         .container{width:100%;margin:0 auto;max-width:1320px;padding-left:12px;padding-right:12px;}
                         .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
@@ -126,6 +147,7 @@ export default async function RootLayout({ children }) {
                         <Toaster position="top-center" reverseOrder={false} />
                         {children}
                         <DeferredAnalytics />
+                        {process.env.NODE_ENV === 'development' && <DeferredWebVitals />}
                         <CSSLoader />
                         <DeferredPrefetcher />
                         <SpeedInsights />

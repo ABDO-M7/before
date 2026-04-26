@@ -90,9 +90,11 @@ const PopularAiTools = ({ initialAiToolData: initialAiToolDataProp }) => {
                 <HTMLContentRenderer
                   htmlContent={featuredTool?.description || ''}
                   contentId={`featured-tool-description-${featuredTool?.id}`}
-                  // Defer iframe mount to avoid blocking initial render.
-                  // 3000ms is sufficient since this section is now below the categories.
-                  deferIframeLoadMs={3000}
+                  // Defer mounting until near/in view so it never competes with above-the-fold work.
+                  deferUntilInView={true}
+                  inViewRootMarginPx={150}
+                  // Avoid extra font connections/stylesheets from inside the iframe on the landing page.
+                  injectGoogleFonts={false}
                   // Reserve space while iframe is deferred to reduce CLS.
                   placeholderMinHeightPx={450}
                 />

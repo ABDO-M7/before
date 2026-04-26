@@ -1,14 +1,24 @@
-import { placeholderImage, normalizeImageUrl } from '@/utils';
-import React, { useState, useEffect } from 'react';
+import { placeholderImage, normalizeImageUrl, useIsRtl } from '@/utils';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 
 
 const CustomLightBox = ({ lightboxOpen, handleCloseLightbox, currentImages, currentImageIndex, setCurrentImage }) => {
 
-    const [isZoomed, setIsZoomed] = useState(false); // State for zoom
-    const [zoomStyle, setZoomStyle] = useState({});
+    const isRtl = useIsRtl();
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomPanSize, setZoomPanSize] = useState(null);
+    const [zoomScale, setZoomScale] = useState(2);
+    const viewportRef = useRef(null);
 
+    useEffect(() => {
+        const mq = window.matchMedia("(max-width: 768px)");
+        const apply = () => setZoomScale(mq.matches ? 1.5 : 2);
+        apply();
+        mq.addEventListener("change", apply);
+        return () => mq.removeEventListener("change", apply);
+    }, []);
 
     useEffect(() => {
         setCurrentImage(currentImageIndex);
@@ -22,9 +32,9 @@ const CustomLightBox = ({ lightboxOpen, handleCloseLightbox, currentImages, curr
             if (e.key === 'Escape') {
                 handleCloseLightbox();
             } else if (e.key === 'ArrowLeft') {
-                goToPrevious();
+                handleLeftArrow();
             } else if (e.key === 'ArrowRight') {
-                goToNext();
+                handleRightArrow();
             }
         };
 
@@ -39,8 +49,30 @@ const CustomLightBox = ({ lightboxOpen, handleCloseLightbox, currentImages, curr
         };
     }, [lightboxOpen]);
 
+    useEffect(() => {
+        if (!lightboxOpen) {
+            setIsZoomed(false);
+            setZoomPanSize(null);
+        }
+    }, [lightboxOpen]);
+
+    useEffect(() => {
+        setIsZoomed(false);
+        setZoomPanSize(null);
+    }, [currentImageIndex]);
+
+    useLayoutEffect(() => {
+        if (!isZoomed || !viewportRef.current || !zoomPanSize) return;
+        const vp = viewportRef.current;
+        vp.scrollLeft = Math.max(0, (vp.scrollWidth - vp.clientWidth) / 2);
+        vp.scrollTop = Math.max(0, (vp.scrollHeight - vp.clientHeight) / 2);
+    }, [isZoomed, zoomPanSize, currentImageIndex]);
+
     const goToPrevious = () => setCurrentImage((prevIndex) => (prevIndex - 1 + currentImages.length) % currentImages.length);
     const goToNext = () => setCurrentImage((prevIndex) => (prevIndex + 1) % currentImages.length);
+
+    const handleLeftArrow = isRtl ? goToNext : goToPrevious;
+    const handleRightArrow = isRtl ? goToPrevious : goToNext;
 
     if (!lightboxOpen || !currentImages.length) return null;
 
@@ -48,48 +80,107 @@ const CustomLightBox = ({ lightboxOpen, handleCloseLightbox, currentImages, curr
 
     if (!currentImage) return null;
     
-    // Normalize image URL (images are already 'large' compressed from SingleProductDetail)
+    // Normalize image URL (product detail passes original full-size URLs)
     const normalizedImage = normalizeImageUrl(currentImage);
 
-    // Handle clicks outside of the lightbox content
-    const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) {
-            handleCloseLightbox();
-        }
-    };
 
     const handleImageClick = (e) => {
-        const rect = e.target.getBoundingClientRect(); // Get the image bounding rectangle
-        const offsetX = e.clientX - rect.left; // Calculate click position relative to the image
-        const offsetY = e.clientY - rect.top;
-
-        setZoomStyle({
-            transformOrigin: `${offsetX}px ${offsetY}px`, // Set transform origin
+        const img = e.currentTarget;
+        const rect = img.getBoundingClientRect();
+        setIsZoomed((prev) => {
+            if (!prev) {
+                setZoomPanSize({
+                    w: rect.width * zoomScale,
+                    h: rect.height * zoomScale,
+                });
+            } else {
+                setZoomPanSize(null);
+            }
+            return !prev;
         });
-
-        setIsZoomed((prevZoom) => !prevZoom); // Toggle zoom state
     };
 
     return (
-        <div className="lightbox-overlay" onClick={handleOverlayClick}>
-            <div className="lightbox-modal">
+        <div
+            className="lightbox-overlay"
+            style={{ "--lightbox-zoom": zoomScale }}
+        >
+            <div className="lightbox-modal" onClick={handleCloseLightbox}>
                 <div className="lightbox-header">
-                    <button onClick={handleCloseLightbox} className="lightbox-close-button">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleCloseLightbox();
+                        }}
+                        className="lightbox-close-button"
+                    >
                         <IoMdClose size={24} />
                     </button>
                 </div>
                 <div className="lightbox-content">
-                    <img src={normalizedImage} alt={`Image ${currentImageIndex + 1}`} className={`lightbox-image ${isZoomed ? 'zoomed' : ''}`} loading="lazy" onError={placeholderImage} onClick={handleImageClick} style={isZoomed ? { ...zoomStyle } : {}} />
-                    {currentImages && currentImages?.length > 1 &&
+                    <div
+                        ref={viewportRef}
+                        className={`lightbox-image-viewport${isZoomed ? " is-zoomed" : ""}`}
+                    >
+                        <div
+                            className="lightbox-image-pan"
+                            style={
+                                zoomPanSize
+                                    ? {
+                                          width: zoomPanSize.w,
+                                          height: zoomPanSize.h,
+                                      }
+                                    : undefined
+                            }
+                        >
+                            <img
+                                src={normalizedImage}
+                                alt={`Image ${currentImageIndex + 1}`}
+                                className={`lightbox-image ${isZoomed ? "zoomed" : ""}`}
+                                loading="lazy"
+                                onError={placeholderImage}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleImageClick(e);
+                                }}
+                            />
+                        </div>
+                    </div>
+                    {currentImages && currentImages?.length > 1 && (
+                        <div
+                            className="lightbox-counter"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <span className="lightbox-counter-current">{currentImageIndex + 1}</span>
+                            <span className="lightbox-counter-sep">/</span>
+                            <span className="lightbox-counter-total">{currentImages.length}</span>
+                        </div>
+                    )}
+                    {currentImages && currentImages?.length > 1 && (
                         <>
-                            <button onClick={goToPrevious} className="lightbox-prev-button">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleLeftArrow();
+                                }}
+                                className="lightbox-prev-button"
+                            >
                                 <FaChevronLeft />
                             </button>
-                            <button onClick={goToNext} className="lightbox-next-button">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRightArrow();
+                                }}
+                                className="lightbox-next-button"
+                            >
                                 <FaChevronRight />
                             </button>
                         </>
-                    }
+                    )}
                 </div>
             </div>
         </div>

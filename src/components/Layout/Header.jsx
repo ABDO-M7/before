@@ -636,7 +636,33 @@ const Header = ({ initialQuickSearchItems }) => {
                   )}
                 </Link>
 
-                {/* Blog & AI Tools - after logo, before search */}
+                {/* Nav tabs - after logo, before search */}
+                {/* <Link
+                  href="/home"
+                  className="nav-item nav-link d-lg-block"
+                  style={{
+                    textDecoration: 'none',
+                    color: '#797b7c',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    backgroundColor: 'transparent',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#06aabd';
+                    e.currentTarget.style.backgroundColor = '#f0fdfd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#797b7c';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {t("home")}
+                </Link> */}
                 <Link
                   href="/blogs"
                   className="nav-item nav-linkS d-lg-block"
@@ -689,7 +715,32 @@ const Header = ({ initialQuickSearchItems }) => {
                 >
                   {t("aiTools")}
                 </Link>
-
+                <Link
+                  href="/places"
+                  className="nav-item nav-link d-lg-block"
+                  style={{
+                    textDecoration: 'none',
+                    color: '#797b7c',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    backgroundColor: 'transparent',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#06aabd';
+                    e.currentTarget.style.backgroundColor = '#f0fdfd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#797b7c';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {t("placesGuide")}
+                </Link>
                 {/* Search Container with Category, Input, Location Icon */}
                 {!isHomePath && (
                 <div className="select_search_cont search_lg" style={{
@@ -730,9 +781,8 @@ const Header = ({ initialQuickSearchItems }) => {
                   {t("categorySelect") || "Select a category to filter products"}
                 </span>
               </div> */}
-                  <form className="search_cont" onSubmit={handleSearchNav} role="search" aria-label={t("searchPropertiesLabel") || "Search properties"} style={{ flex: '1', display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '8px', padding: '4px' }}>
-                    <div className="srchIconinput_cont" style={{ flex: '1', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <BiPlanet size={16} color="#595B6C" className="planet" aria-hidden="true" />
+                  <form className="search_cont" onSubmit={handleSearchNav} role="search" aria-label={t("searchPropertiesLabel") || "Search properties"} style={{ flex: '1', display: 'flex', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '8px', padding: '4px' }}>
+                    <div className="srchIconinput_cont" style={{ flex: '1', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px' }}>
                       <input
                         type="text"
                         placeholder={t("searchAd")}
@@ -741,7 +791,7 @@ const Header = ({ initialQuickSearchItems }) => {
                         aria-label={t("searchPropertiesLabel") || "Search properties"}
                         aria-describedby="search-description"
                         autoComplete="off"
-                        style={{ border: 'none', outline: 'none', padding: '6px 8px', width: '100%', backgroundColor: 'transparent', fontSize: '14px' }}
+                        style={{ border: 'none', outline: 'none', padding: '6px 0', width: '100%', backgroundColor: 'transparent', fontSize: '14px' }}
                       />
                       <span id="search-description" className="sr-only">
                         {t("searchInputDescription")}
@@ -749,72 +799,66 @@ const Header = ({ initialQuickSearchItems }) => {
                     </div>
                     <button
                       type="submit"
-                      aria-label={t("search") || "Search button"}
+                      aria-label={t("search") || "Search"}
                       disabled={isPending}
                       style={{
-                        padding: '8px 20px',
-                        flexShrink: 0,
-                        backgroundColor: '#005f6b',
-                        color: '#ffffff',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: '600',
-                        transition: 'all 0.3s ease',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        color: '#797b7c',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        transition: 'all 0.3s ease',
+                        padding: 0,
+                        margin: 0
                       }}
                       onMouseEnter={(e) => {
-                        if (!isPending) {
-                          e.currentTarget.style.backgroundColor = '#004d56';
-                        }
+                        e.currentTarget.style.color = '#06aabd';
+                        e.currentTarget.style.borderColor = '#06aabd';
+                        e.currentTarget.style.backgroundColor = '#f0fdfd';
                       }}
                       onMouseLeave={(e) => {
-                        if (!isPending) {
-                          e.currentTarget.style.backgroundColor = '#005f6b';
-                        }
+                        e.currentTarget.style.color = '#797b7c';
+                        e.currentTarget.style.borderColor = '#e5e7eb';
+                        e.currentTarget.style.backgroundColor = '#ffffff';
                       }}
                     >
-                      <FaSearch size={14} aria-hidden="true" />
-                      <span className="srch">{t("search")}</span>
+                      <FaSearch size={16} aria-hidden="true" />
                     </button>
                   </form>
-                  {/* Location Icon */}
-                  <button
-                    onClick={openLocationEditModal}
-                    title={hasLocation ? locationFull : t("addLocation")}
-                    style={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e5e7eb',
-                      color: '#797b7c',
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                      transition: 'all 0.3s ease',
-                      padding: 0,
-                      margin: 0
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#06aabd';
-                      e.currentTarget.style.borderColor = '#06aabd';
-                      e.currentTarget.style.backgroundColor = '#f0fdfd';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '#797b7c';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.backgroundColor = '#ffffff';
-                    }}
-                  >
-                    <LuMapPin size={18} />
-                  </button>
                 </div>
                 )}
+                <Link
+                  href="/subscription"
+                  className="nav-item nav-link d-lg-block"
+                  style={{
+                    textDecoration: 'none',
+                    color: '#797b7c',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    backgroundColor: 'transparent',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#06aabd';
+                    e.currentTarget.style.backgroundColor = '#f0fdfd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#797b7c';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {t("subscription")}
+                </Link>
 
                 {/* Navigation Items - Desktop Only (Login, Ad listing, Language) — min-height to avoid CLS when auth/lang load */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, minHeight: '48px' }}>

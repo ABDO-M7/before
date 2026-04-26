@@ -350,6 +350,51 @@ export async function generateAiToolMetadata(slug) {
 }
 
 /**
+ * Generate metadata for place (city guide) detail page
+ * @param {string} slug - Place slug
+ * @returns {Promise<object>} Metadata object
+ */
+export async function generatePlaceMetadata(slug) {
+  return generateMetadataWithCache(
+    'place',
+    slug,
+    async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}places?slug=${encodeURIComponent(slug || '')}&hub=web`,
+          { next: { revalidate: 3600, tags: ['places', slug] } }
+        );
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return null;
+        const data = await res.json();
+        const place = data?.data;
+        if (!place) return null;
+        const title = place?.title || DEFAULT_METADATA.title;
+        const rawDesc = place?.short_description || place?.description || '';
+        const description = String(rawDesc).replace(/<[^>]*>/g, '').slice(0, 160) || DEFAULT_METADATA.description;
+        const canonicalUrl = `${SITE_URL}/places/${encodeURIComponent(String(place?.slug || slug))}`;
+        const social = buildSocialMetadata({
+          title,
+          description,
+          url: canonicalUrl,
+          images: place?.image ? [place.image] : [],
+          type: 'website',
+        });
+        return {
+          title,
+          description,
+          alternates: { canonical: canonicalUrl },
+          ...social,
+        };
+      } catch (error) {
+        console.error(`Error fetching metadata for place ${slug}:`, error.message);
+        return null;
+      }
+    },
+    3600
+  );
+}
+
+/**
  * Generate metadata for system settings (favicon, etc.)
  * @returns {Promise<object>} Metadata object
  */

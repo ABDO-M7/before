@@ -13,6 +13,7 @@ import { CurrentLanguageData } from '@/redux/reuducer/languageSlice'
 import OurBlogCardSkeleton from '@/components/Skeleton/OurBlogCardSkeleton'
 import BlogTagsSkeleton from '@/components/Skeleton/BlogTagsSkeleton'
 import PopularPostsSkeleton from '@/components/Skeleton/PopularPostsSkeleton'
+import '@/components/PagesComponent/AiTools/AiTools.css'
 
 const Blogs = () => {
 
@@ -99,17 +100,22 @@ const Blogs = () => {
     }, [])
 
     return (
-        <section className='static_pages'>
+        <section className='ai-tools-page'>
             {/* <BreadcrumbComponent title2={t("ourBlogs")} /> */}
+            <div className="hero-section">
+                <div className="container">
+                    <h1 className="hero-title">
+                        {t('explore')} <span className="text-primary">{t('ourBlogs')}</span>
+                    </h1>
+                    <p className="hero-desc">
+                        {t('blogsHeroDesc')}
+                    </p>
+                </div>
+            </div>
+
             <div className='container'>
-                <div className="static_div">
-                    <div className="main_title">
-                        <span>
-                            {t('ourBlogs')}
-                        </span>
-                    </div>
-                    <div className="page_content">
-                        <div className="row blog_separator">
+                <div className="page_content">
+                    <div className="row blog_separator">
                             <div className="col-12 col-md-12 col-lg-9">
                                 <div className="row blog_separator home_blogs_row">
                                     {
@@ -170,7 +176,6 @@ const Blogs = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </section>

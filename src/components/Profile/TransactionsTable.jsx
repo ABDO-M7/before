@@ -27,12 +27,47 @@ const TransactionsTable = () => {
     }
 
 
+    const PACKAGE_COLORS = {
+        without:  { primary: "#00ABBF", dark: "#008A9A" },
+        bronze:   { primary: "#CD7F32", dark: "#8D5524" },
+        silver:   { primary: "#B8C2CC", dark: "#5f666c" },
+        gold:     { primary: "#D4AF37", dark: "#AA771C" },
+        platinum: { primary: "#7B8FA1", dark: "#425B70" },
+        diamond:  { primary: "#00B4D8", dark: "#0077B6" },
+    };
+
+    const STATUS_LABELS = {
+        succeed:       t('succeed'),
+        failed:        t('failed'),
+        pending:       t('pending'),
+        'under review': t('underReview'),
+        rejected:      t('rejected'),
+    };
+
     const columns = [
         {
             title: t('id'),
             dataIndex: 'id',
             key: 'id',
             align: 'center',
+        },
+        {
+            title: t('packageName'),
+            key: 'package_name',
+            align: 'center',
+            render: (_, record) => {
+                const pkg = PACKAGE_COLORS[record?.package?.color];
+                return (
+                    <span style={pkg ? {
+                        background: `linear-gradient(135deg, ${pkg.primary}, ${pkg.dark})`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 600,
+                    } : undefined}>
+                        {record?.package?.name || '-'}
+                    </span>
+                );
+            },
         },
         {
             title: t('paymentMethod'),
@@ -93,9 +128,10 @@ const TransactionsTable = () => {
                         break;
                 }
 
+                const label = STATUS_LABELS[text] || text;
+
                 return (
                     <div>
-
                         {record.payment_gateway === 'BankTransfer' && text === 'pending' ? (
                             <button
                                 className="upload_receipt_button"
@@ -103,10 +139,9 @@ const TransactionsTable = () => {
                             >
                                 {t('uploadReceipt')}
                             </button>
-                        )
-                            :
-                            <span className={statusClassName}>{text}</span>
-                        }
+                        ) : (
+                            <span className={statusClassName}>{label}</span>
+                        )}
                     </div>
                 );
             },

@@ -79,7 +79,7 @@ const StripePayment = ({
             // Handle confirm error here
           } else {
             if (paymentIntent.status === "succeeded") {
-              updateActivePackage();
+              updateActivePackage("succeed");
               PaymentModalClose();
             } else {
               toast.error(t("paymentfail " + paymentIntent.status));

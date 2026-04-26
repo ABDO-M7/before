@@ -3,10 +3,10 @@ export default async function sitemap() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const staticRoutes = [
-        'about-us', 'ad-listing', 'ads', 'blogs', 'chat', 'contact-us', 'faqs',
+        'about-us', 'ad-listing', 'ads', 'blogs', 'places', 'chat', 'contact-us', 'faqs',
         'favourites', 'home', 'notifications', 'privacy-policy', 'products',
         'profile/edit-profile', 'reviews', 'subscription', 'terms-and-condition',
-        'transactions', 'user-subscription', 'user-verification', 'job-applications'
+        'transactions',  'user-verification', 'job-applications'
     ];
 
     const staticSitemapEntries = staticRoutes.map(route => ({
@@ -111,5 +111,25 @@ export default async function sitemap() {
         console.error('Error fetching AI tools for sitemap:', error);
     }
 
-    return [baseEntry, ...staticSitemapEntries, ...productEntries, ...categoryEntries, ...blogEntries, ...aiToolEntries];
+    let placeEntries = [];
+    try {
+        const res = await fetch(
+            `${apiUrl}${process.env.NEXT_PUBLIC_END_POINT}places?page=1&limit=50&hub=web`,
+            { next: { revalidate: 604800, tags: ['places'] } }
+        );
+        if (res.ok) {
+            const json = await res.json();
+            const list = json?.data?.data || [];
+            placeEntries = list.map((place) => ({
+                url: `${baseUrl}/places/${encodeURIComponent(place?.slug || '')}`,
+                lastModified: new Date(place?.updated_at || 0),
+                changeFrequency: 'weekly',
+                priority: 0.65,
+            }));
+        }
+    } catch (error) {
+        console.error('Error fetching places for sitemap:', error);
+    }
+
+    return [baseEntry, ...staticSitemapEntries, ...productEntries, ...categoryEntries, ...blogEntries, ...aiToolEntries, ...placeEntries];
 }

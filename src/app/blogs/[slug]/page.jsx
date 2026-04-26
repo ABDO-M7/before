@@ -172,6 +172,7 @@ const SingleBlogPage = async ({ params }) => {
                         isRtl={isRtl}
                         t={t}
                         currentUrl={blogUrl}
+                        viewPingSlug={decodedSlug}
                     />
                 </Layout>
             </>

@@ -9,12 +9,12 @@ import { SlLocationPin } from "react-icons/sl";
 import { RiMailSendFill } from "react-icons/ri";
 import { BiLogoWhatsapp } from "react-icons/bi";
 import googleDownload from '../../../public/assets/GoogleDownload.svg'
+import pwaDownload from '../../../public/assets/DirectDownload_v7.svg'
 import appleDownload from '../../../public/assets/iOSDownload.svg'
 import { placeholderImage, t } from '@/utils'
 import { settingsData } from '@/redux/reuducer/settingSlice'
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice'
 import { useSelector } from 'react-redux'
-import pwaDownload from '../../../public/assets/pwa-icon.png';
 import toast from "@/utils/toast";
 
 
@@ -122,6 +122,9 @@ const Footer = () => {
 
 
     const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const showPwaButton = !isSafari && !isInPWA && isMobileOrTablet && !!deferredPrompt
+    // const showPwaButton = true;
+
     useEffect(() => {
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault(); // منع المتصفح من إظهار نافذة التنصيب تلقائيًا
@@ -144,14 +147,19 @@ const Footer = () => {
         deferredPrompt.prompt()
         const { outcome } = await deferredPrompt.userChoice
 
-        // setDeferredPrompt null after use
+        if (outcome === 'accepted') {
+            toast.success(t("pwaInstallSuccess"));
+        } else {
+            toast.error(t("pwaInstallDismissed"));
+        }
+
         setDeferredPrompt(null)
     }
     return (
         // ✅ CLS Fix: margin-top moved to CSS (.main_footer) — eliminates JS-driven layout shift
         <section className='main_footer'>
             <div className='container'>
-                {showDownloadLinks ? (
+                {(showDownloadLinks || showPwaButton) ? (
                     <div className="eClassifyApp" style={{
                         // background: `url(${bg.src})`,
                         background: `#f46648`,
@@ -174,23 +182,21 @@ const Footer = () => {
                                 }
 
                                 {/* {!isAppInstalled && !isSafari && isUserInSyria && !isInPWA && ( */}
-                                {!isSafari && !isInPWA && isMobileOrTablet && (
+                                {showPwaButton && (
                                     <Link
                                         href="#"
                                         onClick={(e) => {
                                             e.preventDefault();
                                             handleInstallClick();
                                         }}
-                                        style={{ display: 'inline-block' }} // Optional: if you need block styling
                                     >
                                         <Image
                                             loading="lazy"
                                             src={pwaDownload}
-                                            alt="Install PWA"
-                                            width={180}
-                                            height={60}
+                                            alt="Direct Download Web App"
+                                            width={267}
+                                            height={117}
                                             onErrorCapture={placeholderImage}
-                                        // style={{ height: 'auto', width: 'auto' }}
                                         />
                                     </Link>
                                 )}
@@ -279,6 +285,11 @@ const Footer = () => {
                             <div className="footer_links">
                                 <Link href={'/blogs'}>
                                     <span>{t('ourBlog')}</span>
+                                </Link>
+                            </div>
+                            <div className="footer_links">
+                                <Link href={'/places'}>
+                                    <span>{t('places')}</span>
                                 </Link>
                             </div>
                             <div className="footer_links">

@@ -10,6 +10,7 @@ export const GET_PACKAGE = "get-package";
 export const GET_BLOGS = "blogs";
 export const GET_BLOG_TAGS = "blog-tags";
 export const GET_AI_TOOLS = "ai-tools";
+export const GET_PLACES = "places";
 export const GET_AI_TOOL_TAGS = "ai-tool-tags";
 export const GET_FEATURED_SECTION = "get-featured-section";
 export const GET_FAQ = "faq";
@@ -261,6 +262,23 @@ export const getAiToolsApi = {
                 page,
                 limit,
                 featured
+            },
+        });
+    },
+};
+
+export const getPlacesApi = {
+    getPlaces: ({ slug, sort_by, hub, page, limit, state_id, state, city_id } = {}) => {
+        return Api.get(GET_PLACES, {
+            params: {
+                slug,
+                sort_by,
+                hub,
+                page,
+                limit,
+                state_id,
+                state,
+                city_id,
             },
         });
     },

@@ -1,53 +1,50 @@
 "use client";
+import "./subscription-design.css";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/free-mode";
+import React, { useEffect, useState } from "react";
 import SubscriptionCard from "@/components/Cards/SubscriptionCard";
 import {
   assigFreePackageApi,
   getPackageApi,
   getPaymentSettingsApi,
 } from "@/utils/api";
-import { t, useIsRtl } from "@/utils";
+import { t } from "@/utils";
 import PaymentModal from "./PaymentModal";
 import SubscriptionCardSkeleton from "@/components/Skeleton/SubscriptionCardSkeleton";
 import { store } from "@/redux/store";
 import toast from "@/utils/toast";
 import { isLogin } from "@/utils";
-import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
-import Swal from "sweetalert2";
+// import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
 import { useSelector } from "react-redux";
 import { getIsLoggedIn } from "@/redux/reuducer/authSlice";
 import BankDetailsModal from "./BankDetailsModal";
 import { toggleLoginModal } from "@/redux/reuducer/globalStateSlice";
+import NoData from "@/components/NoDataFound/NoDataFound";
 
 const Subscription = () => {
-  const AdListingRef = useRef();
-  const FeaturedAdRef = useRef();
-  const isRtl = useIsRtl();
   const router = useRouter();
   const settingsData = store.getState().Settings?.data;
   const UserData = store.getState().UserSignup?.data?.data;
   const [isLoading, setIsLoading] = useState(false);
-  const [itemPackages, setItemPackages] = useState([]);
+  const [, setItemPackages] = useState([]);
   const [advertisementPackage, setAdvertisementPackage] = useState([]);
   const [packageSettings, setPackageSettings] = useState([]);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
   const [priceData, setPriceData] = useState({});
   const [isPaymentModal, setIsPaymentModal] = useState(false);
   const [isReadonlyModal, setIsReadonlyModal] = useState(false);
-  const isFreeAdListing = Number(settingsData?.data?.free_ad_listing);
   const IsLoggedIn = useSelector(getIsLoggedIn);
 
   const getPackageSettingsData = async () => {
     try {
+      setIsLoadingSettings(true);
       const res = await getPaymentSettingsApi.getPaymentSettings();
       const { data } = res.data;
       setPackageSettings(data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoadingSettings(false);
     }
   };
   // Commented out: item-listing packages are hidden because they are free
@@ -89,32 +86,6 @@ const Subscription = () => {
     }
   }, [isPaymentModal]);
 
-  const breakpoints = {
-    0: {
-      slidesPerView: 1.2,
-      spaceBetween: 10,
-    },
-    430: {
-      slidesPerView: 1.3,
-      spaceBetween: 10,
-    },
-    576: {
-      slidesPerView: 1.3,
-    },
-    768: {
-      slidesPerView: 1.8,
-    },
-    992: {
-      slidesPerView: 2.5,
-    },
-    1200: {
-      slidesPerView: 2.8,
-    },
-    1400: {
-      slidesPerView: 3.2,
-    },
-  };
-
   const assignPackage = async (id) => {
     try {
       const res = await assigFreePackageApi.assignFreePackage({
@@ -128,7 +99,7 @@ const Subscription = () => {
         router.push("/home");
       }
     } catch (error) {
-      toast.error(data.message);
+      toast.error(error?.message || t("errorOccurred"));
       console.log(error);
     }
   };
@@ -136,7 +107,7 @@ const Subscription = () => {
   const handlePurchasePackage = (e, data) => {
     e.preventDefault();
     if (!isLogin()) {
-      toggleLoginModal(true)
+      toggleLoginModal(true);
       return;
     }
     if (data?.final_price === 0) {
@@ -158,90 +129,61 @@ const Subscription = () => {
   useEffect(() => {}, [isPaymentModal, priceData]);
 
   return (
-    <section className="static_pages">
-      <BreadcrumbComponent title2={t("subscription")} />
+    <section className="static_pages subscription-design-section">
+      {/* <BreadcrumbComponent title2={t("subscription")} /> */}
       <div className="container">
-        <div className="page_content">
-          <div className="subscription_cont p-0">
-            {/* Commented out: item-listing packages are hidden because they are free
-                I don't want to see them cause they are free */}
-            {/* <div className="sub_content">
-              {itemPackages && itemPackages.length > 0 && (
-                <div className="title">
-                  <span>{t("adListingPlan")}</span>
-                </div>
-              )}
-              <Swiper
-                onSwiper={(swiper) => {
-                  AdListingRef.current = swiper;
-                }}
-                dir={isRtl ? "rtl" : "ltr"}
-                slidesPerView={3}
-                spaceBetween={30}
-                className="subscription-swiper"
-                breakpoints={breakpoints}
-                freeMode={true}
-                modules={[FreeMode]}
-                key={isRtl}
-              >
-                {isLoading
-                  ? Array(4)
-                      .fill(0)
-                      .map((_, index) => (
-                        <SwiperSlide key={index}>
-                          <SubscriptionCardSkeleton />
-                        </SwiperSlide>
-                      ))
-                  : itemPackages &&
-                    itemPackages.length > 0 &&
-                    itemPackages.map((data, index) => (
-                      <SwiperSlide key={index}>
-                        <SubscriptionCard
-                          data={data}
-                          handlePurchasePackage={handlePurchasePackage}
-                        />
-                      </SwiperSlide>
-                    ))}
-              </Swiper>
-            </div> */}
-            <div className="sub_content">
-              <div className="title">
-                <span>{t("featuredAdPlan")}</span>
-              </div>
-              <Swiper
-                onSwiper={(swiper) => {
-                  FeaturedAdRef.current = swiper;
-                }}
-                dir={isRtl ? "rtl" : "ltr"}
-                slidesPerView={3}
-                spaceBetween={30}
-                className="subscription-swiper"
-                breakpoints={breakpoints}
-                freeMode={true}
-                modules={[FreeMode]}
-                key={isRtl}
-              >
-                {isLoading
-                  ? Array(4)
-                      .fill(0)
-                      .map((_, index) => (
-                        <SwiperSlide key={index}>
-                          <SubscriptionCardSkeleton />
-                        </SwiperSlide>
-                      ))
-                  : advertisementPackage &&
-                    advertisementPackage.map((data, index) => (
-                      <SwiperSlide key={index}>
-                        <SubscriptionCard
-                          data={data}
-                          handlePurchasePackage={handlePurchasePackage}
-                          onViewPaymentDetails={handleViewPaymentDetails}
-                        />
-                      </SwiperSlide>
-                    ))}
-              </Swiper>
-            </div>
+        <div className="subscription-design-page-wrapper">
+          {/* <div className="subscription-design-orb subscription-design-orb-cyan" />
+          <div className="subscription-design-orb subscription-design-orb-gold" /> */}
+
+          <div className="subscription-design-header">
+            <span className="subscription-design-header-badge">استثمر في عقارك</span>
+            <h1>باقات التمييز الاحترافية</h1>
+            <p>
+              ضاعف فرص بيع عقارك بالوصول إلى آلاف المشترين الجادين عبر حلولنا
+              التسويقية المبتكرة.
+            </p>
           </div>
+
+          {isLoading ? (
+            <div className="subscription-design-grid">
+              {Array(4)
+                .fill(0)
+                .map((_, index) => (
+                  <div key={index} className="subscription-design-skeleton">
+                    <SubscriptionCardSkeleton />
+                  </div>
+                ))}
+            </div>
+          ) : advertisementPackage?.length > 0 ? (
+            <div className="subscription-design-grid">
+              {(() => {
+                const hasActivePackage = advertisementPackage.some((pkg) => {
+                  const status = String(pkg?.payment_status || "").toLowerCase().trim();
+                  return Boolean(pkg?.is_active) || status === "succeed";
+                });
+
+                return [...advertisementPackage]
+                .sort((a, b) => {
+                  const aFeatured = Number(a?.featured ?? 0);
+                  const bFeatured = Number(b?.featured ?? 0);
+                  if (aFeatured !== bFeatured) return aFeatured - bFeatured; // non-featured first
+                  return Number(a?.id ?? 0) - Number(b?.id ?? 0);
+                })
+                .map((data) => (
+                <SubscriptionCard
+                  key={data.id}
+                  data={data}
+                  handlePurchasePackage={handlePurchasePackage}
+                  onViewPaymentDetails={handleViewPaymentDetails}
+                  hideActions={hasActivePackage}
+                />
+                ));
+              })()}
+            </div>
+          ) : (
+            <NoData name={t("packages")} />
+          )}
         </div>
       </div>
       {isPaymentModal ? (
@@ -258,6 +200,7 @@ const Subscription = () => {
           setItemPackages={setItemPackages}
           setAdvertisementPackage={setAdvertisementPackage}
           isReadonly={isReadonlyModal}
+          IsPaymentModalOpening={isLoadingSettings}
         />
       ) : null}
 

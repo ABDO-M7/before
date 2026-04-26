@@ -14,8 +14,8 @@ export async function GET(request) {
       headers: {
         'Accept': 'application/xml, text/xml, */*',
       },
-      // Cache for 1 hour (3600 seconds) - adjust as needed
-      next: { revalidate: 3600 }
+      // Cache for 1 hour (3600 seconds); tag allows on-demand purge via /api/revalidate
+      next: { revalidate: 3600, tags: ['facebook-feed'] }
     });
 
     if (!response.ok) {

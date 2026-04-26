@@ -1,11 +1,12 @@
 "use client";
+import "@/styles/feat-spinner.css";
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
-import { FaArrowLeft, FaArrowRight, FaRegLightbulb } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaRegLightbulb, FaMagnifyingGlassPlus } from "react-icons/fa6";
 import { MdKeyboardArrowDown, MdOutlineAttachFile } from "react-icons/md";
 import adIcon from "../../../../public/assets/ad_icon.svg";
 import NoPackageModal from "@/components/MyListing/NoPackageModal";
@@ -30,6 +31,16 @@ import {
 import Link from "next/link";
 import toast from "@/utils/toast";
 import { FaPlayCircle } from "react-icons/fa";
+import { BiBadgeCheck } from "react-icons/bi";
+
+const PACKAGE_COLORS = {
+  without:  { primary: "#00ABBF", dark: "#008A9A" },
+  bronze:   { primary: "#CD7F32", dark: "#8D5524" },
+  silver:   { primary: "#B8C2CC", dark: "#5f666c" },
+  gold:     { primary: "#D4AF37", dark: "#AA771C" },
+  platinum: { primary: "#7B8FA1", dark: "#425B70" },
+  diamond:  { primary: "#00B4D8", dark: "#0077B6" },
+};
 // ✅ Lazy load ReactPlayer to reduce initial bundle size
 import dynamic from "next/dynamic";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -71,13 +82,18 @@ const SingleListing = ({ slug }) => {
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [isVideClicked, setIsVideClicked] = useState(false);
   const [IsCallSingleListing, setIsCallSingleListing] = useState(false);
+  const [isCheckingLimits, setIsCheckingLimits] = useState(false);
   const [IsSoldOutModalOpen, setIsSoldOutModalOpen] = useState(false);
   const [IsSoldOutConfirmModal, setIsSoldOutConfirmModal] = useState(false);
   const [selectedRadioValue, setSelectedRadioValue] = useState(null);
   const [viewerIsOpen, setViewerIsOpen] = useState(false);
-  const displayedImageIndex = images.findIndex(
-    (image) => image === displayedImage
-  );
+  const displayedImageIndex = (() => {
+    const normalized = displayedImage ? normalizeImageUrl(displayedImage) : "";
+    const idx = images.findIndex((img) => normalizeImageUrl(img) === normalized);
+    if (idx >= 0) return idx;
+    if (activeIndex >= 0 && activeIndex < images.length) return activeIndex;
+    return 0;
+  })();
   const [currentImage, setCurrentImage] = useState(1);
   const [RenewId, setRenewId] = useState("");
   const [ItemPackages, setItemPackages] = useState([]);
@@ -289,17 +305,23 @@ const SingleListing = ({ slug }) => {
       const res = await getLimitsApi.getLimits({
         package_type: "advertisement",
       });
-      if (res?.data?.error === false) {
-        setIsGranted(true);
-      }
+      const granted = res?.data?.error === false;
+      setIsGranted(granted);
+      return granted;
     } catch (error) {
       console.log(error);
+      return false;
     }
   };
 
-  const handleCreateFeaturedAd = () => {
-    setIsNoPackageModal(true);
-    getLimitsData();
+  const handleCreateFeaturedAd = async () => {
+    setIsCheckingLimits(true);
+    try {
+      await getLimitsData();
+    } finally {
+      setIsCheckingLimits(false);
+      setIsNoPackageModal(true);
+    }
   };
 
   const handleRenewChange = (e) => {
@@ -338,7 +360,7 @@ const SingleListing = ({ slug }) => {
       );
       if (subPackage.is_active === false) {
         toast.error(t("purchasePackageFirst"));
-        router.push("/user-subscription");
+        router.push("/subscription");
         return;
       }
       const res = await renewItemApi.renewItem({
@@ -371,22 +393,75 @@ const SingleListing = ({ slug }) => {
             <div className="row" id="details_main_row">
               <div className="col-md-12 col-lg-8">
                 <div className="gallary_section">
-                  <div className="display_img">
-                    {isVideClicked == false ? (
-                      <Image
-                        src={displayedImage ? normalizeImageUrl(displayedImage) : placeholderImageUrl}
-                        alt={SingleListing?.name || "Product image"}
-                        loading="lazy"
-                        width={870}
-                        height={500}
-                        sizes="(max-width: 768px) 100vw, 66vw"
-                        onError={(e) => {
-                          if (e.target.src !== placeholderImageUrl) {
-                            e.target.src = placeholderImageUrl;
+                  <div className="display_img" style={(() => {
+                    const pkg = PACKAGE_COLORS[SingleListing?.package_color];
+                    return {
+                      position: 'relative',
+                      ...(pkg ? { border: `2.5px solid ${pkg.primary}`, borderRadius: '12px', overflow: 'hidden', boxShadow: `0 0 16px ${pkg.primary}40` } : {}),
+                    };
+                  })()}>
+                    {SingleListing?.is_feature && (() => {
+                      const pkg = PACKAGE_COLORS[SingleListing?.package_color] || null;
+                      const badgeStyle = pkg
+                        ? {
+                            background: `linear-gradient(135deg, ${pkg.primary}, ${pkg.dark})`,
+                            border: `1.5px solid ${pkg.dark}`,
+                            boxShadow: `0 4px 10px ${pkg.primary}55`,
                           }
-                        }}
-                        onClick={openLightbox}
-                      />
+                        : {};
+                      return (
+                        <span
+                          className="featured_badge_new"
+                          style={{
+                            ...badgeStyle,
+                            top: '0.75rem',
+                            ...(isRtl ? { right: '0.75rem', left: 'auto' } : { left: '0.75rem', right: 'auto' }),
+                          }}
+                        >
+                          <BiBadgeCheck size={16} /> {t("featured")}
+                        </span>
+                      );
+                    })()}
+                    {isVideClicked == false ? (
+                      <>
+                        <Image
+                          src={displayedImage ? normalizeImageUrl(displayedImage) : placeholderImageUrl}
+                          alt={SingleListing?.name || "Product image"}
+                          loading="lazy"
+                          width={870}
+                          height={500}
+                          sizes="(max-width: 768px) 100vw, 66vw"
+                          style={{ cursor: "pointer" }}
+                          onError={(e) => {
+                            if (e.target.src !== placeholderImageUrl) {
+                              e.target.src = placeholderImageUrl;
+                            }
+                          }}
+                          onClick={openLightbox}
+                        />
+                        {displayedImage && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              bottom: 12,
+                              ...(isRtl ? { left: 12, right: "auto" } : { right: 12, left: "auto" }),
+                              zIndex: 2,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: 40,
+                              height: 40,
+                              borderRadius: 8,
+                              background: "rgba(0,0,0,0.45)",
+                              color: "#fff",
+                              pointerEvents: "none",
+                            }}
+                            aria-hidden
+                          >
+                            <FaMagnifyingGlassPlus size={18} />
+                          </span>
+                        )}
+                      </>
                     ) : (
                       <ReactPlayer
                         url={videoUrl}
@@ -536,10 +611,17 @@ const SingleListing = ({ slug }) => {
                           onErrorCapture={placeholderImage}
                         />
                       </div>
-                      <p>{t("featureAdPrompt")}</p>
+                      <p style={{ fontSize: '19px' }}>
+                        {t("featureAdPrompt")}
+                      </p>
                     </div>
-                    <button onClick={handleCreateFeaturedAd}>
-                      {t("createFeaturedAd")}
+                    <button onClick={handleCreateFeaturedAd} disabled={isCheckingLimits} style={{ opacity: isCheckingLimits ? 0.7 : 1, cursor: isCheckingLimits ? 'not-allowed' : 'pointer' }}>
+                      {isCheckingLimits ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                          <span className="feat_btn_spinner" />
+                          {t("loading")}
+                        </span>
+                      ) : t("createFeaturedAd")}
                     </button>
                   </div>
                 )}

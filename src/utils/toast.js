@@ -32,4 +32,9 @@ toast.promise = async (promise, msgs, options) => {
   return t.promise(promise, msgs, options);
 };
 
+toast.custom = async (render, options) => {
+  const t = await loadToast();
+  return t.custom(render, options);
+};
+
 export default toast;

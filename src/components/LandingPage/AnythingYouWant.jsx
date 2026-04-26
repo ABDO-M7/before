@@ -1,4 +1,5 @@
 "use client";
+// import "./hero-bg-shapes.css";
 import { useState, useTransition, useEffect, useRef } from "react";
 // import Image from "next/image";
 // import Img1 from "../../../public/assets/landing_page_photos/Image1.png";
@@ -7,6 +8,7 @@ import { useState, useTransition, useEffect, useRef } from "react";
 // import Img4 from "../../../public/assets/landing_page_photos/Image4.png";
 // import Img5 from "../../../public/assets/landing_page_photos/Image5.png";
 // import Img6 from "../../../public/assets/landing_page_photos/Image6.png";
+import Image from "next/image";
 import { IoSearchOutline, IoAddCircleOutline, IoChevronForward } from "react-icons/io5";
 import { t } from "@/utils";
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice";
@@ -16,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { setSearch } from "@/redux/reuducer/searchSlice";
 import QuickSearchRow from "@/components/Layout/QuickSearchRow";
 import { quickSearchesApi } from "@/utils/api";
+import googleDownload from "../../../public/assets/GoogleDownload.svg";
+import appleDownload from "../../../public/assets/iOSDownload.svg";
 
 const HERO_TYPEWRITER_KEYS = [
   "heroTypewriterPhrase1",
@@ -25,7 +29,7 @@ const HERO_TYPEWRITER_KEYS = [
   "heroTypewriterPhrase5",
 ];
 
-const AnythingYouWant = ({ initialQuickSearchItems = null }) => {
+const AnythingYouWant = ({ initialQuickSearchItems = null, playStoreLink = "#", appStoreLink = "#" }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const currentLang = useSelector(CurrentLanguageData);
@@ -140,11 +144,6 @@ const AnythingYouWant = ({ initialQuickSearchItems = null }) => {
     });
   };
 
-  const handleExploreAds = (e) => {
-    e.preventDefault();
-    router.push("/products");
-  };
-
   return (
     <>
       <section
@@ -196,7 +195,7 @@ const AnythingYouWant = ({ initialQuickSearchItems = null }) => {
               </div>
               <div className="main_decs">
                 
-                <p>{t("anythingYouWantHeroTagline")}</p>
+                <p >{t("anythingYouWantHeroTagline")}</p>
                 
               </div>
 
@@ -248,18 +247,13 @@ const AnythingYouWant = ({ initialQuickSearchItems = null }) => {
 
               
 
+              <p className="hero_download_label">{t("downloadNow")}</p>
               <div className="hero_cta_buttons">
-                <a
-                  href="/products"
-                  className="hero_cta_btn hero_cta_btn_explore"
-                  onClick={handleExploreAds}
-                >
-                  {/* <IoSearchOutline size={20} /> */}
-                  <span>{t("explore_ads")}</span>
-                </a>
-                <Link href="/ad-listing" className="hero_cta_btn hero_cta_btn_post">
-                  {/* <IoAddCircleOutline size={20} /> */}
-                  <span>{t("post_ads")}</span>
+                <Link href={playStoreLink} target="_blank" rel="noopener noreferrer">
+                  <Image src={googleDownload} alt="Download on Google Play" width={240} height={80} style={{ width: "100%", height: "auto" }} />
+                </Link>
+                <Link href={appStoreLink} target="_blank" rel="noopener noreferrer">
+                  <Image src={appleDownload} alt="Download on App Store" width={240} height={80} style={{ width: "100%", height: "auto" }} />
                 </Link>
               </div>
             </div>
@@ -295,3 +289,4 @@ const AnythingYouWant = ({ initialQuickSearchItems = null }) => {
 };
 
 export default AnythingYouWant;
+   

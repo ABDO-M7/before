@@ -1,0 +1,27 @@
+/* Transactions page — top bar and back button */
+
+.transactions_top_bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.back_to_subscriptions_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: transparent;
+  color: var(--primary-color);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.back_to_subscriptions_btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+}

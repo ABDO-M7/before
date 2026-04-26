@@ -7,7 +7,7 @@ const fetchFeaturedSectionsWithItems = async () => {
     );
     url.searchParams.set('hub', 'web');
     url.searchParams.set('limit', '5');
-    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders', 'tips'] } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400, tags: ['sliders', 'tips', 'featured-sections', 'items'] } });
     if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) return [];
     const data = await res.json();
     const sections = data?.data || [];

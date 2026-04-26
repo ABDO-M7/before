@@ -1,0 +1,92 @@
+/* Package tier border + glow frames for product cards */
+
+/* Featured badge gradient colors — replaces JS-computed inline styles */
+.featured_badge_new.featured-badge-without,
+.product_card_featured_cont.featured-badge-without { background: linear-gradient(135deg, #00ABBF, #008A9A); border: 1.5px solid #008A9A; box-shadow: 0 4px 10px #00ABBF55; }
+.featured_badge_new.featured-badge-bronze,
+.product_card_featured_cont.featured-badge-bronze { background: linear-gradient(135deg, #CD7F32, #8D5524); border: 1.5px solid #8D5524; box-shadow: 0 4px 10px #CD7F3255; }
+.featured_badge_new.featured-badge-silver,
+.product_card_featured_cont.featured-badge-silver { background: linear-gradient(135deg, #B8C2CC, #5f666c); border: 1.5px solid #5f666c; box-shadow: 0 4px 10px #B8C2CC55; }
+.featured_badge_new.featured-badge-gold,
+.product_card_featured_cont.featured-badge-gold { background: linear-gradient(135deg, #D4AF37, #AA771C); border: 1.5px solid #AA771C; box-shadow: 0 4px 10px #D4AF3755; }
+.featured_badge_new.featured-badge-platinum,
+.product_card_featured_cont.featured-badge-platinum { background: linear-gradient(135deg, #7B8FA1, #425B70); border: 1.5px solid #425B70; box-shadow: 0 4px 10px #7B8FA155; }
+.featured_badge_new.featured-badge-diamond,
+.product_card_featured_cont.featured-badge-diamond { background: linear-gradient(135deg, #00B4D8, #0077B6); border: 1.5px solid #0077B6; box-shadow: 0 4px 10px #00B4D855; }
+
+
+.product_card_new.tier-bronze,
+.product_card.tier-bronze {
+    outline: 2px solid #cd7f32 !important;
+    box-shadow:
+        0 0 0 3px rgba(205, 127, 50, 0.12),
+        0 10px 20px -4px rgba(205, 127, 50, 0.25) !important;
+}
+.product_card_new.tier-bronze:hover,
+.product_card.tier-bronze:hover {
+    box-shadow:
+        0 0 0 3px rgba(205, 127, 50, 0.22),
+        0 28px 48px -10px rgba(205, 127, 50, 0.35) !important;
+}
+
+.product_card_new.tier-silver,
+.product_card.tier-silver {
+    outline: 2px solid #a8a9ad !important;
+    box-shadow:
+        0 0 0 3px rgba(168, 169, 173, 0.15),
+        0 10px 20px -4px rgba(168, 169, 173, 0.28) !important;
+}
+.product_card_new.tier-silver:hover,
+.product_card.tier-silver:hover {
+    box-shadow:
+        0 0 0 3px rgba(168, 169, 173, 0.28),
+        0 28px 48px -10px rgba(168, 169, 173, 0.38) !important;
+}
+
+.product_card_new.tier-gold,
+.product_card.tier-gold {
+    outline: 2px solid #d4a017 !important;
+    box-shadow:
+        0 0 0 3px rgba(212, 160, 23, 0.18),
+        0 0 18px rgba(212, 160, 23, 0.22),
+        0 10px 20px -4px rgba(212, 160, 23, 0.35) !important;
+}
+.product_card_new.tier-gold:hover,
+.product_card.tier-gold:hover {
+    box-shadow:
+        0 0 0 3px rgba(212, 160, 23, 0.32),
+        0 0 28px rgba(212, 160, 23, 0.30),
+        0 28px 48px -10px rgba(212, 160, 23, 0.45) !important;
+}
+
+.product_card_new.tier-platinum,
+.product_card.tier-platinum {
+    outline: 2px solid #7b8fa1 !important;
+    box-shadow:
+        0 0 0 3px rgba(123, 143, 161, 0.18),
+        0 0 20px rgba(123, 143, 161, 0.20),
+        0 10px 20px -4px rgba(123, 143, 161, 0.32) !important;
+}
+.product_card_new.tier-platinum:hover,
+.product_card.tier-platinum:hover {
+    box-shadow:
+        0 0 0 3px rgba(123, 143, 161, 0.32),
+        0 0 30px rgba(123, 143, 161, 0.28),
+        0 28px 48px -10px rgba(123, 143, 161, 0.42) !important;
+}
+
+.product_card_new.tier-diamond,
+.product_card.tier-diamond {
+    outline: 2px solid #00b4d8 !important;
+    box-shadow:
+        0 0 0 3px rgba(0, 180, 216, 0.20),
+        0 0 24px rgba(0, 180, 216, 0.32),
+        0 10px 20px -4px rgba(0, 180, 216, 0.40) !important;
+}
+.product_card_new.tier-diamond:hover,
+.product_card.tier-diamond:hover {
+    box-shadow:
+        0 0 0 3px rgba(0, 180, 216, 0.35),
+        0 0 40px rgba(0, 180, 216, 0.45),
+        0 28px 48px -10px rgba(0, 180, 216, 0.50) !important;
+}

@@ -40,8 +40,8 @@ export class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          // Log long tasks (> 50ms) to console in development
-          if (process.env.NODE_ENV === 'development' && entry.duration > 50) {
+          // Log long tasks (> 200ms) to console in development — under 200ms users don't notice
+          if (process.env.NODE_ENV === 'development' && entry.duration > 200) {
             console.warn('Long Task detected:', {
               duration: entry.duration,
               startTime: entry.startTime,
@@ -50,7 +50,7 @@ export class PerformanceMonitor {
           }
 
           // Send to analytics if available (only in production)
-          if (process.env.NODE_ENV === 'production' && window.gtag && entry.duration > 50) {
+          if (process.env.NODE_ENV === 'production' && window.gtag && entry.duration > 200) {
             window.gtag('event', 'long_task', {
               event_category: 'Performance',
               value: Math.round(entry.duration),
@@ -76,8 +76,8 @@ export class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          // Track slow resources (> 1s)
-          if (entry.duration > 1000) {
+          // Track slow resources (> 3s — anything under is normal for this VPS/API setup)
+          if (entry.duration > 3000) {
             if (process.env.NODE_ENV === 'development') {
               console.warn('Slow resource detected:', {
                 name: entry.name,
@@ -92,6 +92,7 @@ export class PerformanceMonitor {
               window.gtag('event', 'slow_resource', {
                 event_category: 'Performance',
                 event_label: entry.initiatorType,
+                resource_url: entry.name,
                 value: Math.round(entry.duration),
                 non_interaction: true,
               });

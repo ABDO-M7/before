@@ -52,7 +52,7 @@ const ProfileDropdown = ({ closeDrawer, settings, handleLogout, isDrawer }) => {
         },
         {
             key: 4,
-            href: '/user-subscription',
+            href: '/subscription',
             label: (
                 <div className="profDropIconCont">
                     <span><BiDollarCircle size={16} /></span>

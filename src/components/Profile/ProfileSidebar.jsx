@@ -126,7 +126,7 @@ const ProfileSidebar = () => {
                     <BiChat size={24} />
                     <span className='profile_sidebar_notif'>{t('chat')}</span>
                 </Link>
-                <Link href='/user-subscription' className={`profile_sidebar_tab ${pathname === '/user-subscription' && 'active_tab'}`}>
+                <Link href='/subscription' className={`profile_sidebar_tab ${pathname === '/subscription' && 'active_tab'}`}>
                     <BiDollarCircle size={24} />
                     <span className='profile_sidebar_notif'>{t('subscription')}</span>
                 </Link>

@@ -107,7 +107,10 @@ const HomePageRoute = async () => {
       <Layout initialQuickSearchItems={initialQuickSearchItems} initialSettings={initialSettings}>
         
         {/* Hero Section */}
-        <AnythingYouWant />
+        <AnythingYouWant
+          playStoreLink={initialSettings?.data?.play_store_link || "#"}
+          appStoreLink={initialSettings?.data?.app_store_link || "#"}
+        />
 
         {/* Below-the-fold sections: each streams independently */}
         <div

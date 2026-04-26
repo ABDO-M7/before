@@ -59,8 +59,6 @@ const Layout = ({ children, initialQuickSearchItems, initialSettings }) => {
   // Keep body from horizontal overflow without a MutationObserver loop
   // (observer caused repeated style invalidations and extra reflow work).
   useEffect(() => {
-    document.documentElement.style.overflowX = 'hidden';
-    document.body.style.overflowX = 'hidden';
     document.body.style.maxWidth = '100vw';
   }, [pathname]);
 

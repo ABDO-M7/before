@@ -62,12 +62,11 @@ export const formatNumberByLang = (number, maxFractionDigits = 1, useGrouping = 
     return new Intl.NumberFormat(locale, {
       maximumFractionDigits: maxFractionDigits,
       useGrouping,
-      numberingSystem: isArabic ? "arab" : "latn",
+      numberingSystem: "latn",
     }).format(Number(number));
   } catch (err) {
-    // Fallback: simple formatting
     const fixed = Number(number) % 1 === 0 ? Number(number).toString() : Number(number).toFixed(maxFractionDigits);
-    return isArabic ? toArabicDigits(fixed) : fixed;
+    return fixed;
   }
 };
 
@@ -150,12 +149,6 @@ export const formatDate = (createdAt) => {
   try {
     // Use the built-in mini style which is designed for short labels
     const formatted = timeAgo.format(date, "mini-now");
-    // Ensure digits are shown according to current language
-    if (currentLanguage === "ar") {
-      // console.log("formatted date in arabic:", formatted);
-      return toArabicDigits(formatted);
-    }
-    console.log("formatted date in latin:", formatted);
     return toLatinDigits(formatted);
   } catch (error) {
     console.error("Error formatting date:", error);
@@ -404,7 +397,7 @@ export const exactPrice = (price) => {
   const formattedNumber = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 2,
     useGrouping: true,
-    numberingSystem: isArabic ? 'arab' : 'latn', // Force numbering system based on language
+    numberingSystem: 'latn',
   }).format(Number(price));
 
   return currencyPosition === "right"
@@ -460,7 +453,7 @@ export const formatPriceAbbreviated = (price) => {
   const formattedNumber = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 2,
     useGrouping: true,
-    numberingSystem: isArabic ? 'arab' : 'latn', // Force numbering system based on language
+    numberingSystem: 'latn',
   }).format(Number(price));
 
   return currencyPosition === "right"

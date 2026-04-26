@@ -1,7 +1,19 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { getBlogsApi } from '@/utils/api'
+
+/** Fire-and-forget GET blogs?slug=… so Laravel increments views while server fetch stays ISR-cached. */
+export function BlogViewPing({ slug }) {
+    useEffect(() => {
+        if (!slug || typeof slug !== 'string') return
+        const s = slug.trim()
+        if (!s) return
+        getBlogsApi.getBlogs({ slug: s }).catch(() => {})
+    }, [slug])
+    return null
+}
 
 // ✅ BlogSocialShare - defer social icons + browser-only logic
 export const BlogSocialShareWrapper = dynamic(

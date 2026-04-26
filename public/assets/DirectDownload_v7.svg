@@ -1,0 +1,9 @@
+<svg width="267" height="117" viewBox="0 0 267 117" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="11" width="235" height="85" rx="10" fill="#FFF" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="57" cy="53" r="19" fill="#00ABBF" stroke="#00ABBF" stroke-width="2"/>
+  <line x1="57" y1="43" x2="57" y2="57" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <polyline points="50,52 57,60 64,52" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="50.5" y1="64" x2="63.5" y2="64" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="90" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#2A2A2A" letter-spacing="0.2">Direct Download</text>
+  <text x="90" y="73" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" fill="#2A2A2A" letter-spacing="-0.3">Web App</text>
+</svg>

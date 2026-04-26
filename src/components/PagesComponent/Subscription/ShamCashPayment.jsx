@@ -2,12 +2,21 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Modal } from "antd";
 import Image from "next/image";
-import { FaAngleRight, FaCopy, FaQrcode } from "react-icons/fa6";
+import { FaAngleRight, FaCopy, FaQrcode, FaWhatsapp } from "react-icons/fa6";
 import { MdClose, MdCheckCircle } from "react-icons/md";
-import { t, placeholderImage } from "@/utils";
+import { t, placeholderImage, useIsRtl } from "@/utils";
 import { createPaymentIntentApi } from "@/utils/api";
 import toast from "@/utils/toast";
 import { useRouter } from "next/navigation";
+
+const PACKAGE_COLORS = {
+  without:  { primary: "#00ABBF", dark: "#008A9A" },
+  bronze:   { primary: "#CD7F32", dark: "#8D5524" },
+  silver:   { primary: "#B8C2CC", dark: "#5f666c" },
+  gold:     { primary: "#D4AF37", dark: "#AA771C" },
+  platinum: { primary: "#7B8FA1", dark: "#425B70" },
+  diamond:  { primary: "#00B4D8", dark: "#0077B6" },
+};
 
 // Styles for payment modals
 const paymentModalStyles = `
@@ -62,7 +71,7 @@ const paymentModalStyles = `
   
   .sham-cash-step,
   .third-party-step {
-    min-height: 400px;
+    min-height: unset;
   }
   
   .step-title {
@@ -456,6 +465,7 @@ const ShamCashPayment = ({
   isReadonly = false,
 }) => {
   const router = useRouter();
+  const isRtl = useIsRtl();
   const [isShamCashModal, setIsShamCashModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -496,6 +506,20 @@ const ShamCashPayment = ({
     setIsShamCashModal(false);
     setCurrentStep(1);
     setOrderId("");
+    if (isConfirmed) {
+      PaymentModalClose();
+      toast.custom((toastInst) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '14px', color: '#1f2937' }}>{t('paymentSubmitted')}</span>
+          <button
+            onClick={() => { router.push('/transactions'); toast.dismiss(toastInst.id); }}
+            style={{ whiteSpace: 'nowrap', background: 'var(--primary-color, #00ABBF)', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+          >
+            {t('viewTransactions')}
+          </button>
+        </div>
+      ), { duration: 5000 });
+    }
     setIsConfirmed(false);
   };
 
@@ -536,13 +560,8 @@ const ShamCashPayment = ({
 
       if (res?.data?.error === false) {
         setIsConfirmed(true);
-        updateActivePackage();
+        updateActivePackage("under review");
         toast.success(t("paymentSubmitted"));
-        setTimeout(() => {
-          handleClose();
-          PaymentModalClose();
-          router.push("/transactions");
-        }, 3000);
       } else {
         toast.error(res?.data?.message || t("errorOccurred"));
       }
@@ -666,9 +685,9 @@ const ShamCashPayment = ({
         return (
           <div className="sham-cash-step">
             <h3 className="step-title">{t("confirmPayment")}</h3>
-            <div className="confirmation-question">
+            {/* <div className="confirmation-question">
               <p className="question-text">{t("didYouCompletePayment")}</p>
-            </div>
+            </div> */}
             
             {!isConfirmed ? (
               <>
@@ -721,6 +740,18 @@ const ShamCashPayment = ({
                 <MdCheckCircle size={60} color="#52c41a" />
                 <h4>{t("paymentSubmitted")}</h4>
                 <p>{t("reviewMessage")}</p>
+                <div style={{ marginTop: "1.25rem", paddingTop: "1rem", borderTop: "1px solid #e8e8e8" }}>
+                  <p style={{ margin: "0 0 0.6rem", color: "#555", fontSize: "14px" }}>{t("supportInquiryText")}</p>
+                  <a
+                    href={`https://wa.me/971547399982?text=${encodeURIComponent(t("supportWhatsappMessage"))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "#25D366", color: "#fff", padding: "9px 18px", borderRadius: "8px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}
+                  >
+                    <FaWhatsapp size={18} />
+                    <span>{t("contactSupportWhatsapp")}</span>
+                  </a>
+                </div>
               </div>
             )}
           </div>
@@ -769,6 +800,27 @@ const ShamCashPayment = ({
         width={600}
       >
         <div className="sham-cash-payment-container">
+          {priceData?.name && (() => {
+            const color = priceData.color && PACKAGE_COLORS[priceData.color] ? priceData.color : "without";
+            const { primary, dark } = PACKAGE_COLORS[color];
+            return (
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <span style={{
+                  display: "inline-block",
+                  background: `linear-gradient(135deg, ${primary}, ${dark})`,
+                  color: "#fff",
+                  padding: "6px 22px",
+                  borderRadius: "30px",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  letterSpacing: "0.5px",
+                  boxShadow: `0 3px 10px ${primary}55`,
+                }}>
+                  <span style={{ fontWeight: 400, opacity: 0.85 }}>{t("packageLabel")}:</span>{" "}{priceData.name}
+                </span>
+              </div>
+            );
+          })()}
           <div className="step-indicator">
             <div className={`step ${currentStep >= 1 ? "active" : ""}`}>
               <span>1</span>
@@ -776,7 +828,7 @@ const ShamCashPayment = ({
             <div className={`step-line ${currentStep >= 2 ? "active" : ""}`}></div>
             <div className={`step ${currentStep >= 2 ? "active" : ""}`}>
               <span>2</span>
-            </div>
+            </div>  
             <div className={`step-line ${currentStep >= 3 ? "active" : ""}`}></div>
             <div className={`step ${currentStep >= 3 ? "active" : ""}`}>
               <span>3</span>

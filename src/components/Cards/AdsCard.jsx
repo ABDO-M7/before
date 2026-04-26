@@ -35,8 +35,14 @@ const AdsCard = ({ data, sortBy }) => {
     data?.price === undefined ||
     (typeof data?.price === "string" && data?.price.trim() === "");
 
+  const tierClass = (() => {
+    const color = data?.package_color;
+    if (!color || color === 'without') return '';
+    return `tier-${color}`;
+  })();
+
   return (
-    <Link href={`/my-listing/${encodeURIComponent(data?.slug || '')}`} className="product_card">
+    <Link href={`/my-listing/${encodeURIComponent(data?.slug || '')}`} className={`product_card${tierClass ? ` ${tierClass}` : ''}`}>
 
       <Image
         src={imageSrc}
@@ -62,7 +68,7 @@ const AdsCard = ({ data, sortBy }) => {
               <p className="product_card_featured">{t("live")}</p>
             </div>
           ) : data?.is_feature ? (
-            <div className="product_card_featured_cont">
+            <div className={`product_card_featured_cont${data?.package_color ? ` featured-badge-${data.package_color}` : ''}`}>
               <BiBadgeCheck size={16} color="white" />
               <p className="product_card_featured">{t("featured")}</p>
             </div>

@@ -10,15 +10,22 @@ import { allItemApi } from "@/utils/api";
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer'; // ✅ Defer fetching until in view
 
-const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_main_items", aboveFold = false }) => {
+const BlogProductsCarousel = ({ itemIds, initialItems, isRtl, containerClassPrefix = "blog_main_items", aboveFold = false }) => {
     const swiperRef = useRef(null);
     const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
     const [navState, setNavState] = useState({ isBeginning: true, isEnd: false });
-    const [items, setItems] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const hasInitialItems = Array.isArray(initialItems) && initialItems.length > 0;
+    const [items, setItems] = useState(() => (hasInitialItems ? initialItems : []));
+    const [isLoading, setIsLoading] = useState(() => !hasInitialItems);
 
     useEffect(() => {
         const getBlogItems = async () => {
+            if (Array.isArray(initialItems) && initialItems.length > 0) {
+                setItems(initialItems);
+                setIsLoading(false);
+                return;
+            }
+
             // ✅ Only fetch if above fold OR in view
             if (!aboveFold && !inView) return;
             
@@ -73,7 +80,7 @@ const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_mai
             }
         };
         getBlogItems();
-    }, [itemIds, inView, aboveFold]);
+    }, [itemIds, initialItems, inView, aboveFold]);
 
     const handleLike = (id) => {
         setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, is_liked: !item.is_liked } : item));
@@ -96,7 +103,8 @@ const BlogProductsCarousel = ({ itemIds, isRtl, containerClassPrefix = "blog_mai
         if (swiperRef.current) swiperRef.current.slideNext();
     }, []);
 
-    if (!aboveFold && !inView) {
+    const skipLazyGate = aboveFold || (Array.isArray(initialItems) && initialItems.length > 0);
+    if (!skipLazyGate && !inView) {
         return (
             <div ref={ref} className={`${containerClassPrefix}_swiper_container`} style={{ position: 'relative', minHeight: '430px' }}>
                 <div className="carousel-skeleton" style={{ minHeight: '430px', background: '#f5f5f5', borderRadius: '12px' }} />

@@ -33,7 +33,17 @@ const BankDetailsModal = ({ priceData, bankDetails }) => {
             if (res?.data?.error === false) {
                 toast.success(t('paymentConfirmed'))
                 hideBankDetails()
-                router.push('/transactions')
+                toast.custom((toastInst) => (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{t('paymentConfirmed')}</span>
+                        <button
+                            onClick={() => { router.push('/transactions'); toast.dismiss(toastInst.id); }}
+                            style={{ whiteSpace: 'nowrap', background: 'var(--primary-color, #00ABBF)', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                            {t('viewTransactions')}
+                        </button>
+                    </div>
+                ), { duration: 10000 })
             }
             else {
                 toast.error(res?.data?.message)

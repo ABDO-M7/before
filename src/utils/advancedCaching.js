@@ -135,6 +135,8 @@ class BrowserCache {
   }
 }
 
+const IS_DEV = process.env.NODE_ENV !== 'production';
+
 /**
  * Advanced caching manager with multiple layers
  */
@@ -155,6 +157,8 @@ export class AdvancedCache {
    * Get value from cache (checks memory first, then browser)
    */
   async get(key) {
+    if (IS_DEV) return null;
+
     // Check memory cache first (fastest)
     const memoryValue = this.memoryCache.get(key);
     if (memoryValue !== null) {
@@ -178,6 +182,8 @@ export class AdvancedCache {
    * Set value in cache (stores in both memory and browser)
    */
   async set(key, value, ttl = 5 * 60 * 1000) {
+    if (IS_DEV) return;
+
     // Set in memory cache (fast)
     this.memoryCache.set(key, value, ttl);
 

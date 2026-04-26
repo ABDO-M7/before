@@ -37,7 +37,7 @@ const RazorpayPayment = ({
         image: settingsData.company_logo,
         order_id: paymentIntent.id,
         handler: function (response) {
-          updateActivePackage();
+          updateActivePackage("succeed");
         },
         prefill: {
           name: user.name,

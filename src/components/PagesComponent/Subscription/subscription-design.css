@@ -1,0 +1,582 @@
+/* Subscription page — tier ribbons, tier card frames, and design section */
+
+/* ── Shimmer animation (gold, platinum, diamond) ── */
+@keyframes sub-tier-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ── Cards with a tier: make room at the top for the ribbon ── */
+.regular_card[class*="sub-tier-"] {
+  padding-top: 48px;
+}
+@media (max-width: 575px) {
+  .regular_card[class*="sub-tier-"] {
+    padding-top: 40px;
+  }
+}
+
+/* ── Tier ribbon base ── */
+.sub-tier-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 20px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  border-radius: 14px 14px 0 0;
+  color: #fff;
+  z-index: 1;
+}
+.sub-tier-ribbon-symbol {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* BRONZE */
+.regular_card.sub-tier-bronze {
+  border: 2px solid #cd7f32 !important;
+  box-shadow:
+    0 0 0 3px rgba(205, 127, 50, 0.10),
+    0 8px 24px -4px rgba(205, 127, 50, 0.28) !important;
+}
+.sub-tier-ribbon-bronze {
+  background: linear-gradient(90deg, #6b3a10 0%, #cd7f32 50%, #e8a869 100%);
+}
+
+/* SILVER */
+.regular_card.sub-tier-silver {
+  border: 2px solid #a8a9ad !important;
+  box-shadow:
+    0 0 0 3px rgba(168, 169, 173, 0.12),
+    0 8px 24px -4px rgba(168, 169, 173, 0.30) !important;
+}
+.sub-tier-ribbon-silver {
+  background: linear-gradient(90deg, #4a4b4e 0%, #a8a9ad 50%, #d8d9dc 100%);
+}
+
+/* GOLD */
+.regular_card.sub-tier-gold {
+  border: 2px solid #d4a017 !important;
+  box-shadow:
+    0 0 0 3px rgba(212, 160, 23, 0.15),
+    0 0 20px rgba(212, 160, 23, 0.20),
+    0 8px 24px -4px rgba(212, 160, 23, 0.38) !important;
+}
+.sub-tier-ribbon-gold {
+  background: linear-gradient(90deg, #7a5c09 0%, #c99a0a 30%, #ffd700 50%, #c99a0a 70%, #7a5c09 100%);
+  background-size: 200% auto;
+  animation: sub-tier-shimmer 3s linear infinite;
+  color: #3a2e00;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* PLATINUM */
+.regular_card.sub-tier-platinum {
+  border: 2px solid #7b8fa1 !important;
+  box-shadow:
+    0 0 0 3px rgba(123, 143, 161, 0.15),
+    0 0 22px rgba(123, 143, 161, 0.22),
+    0 8px 24px -4px rgba(123, 143, 161, 0.35) !important;
+}
+.sub-tier-ribbon-platinum {
+  background: linear-gradient(90deg, #0f1f2e 0%, #2e4a60 25%, #7b8fa1 50%, #2e4a60 75%, #0f1f2e 100%);
+  background-size: 200% auto;
+  animation: sub-tier-shimmer 4s linear infinite;
+}
+
+/* DIAMOND */
+.regular_card.sub-tier-diamond {
+  border: 2px solid #00b4d8 !important;
+  box-shadow:
+    0 0 0 3px rgba(0, 180, 216, 0.18),
+    0 0 28px rgba(0, 180, 216, 0.30),
+    0 8px 24px -4px rgba(0, 180, 216, 0.42) !important;
+}
+.sub-tier-ribbon-diamond {
+  background: linear-gradient(90deg, #004e7c 0%, #0077b6 20%, #00b4d8 40%, #90e0ef 50%, #00b4d8 60%, #0077b6 80%, #004e7c 100%);
+  background-size: 200% auto;
+  animation: sub-tier-shimmer 2.5s linear infinite;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover lifts for all tiers */
+.regular_card.sub-tier-bronze:hover,
+.regular_card.sub-tier-silver:hover,
+.regular_card.sub-tier-gold:hover,
+.regular_card.sub-tier-platinum:hover,
+.regular_card.sub-tier-diamond:hover {
+  transform: translateY(-6px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Subscribed (active_card) + tier: keep border & glow */
+.active_card.sub-tier-bronze  { border: 2px solid #cd7f32 !important; box-shadow: 0 0 0 3px rgba(205,127,50,0.25), 0 8px 24px -4px rgba(205,127,50,0.40) !important; }
+.active_card.sub-tier-silver  { border: 2px solid #d8d9dc !important; box-shadow: 0 0 0 3px rgba(216,217,220,0.30), 0 8px 24px -4px rgba(168,169,173,0.40) !important; }
+.active_card.sub-tier-gold    { border: 2px solid #ffd700 !important; box-shadow: 0 0 0 3px rgba(255,215,0,0.25), 0 0 22px rgba(255,215,0,0.30), 0 8px 24px -4px rgba(212,160,23,0.45) !important; }
+.active_card.sub-tier-platinum{ border: 2px solid #a8bcc8 !important; box-shadow: 0 0 0 3px rgba(168,188,200,0.25), 0 0 24px rgba(123,143,161,0.35), 0 8px 24px -4px rgba(123,143,161,0.45) !important; }
+.active_card.sub-tier-diamond { border: 2px solid #90e0ef !important; box-shadow: 0 0 0 3px rgba(144,224,239,0.30), 0 0 32px rgba(0,180,216,0.45), 0 8px 24px -4px rgba(0,180,216,0.55) !important; }
+
+/* ═══════════════════════════════════════════════════════
+   Subscription design page section
+   ═══════════════════════════════════════════════════════ */
+
+.subscription-design-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.subscription-design-page-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.subscription-design-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+  animation: subscriptionDesignFloat 10s infinite ease-in-out alternate;
+}
+
+.subscription-design-orb-cyan {
+  width: 260px;
+  height: 260px;
+  top: 0;
+  right: -40px;
+  background: #00abbf;
+}
+
+.subscription-design-orb-gold {
+  width: 340px;
+  height: 340px;
+  left: -70px;
+  bottom: 0;
+  background: #d4af37;
+  animation-delay: -4s;
+}
+
+@keyframes subscriptionDesignFloat {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-24px) scale(1.08); }
+}
+
+.subscription-design-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 40px;
+}
+
+.subscription-design-header-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #00abbf;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.subscription-design-header h1 {
+  margin: 0 0 12px;
+  font-size: 32px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.subscription-design-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.subscription-design-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+@media (min-width: 1200px) {
+  .subscription-design-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .subscription-design-grid > .subscription-design-card {
+    flex: 0 1 360px;
+    min-width: 280px;
+    max-width: 360px;
+  }
+}
+
+.subscription-design-skeleton .regular_card {
+  min-height: 100%;
+}
+
+.subscription-design-card {
+  position: relative;
+  min-height: 100%;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.96) 100%);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.subscription-design-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  pointer-events: none;
+}
+
+.subscription-design-card-highlighted { min-height: 120%; }
+.subscription-design-card-active      { box-shadow: none; }
+.subscription-design-card-pending     { box-shadow: none; }
+
+.subscription-design-shimmer {
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.7), transparent);
+  transform: skewX(-20deg);
+  animation: subscriptionDesignShimmer 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes subscriptionDesignShimmer {
+  0%       { left: -150%; }
+  50%, 100% { left: 150%; }
+}
+
+.subscription-design-popular-badge {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  z-index: 2;
+  padding: 6px 14px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(to bottom, var(--package-accent), var(--package-accent-dark));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--package-primary) 24%, transparent);
+}
+
+.subscription-design-card-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  padding: 52px 22px 22px;
+  background: transparent;
+  border-radius: inherit;
+}
+
+.subscription-design-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.subscription-design-card-title {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.subscription-design-exclusive-title {
+  background: linear-gradient(90deg, var(--package-accent-dark), var(--package-accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subscription-design-card-subtitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--package-primary);
+}
+
+.subscription-design-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--package-primary) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--package-primary) 24%, white);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--package-primary) 14%, transparent);
+  flex-shrink: 0;
+}
+
+.subscription-design-card-icon-svg {
+  width: 32px;
+  height: 32px;
+  color: var(--package-primary);
+}
+
+.subscription-design-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 160px;
+}
+
+.subscription-design-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.subscription-design-check-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--package-primary) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--package-primary) 20%, white);
+  color: var(--package-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.subscription-design-feature-text {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+.subscription-design-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid color-mix(in srgb, var(--package-primary) 12%, #e5e7eb);
+  border-bottom: 1px solid color-mix(in srgb, var(--package-primary) 12%, #e5e7eb);
+  margin-bottom: 4px;
+}
+
+.subscription-design-stat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: color-mix(in srgb, var(--package-primary) 6%, #f9fafb);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.subscription-design-stat-icon {
+  color: var(--package-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.subscription-design-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.subscription-design-stat-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subscription-design-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--package-primary-dark, #1f2937);
+  line-height: 1.2;
+}
+
+.subscription-design-price-row {}
+
+.subscription-design-price-wrap {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.subscription-design-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1;
+  color: #111827;
+}
+
+.subscription-design-price-amount {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.subscription-design-price-symbol {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--package-primary);
+  align-self: flex-end;
+  padding-bottom: 3px;
+}
+
+.subscription-design-price-before {
+  font-size: 16px;
+  color: #9ca3af;
+  text-decoration: line-through;
+  margin-bottom: 4px;
+}
+
+.subscription-design-button {
+  width: 100%;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(to right, var(--package-primary), var(--package-primary-dark));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--package-primary) 25%, transparent);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, filter 0.25s ease;
+}
+
+.subscription-design-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(0.88);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--package-primary) 35%, transparent);
+}
+
+.subscription-design-button-highlighted {
+  background: #00ABBF;
+  box-shadow: 0 12px 24px rgba(0, 138, 156, 0.32);
+}
+
+.subscription-design-button-highlighted:hover:not(:disabled) {
+  box-shadow: 0 16px 30px rgba(0, 138, 156, 0.42);
+}
+
+.subscription-design-button-active,
+.subscription-design-button:disabled {
+  cursor: default;
+  background: linear-gradient(to right, var(--package-primary), var(--package-primary-dark));
+  color: #fff;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
+@media (max-width: 1199px) {
+  .subscription-design-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .subscription-design-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .subscription-design-card-highlighted {
+    transform: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .subscription-design-card-highlighted {
+    transform: scale(1.03);
+  }
+}
+
+@media (max-width: 767px) {
+  .subscription-design-page-wrapper {
+    padding: 10px 0 36px;
+  }
+  .subscription-design-header {
+    margin-bottom: 28px;
+  }
+  .subscription-design-header h1 {
+    font-size: 28px;
+  }
+  .subscription-design-grid {
+    display: grid;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 78%);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subscription-design-card {
+    scroll-snap-align: start;
+  }
+  .subscription-design-card-inner {
+    padding: 52px 16px 18px;
+    gap: 18px;
+  }
+  .subscription-design-card-title {
+    font-size: 20px;
+  }
+  .subscription-design-card-subtitle,
+  .subscription-design-feature-text {
+    font-size: 13px;
+  }
+  .subscription-design-card-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .subscription-design-price {
+    font-size: 32px;
+  }
+  .subscription-design-button {
+    min-height: 52px;
+    font-size: 14px;
+  }
+}

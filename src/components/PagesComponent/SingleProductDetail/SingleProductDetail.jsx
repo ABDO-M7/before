@@ -1,9 +1,10 @@
 "use client";
+import "@/styles/feat-spinner.css";
 import SimilarProducts from "@/components/ProductDetails/SimilarProducts";
 import NearbyProducts from "@/components/ProductDetails/NearbyProducts";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { FaArrowLeft, FaArrowRight, FaRegLightbulb } from "react-icons/fa6";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaArrowLeft, FaArrowRight, FaMagnifyingGlassPlus, FaRegLightbulb } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -23,6 +24,16 @@ import { allItemApi, setItemTotalClickApi } from "@/utils/api";
 import { useSelector } from "react-redux";
 import ReportModal from "@/components/User/ReportModal";
 import { FaPlayCircle } from "react-icons/fa";
+import { BiBadgeCheck } from "react-icons/bi";
+
+const PACKAGE_COLORS = {
+  without:  { primary: "#00ABBF", dark: "#008A9A" },
+  bronze:   { primary: "#CD7F32", dark: "#8D5524" },
+  silver:   { primary: "#B8C2CC", dark: "#5f666c" },
+  gold:     { primary: "#D4AF37", dark: "#AA771C" },
+  platinum: { primary: "#7B8FA1", dark: "#425B70" },
+  diamond:  { primary: "#00B4D8", dark: "#0077B6" },
+};
 import NoData from "@/components/NoDataFound/NoDataFound";
 // import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent";
 // ✅ Lazy load ReactPlayer to reduce initial bundle size
@@ -40,8 +51,6 @@ import LocationCardInProdDet from "./LocationCardInProdDet";
 import ReportAdCard from "./ReportAdCard";
 import OpenInAppDrawer from "./OpenInAppDrawer";
 import { useSearchParams } from "next/navigation";
-
-
 
 const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
   // Decode slug if percent-encoded (e.g. Arabic) so API receives the actual string
@@ -69,12 +78,23 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
     return [main, ...gallery].filter(Boolean).map(normalizeImageUrl);
   };
 
+  /** Original full-size URLs for lightbox (not compressed derivatives). */
+  const getInitialOriginalImages = (data) => {
+    if (!data) return [];
+    const main = data?.image;
+    const gallery =
+      data?.gallery_images?.map((img) =>
+        typeof img === "string" ? img : img?.image
+      ) || [];
+    return [main, ...gallery].filter(Boolean).map(normalizeImageUrl);
+  };
+
   const [displayedImage, setDisplayedImage] = useState(() => {
     if (!initialData) return undefined;
-    const img = getCompressedImage(initialData, 'medium', initialData?.image);
+    const img = getCompressedImage(initialData, 'large', initialData?.image);
     return img ? normalizeImageUrl(img) : undefined;
   });
-  const [images, setImages] = useState(() => getInitialImages(initialData, 'large')); 
+  const [images, setImages] = useState(() => getInitialOriginalImages(initialData));
   const [galleryThumbnails, setGalleryThumbnails] = useState(() => getInitialImages(initialData, 'small')); 
   
   const [isLoading, setIsLoading] = useState(!initialData);
@@ -84,9 +104,15 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
   const [videoUrl, setVideoUrl] = useState("");
   const [currentImage, setCurrentImage] = useState(1);
   const [viewerIsOpen, setViewerIsOpen] = useState(false);
-  const displayedImageIndex = images.findIndex(
-    (image) => image === displayedImage
-  );
+  const displayedImageIndex = useMemo(() => {
+    const normalizedDisplayed = displayedImage
+      ? normalizeImageUrl(displayedImage)
+      : "";
+    const idx = images.findIndex((image) => image === normalizedDisplayed);
+    if (idx >= 0) return idx;
+    if (activeIndex >= 0 && activeIndex < images.length) return activeIndex;
+    return 0;
+  }, [displayedImage, images, activeIndex]);
   const [IsOpenInApp, setIsOpenInApp] = useState(false);
 
   useEffect(() => {
@@ -98,62 +124,72 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
     }
   }, [isShare]);
 
-  const incrementViews = async (item_id) => {
+  /** POSTs every time (reload, revisit in same tab, client navigation) — no session deduplication. */
+  const recordItemView = useCallback(async (itemId) => {
+    if (typeof window === "undefined" || itemId == null) return;
+    const id = Number(itemId);
+    if (!Number.isFinite(id) || id <= 0) return;
     try {
-      if (!item_id) {
-        console.error("Invalid item_id for incrementViews");
-        return;
-      }
-      const res = await setItemTotalClickApi.setItemTotalClick({ item_id });
+      await setItemTotalClickApi.setItemTotalClick({ item_id: id });
     } catch (error) {
-      console.error("Error incrementing views:", error);
+      console.error("Error recording item view:", error);
     }
-  };
+  }, []);
 
-  const fetchProductData = async () => {
+  const fetchProductData = async ({ silent = false } = {}) => {
     if (!slug || typeof slug !== 'string' || slug.trim() === '') return;
     try {
-      setIsLoading(true); // Set loading to true when fetching data
+      if (!silent) setIsLoading(true);
       const response = await allItemApi.getItems({
         slug: slug.trim(),
-        // sort_by: sort_by === "default" ? "" : sort_by // Map "default" to ""
       });
       const responseData = response?.data?.data;
       if (responseData) {
         const { data } = responseData;
         setProductData(data[0]);
-        // Use 'medium' compressed image for main displayed image, fallback to original if compressed doesn't exist
-        const mainImageMedium = getCompressedImage(data[0], 'medium', data[0]?.image);
-        const finalMainImage = (mainImageMedium && mainImageMedium !== data[0]?.image) ? mainImageMedium : (data[0]?.image || null);
+        // Use 'large' compressed image for main displayed image, fallback to original if compressed doesn't exist
+        const mainImageLarge = getCompressedImage(data[0], 'large', data[0]?.image);
+        const finalMainImage = (mainImageLarge && mainImageLarge !== data[0]?.image) ? mainImageLarge : (data[0]?.image || null);
         setDisplayedImage(finalMainImage);
-        await incrementViews(data[0]?.id);
+        await recordItemView(data[0]?.id);
       } else {
         console.error("Invalid response:", response);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setIsLoading(false); // Set loading to false after data is fetched
+      if (!silent) setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!initialData || Object.keys(initialData).length === 0) {
+    if (initialData && Object.keys(initialData).length > 0) {
+      // SSR data exists — do a silent background refresh to get fresh dynamic fields
+      // (package_color, is_feature) which may be stale due to 24h SSR cache
+      fetchProductData({ silent: true });
+    } else {
       fetchProductData();
     }
   }, []);
+
+  // SSR passes initialData — client never called fetchProductData, so record the view here (runs again on each mount = reload / revisit).
+  useEffect(() => {
+    const id = initialData?.id;
+    if (id == null || id === "") return;
+    recordItemView(id);
+  }, [initialData?.id, recordItemView]);
 
   const swipePrev = () => {
     if (displayedImageIndex > 0) {
       // Check if there's a previous image
       swiperRef?.current?.slidePrev();
-      // Get 'medium' compressed version for displayed image (big photo), check each image individually
+      // Get 'large' compressed version for displayed image (big photo), check each image individually
       const prevIndex = displayedImageIndex - 1;
       const prevItem = prevIndex === 0 ? productData : productData?.gallery_images?.[prevIndex - 1];
       const originalPrevImg = prevIndex === 0 ? productData?.image : (productData?.gallery_images?.[prevIndex - 1]?.image || null);
       if (originalPrevImg) {
-        const prevImageMedium = getCompressedImage(prevItem, 'medium', originalPrevImg);
-        const finalPrevImg = (prevImageMedium && prevImageMedium !== originalPrevImg) ? prevImageMedium : originalPrevImg;
+        const prevImageLarge = getCompressedImage(prevItem, 'large', originalPrevImg);
+        const finalPrevImg = (prevImageLarge && prevImageLarge !== originalPrevImg) ? prevImageLarge : originalPrevImg;
         setDisplayedImage(finalPrevImg);
       }
       setActiveIndex(prevIndex);
@@ -164,13 +200,13 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
     if (displayedImageIndex < images.length - 1) {
       // Check if there's a next image
       swiperRef?.current?.slideNext();
-      // Get 'medium' compressed version for displayed image (big photo), check each image individually
+      // Get 'large' compressed version for displayed image (big photo), check each image individually
       const nextIndex = displayedImageIndex + 1;
       const nextItem = nextIndex === 0 ? productData : productData?.gallery_images?.[nextIndex - 1];
       const originalNextImg = nextIndex === 0 ? productData?.image : (productData?.gallery_images?.[nextIndex - 1]?.image || null);
       if (originalNextImg) {
-        const nextImageMedium = getCompressedImage(nextItem, 'medium', originalNextImg);
-        const finalNextImg = (nextImageMedium && nextImageMedium !== originalNextImg) ? nextImageMedium : originalNextImg;
+        const nextImageLarge = getCompressedImage(nextItem, 'large', originalNextImg);
+        const finalNextImg = (nextImageLarge && nextImageLarge !== originalNextImg) ? nextImageLarge : originalNextImg;
         setDisplayedImage(finalNextImg);
       }
       setActiveIndex(nextIndex);
@@ -184,15 +220,17 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
   };
 
   useEffect(() => {
-    // For lightbox, use 'large' compressed images, fallback to original if compressed doesn't exist
-    const mainImageLarge = getCompressedImage(productData, 'large', productData?.image);
-    const finalMainLarge = (mainImageLarge && mainImageLarge !== productData?.image) ? mainImageLarge : (productData?.image || null);
-    const galleryImagesLarge = productData?.gallery_images?.map((img) => {
-      const originalImg = typeof img === 'string' ? img : img?.image;
-      const compressedImg = getCompressedImage(img, 'large', originalImg);
-      return (compressedImg && compressedImg !== originalImg) ? compressedImg : originalImg;
-    }).filter(Boolean) || [];
-    setImages([finalMainLarge, ...galleryImagesLarge].filter(Boolean));
+    // Lightbox: full original uploads (not compressed.small/medium/large)
+    const mainOriginal = productData?.image || null;
+    const galleryOriginals =
+      productData?.gallery_images
+        ?.map((img) => (typeof img === "string" ? img : img?.image))
+        .filter(Boolean) || [];
+    setImages(
+      [mainOriginal, ...galleryOriginals]
+        .filter(Boolean)
+        .map(normalizeImageUrl)
+    );
     
     // For gallery row thumbnails, use 'small' compressed images, fallback to original if compressed doesn't exist
     const mainImageSmall = getCompressedImage(productData, 'small', productData?.image);
@@ -222,13 +260,13 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
       setIsVideClicked(false);
     }
     setActiveIndex(index); // Update active slide index
-    // Use 'medium' compressed image for displayed image, fallback to original if compressed doesn't exist
-    const compressedMedium = getCompressedImage(
+    // Use 'large' compressed image for displayed image, fallback to original if compressed doesn't exist
+    const compressedLarge = getCompressedImage(
       index === 0 ? productData : productData?.gallery_images?.[index - 1],
-      'medium',
+      'large',
       img
     );
-    const finalImage = (compressedMedium && compressedMedium !== img) ? compressedMedium : img;
+    const finalImage = (compressedLarge && compressedLarge !== img) ? compressedLarge : img;
     setDisplayedImage(finalImage); // Update displayed image
   };
 
@@ -298,23 +336,77 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
               <div className="row" id="details_main_row">
                 <div className="col-md-12 col-lg-8">
                   <div className="gallary_section">
-                    <div className="display_img" style={{ position: 'relative', width: '100%', minHeight: '400px' }}>
-                      {isVideClicked == false ? (
-                        <Image
-                          priority={true}
-                          loading="eager"
-                          src={displayedImage ? normalizeImageUrl(displayedImage) : placeholderImageUrl}
-                          fill
-                          alt="display_img"
-                          style={{ objectFit: 'contain' }}
-                          {...({ fetchPriority: "high" })}
-                          onError={(e) => {
-                            if (e.target.src !== placeholderImageUrl) {
-                              e.target.src = placeholderImageUrl;
+                    <div className="display_img" style={(() => {
+                      const pkg = PACKAGE_COLORS[productData?.package_color];
+                      return {
+                        position: 'relative',
+                        width: '100%',
+                        minHeight: '400px',
+                        ...(pkg ? { border: `2.5px solid ${pkg.primary}`, borderRadius: '12px', overflow: 'hidden', boxShadow: `0 0 16px ${pkg.primary}40` } : {}),
+                      };
+                    })()}>
+                      {productData?.is_feature && (() => {
+                        const pkg = PACKAGE_COLORS[productData?.package_color] || null;
+                        const badgeStyle = pkg
+                          ? {
+                              background: `linear-gradient(135deg, ${pkg.primary}, ${pkg.dark})`,
+                              border: `1.5px solid ${pkg.dark}`,
+                              boxShadow: `0 4px 10px ${pkg.primary}55`,
                             }
-                          }}
-                          onClick={openLightbox}
-                        />
+                          : {};
+                        return (
+                          <span
+                            className="featured_badge_new"
+                            style={{
+                              ...badgeStyle,
+                              top: '0.75rem',
+                              ...(isRtl ? { right: '0.75rem', left: 'auto' } : { left: '0.75rem', right: 'auto' }),
+                            }}
+                          >
+                            <BiBadgeCheck size={16} /> {t("featured")}
+                          </span>
+                        );
+                      })()}
+                      {isVideClicked == false ? (
+                        <>
+                          <Image
+                            priority={true}
+                            loading="eager"
+                            src={displayedImage ? normalizeImageUrl(displayedImage) : placeholderImageUrl}
+                            fill
+                            alt="display_img"
+                            style={{ objectFit: "contain", cursor: "pointer" }}
+                            {...({ fetchPriority: "high" })}
+                            onError={(e) => {
+                              if (e.target.src !== placeholderImageUrl) {
+                                e.target.src = placeholderImageUrl;
+                              }
+                            }}
+                            onClick={openLightbox}
+                          />
+                          {displayedImage && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                bottom: 12,
+                                ...(isRtl ? { left: 12, right: "auto" } : { right: 12, left: "auto" }),
+                                zIndex: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: 40,
+                                height: 40,
+                                borderRadius: 8,
+                                background: "rgba(0,0,0,0.45)",
+                                color: "#fff",
+                                pointerEvents: "none",
+                              }}
+                              aria-hidden
+                            >
+                              <FaMagnifyingGlassPlus size={18} />
+                            </span>
+                          )}
+                        </>
                       ) : (
                         <ReactPlayer
                           url={videoUrl}
@@ -421,7 +513,7 @@ const SingleProductDetail = ({ slug: slugFromParams, initialData = null }) => {
                                         const originalImg = index === 0 
                                           ? productData?.image 
                                           : productData?.gallery_images?.[index - 1]?.image;
-                                        // handleImageClick will get 'medium' compressed for displayedImage (big photo)
+                                        // handleImageClick will get 'large' compressed for displayedImage (big photo)
                                         // Each image is checked individually for compressed version
                                         handleImageClick(originalImg, index);
                                       }}

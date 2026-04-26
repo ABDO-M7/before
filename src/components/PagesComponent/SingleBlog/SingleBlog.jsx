@@ -9,7 +9,8 @@ import HTMLContentRenderer from "@/components/DynamicHTMLContent/HTMLContentRend
 import { 
   BlogSocialShareWrapper as BlogSocialShare,
   BlogProductsCarouselWrapper as BlogProductsCarousel,
-  RelatedArticlesWrapper as RelatedArticles
+  RelatedArticlesWrapper as RelatedArticles,
+  BlogViewPing
 } from './BlogClientWrappers'
 import BlogBreadcrumbHandler from './BlogBreadcrumbHandler'
 import BlogCopyUrl from './BlogCopyUrl'
@@ -21,7 +22,8 @@ const SingleBlog = ({
     settings, 
     isRtl, 
     t, 
-    currentUrl 
+    currentUrl,
+    viewPingSlug,
 }) => {
     try {
         // ─── Data Preparation ──────────────────────────────────────────────────
@@ -81,6 +83,7 @@ const SingleBlog = ({
 
         return (
             <>
+                <BlogViewPing slug={viewPingSlug || String(blogData?.slug || '')} />
                 {/* ✅ Side Effect Handler (Client Component) */}
                 <BlogBreadcrumbHandler title={String(blogData?.title || '')} tOurBlogs={t.ourBlogs} />
 
@@ -193,7 +196,7 @@ const SingleBlog = ({
                                                 {section.items?.length > 0 && (
                                                     <div className="blog_section_items" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                                                         <BlogProductsCarousel
-                                                            items={section.items}
+                                                            initialItems={section.items}
                                                             isRtl={isRtl}
                                                             containerClassPrefix="blog_section"
                                                         />

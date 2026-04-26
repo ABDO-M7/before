@@ -1,5 +1,6 @@
 import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { clearCachedMetadata } from '@/utils/metadataCache';
 
 /**
  * On-Demand Revalidation Webhook
@@ -31,7 +32,10 @@ export async function GET(request) {
 
     try {
         // 2. Revalidate by Tag(s)
-        resolvedTags.forEach((t) => revalidateTag(t));
+        resolvedTags.forEach((t) => {
+            revalidateTag(t);
+            clearCachedMetadata(t);
+        });
         return NextResponse.json({ revalidated: true, tags: resolvedTags, now: Date.now() });
     } catch (err) {
         return NextResponse.json({ message: 'Error revalidating', error: err.message }, { status: 500 });

@@ -1,4 +1,5 @@
 "use client";
+import "./tier-frames.css";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -233,6 +234,13 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
   // ✅ Prefetch on hover for faster navigation
   const prefetchHandlers = usePrefetchOnHover(productDetailsUrl, 150);
 
+  // Tier frame class based on the package color assigned to this featured item
+  const tierClass = useMemo(() => {
+    const color = data?.package_color;
+    if (!color || color === 'without') return '';
+    return `tier-${color}`;
+  }, [data?.package_color]);
+
   // Get language code with proper fallback (default to "en")
   const getLanguageCode = () => {
     return currentLanguage?.language?.code || "en";
@@ -291,7 +299,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
   };
 
   return (
-    <article className="product_card_new card-shadow" role="article" aria-label={data?.name || "Product"}>
+    <article className={`product_card_new card-shadow${tierClass ? ` ${tierClass}` : ''}`} role="article" aria-label={data?.name || "Product"}>
       <button 
         className={`favorite_btn_new ${data?.is_liked ? 'isLiked' : ''}`}
         onClick={(e) => handleLikeItem(e)}
@@ -314,7 +322,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
         {...prefetchHandlers}
       >
         {data?.is_feature && (
-          <span className="featured_badge_new">
+          <span className={`featured_badge_new${data?.package_color ? ` featured-badge-${data.package_color}` : ''}`}>
             <BiBadgeCheck size={16} /> {t("featured")}
           </span>
         )}
@@ -415,8 +423,8 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
 
         {/* Tags & Custom Fields Section */}
         <div className="d-flex flex-wrap gap-1 mb-3">
-          {data?.is_feature && (
-            <span className="tag_badge tag_yellow">
+          {/* {data?.is_feature && (
+            <span className="tag_badge tag_yellow" style={featuredBadgeStyle}>
               <i className="fas fa-star me-1"></i>{t("featured")}
             </span>
           )}
@@ -424,7 +432,7 @@ const ProductCard = ({ data, handleLike, priority = false }) => {
              <span className="tag_badge tag_blue">
               {t("job")}
            </span>
-          )}
+          )} */}
           {/* Render custom fields if show_on_card_details is checked and match specific types */}
           {data?.custom_fields?.filter(cf => 
             cf.show_on_card_details == 1 &&
@@ -526,6 +534,7 @@ export default memo(ProductCard, (prevProps, nextProps) => {
     prevProps.data?.compressed === nextProps.data?.compressed &&
     prevProps.data?.price === nextProps.data?.price &&
     prevProps.data?.name === nextProps.data?.name &&
+    prevProps.data?.package_color === nextProps.data?.package_color &&
     prevProps.handleLike === nextProps.handleLike &&
     prevProps.priority === nextProps.priority
   );

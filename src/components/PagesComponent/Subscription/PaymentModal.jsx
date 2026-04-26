@@ -51,12 +51,20 @@ const PaymentModal = ({
       <MdClose size={24} color="black" />
     </div>
   );
-  const updateActivePackage = () => {
+  const updateActivePackage = (status = "succeed") => {
+    const nextStatus = String(status).toLowerCase().trim();
+    const isActiveStatus = nextStatus === "succeed";
+
     if (priceData.type === "advertisement") {
       setAdvertisementPackage((prev) => {
         return prev.map((item) => {
           if (item.id === priceData.id) {
-            return { ...item, is_active: true };
+            return {
+              ...item,
+              is_active: isActiveStatus,
+              payment_status: nextStatus,
+              payment_submit_date: new Date().toISOString(),
+            };
           }
           return item;
         });
@@ -65,20 +73,26 @@ const PaymentModal = ({
       setItemPackages((prev) => {
         return prev.map((item) => {
           if (item.id === priceData.id) {
-            return { ...item, is_active: true };
+            return {
+              ...item,
+              is_active: isActiveStatus,
+              payment_status: nextStatus,
+              payment_submit_date: new Date().toISOString(),
+            };
           }
           return item;
         });
       });
     }
-    toast.success(t("paymentSuccess"));
+
+    toast.success(isActiveStatus ? t("paymentSuccess") : t("paymentSubmitted"));
   };
 
   const handleMessage = (event) => {
     if (event.origin === process.env.NEXT_PUBLIC_API_URL) {
       const { status } = event.data;
       if (status === "success") {
-        updateActivePackage();
+        updateActivePackage("succeed");
         PaymentModalClose();
       } else {
         toast.error(t("paymentFailed"));
@@ -105,10 +119,40 @@ const PaymentModal = ({
         onCancel={PaymentModalClose}
         // Ensure the modal contents (and Stripe-related effects) are unmounted when closed.
         destroyOnClose
+        zIndex={1000000}
         footer={null}
         maskClosable={false}
       >
         <div className="payment_section">
+          {!IsPaymentModalOpening && priceData?.name && (() => {
+            const PACKAGE_COLORS = {
+              without:  { primary: "#00ABBF", dark: "#008A9A" },
+              bronze:   { primary: "#CD7F32", dark: "#8D5524" },
+              silver:   { primary: "#B8C2CC", dark: "#5f666c" },
+              gold:     { primary: "#D4AF37", dark: "#AA771C" },
+              platinum: { primary: "#7B8FA1", dark: "#425B70" },
+              diamond:  { primary: "#00B4D8", dark: "#0077B6" },
+            };
+            const color = priceData.color && PACKAGE_COLORS[priceData.color] ? priceData.color : "without";
+            const { primary, dark } = PACKAGE_COLORS[color];
+            return (
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <span style={{
+                  display: "inline-block",
+                  background: `linear-gradient(135deg, ${primary}, ${dark})`,
+                  color: "#fff",
+                  padding: "6px 22px",
+                  borderRadius: "30px",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  letterSpacing: "0.5px",
+                  boxShadow: `0 3px 10px ${primary}55`,
+                }}>
+                  <span style={{ fontWeight: 400, opacity: 0.85 }}>{t("packageLabel")}:</span>{" "}{priceData.name}
+                </span>
+              </div>
+            );
+          })()}
           {IsPaymentModalOpening ? (
             <PaymentModalSkeleton />
           ) : isReadonly ? (
