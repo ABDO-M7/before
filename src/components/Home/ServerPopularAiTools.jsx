@@ -1,4 +1,10 @@
-import PopularAiTools from "./PopularAiTools";
+import dynamic from 'next/dynamic';
+import AiToolsSkeleton from "../Skeleton/AiToolsSkeleton";
+
+const PopularAiTools = dynamic(() => import('./PopularAiTools'), {
+  ssr: false,
+  loading: () => <AiToolsSkeleton />
+});
 
 const fetchFeaturedAiTool = async () => {
   try {

@@ -366,9 +366,9 @@ const nextConfig = {
         // ✅ Optimized code splitting (reduce fragments)
         splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 20, // قلل الرقم ده لتقليل عدد الـ Requests
-          maxInitialRequests: 20, // قلل الرقم ده
-          minSize: 40000, // ارفع الحجم الأدنى لتقليل عدد الملفات الصغيرة
+          maxAsyncRequests: 10,
+          maxInitialRequests: 6,
+          minSize: 20000,
           cacheGroups: {
             default: false,
             vendors: false,

@@ -1,4 +1,10 @@
-import PopularCategories from "./PopularCategories";
+import dynamic from 'next/dynamic';
+import PopularCategoriesSkeleton from "../Skeleton/PopularCategoriesSkeleton";
+
+const PopularCategories = dynamic(() => import('./PopularCategories'), {
+  ssr: false,
+  loading: () => <PopularCategoriesSkeleton />
+});
 
 // Default language for server-side fetch so categories come in correct locale (matches app default)
 const DEFAULT_LANG = 'ar';
