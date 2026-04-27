@@ -77,12 +77,12 @@ export default async function RootLayout({ children }) {
             <head>
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#000000" />
-                <meta name="build-ver" content="no-external-fonts-v3" />
-                <meta name="deploy-ts" content="2026-04-27T04:45:00Z" />
+                <meta name="build-ver" content="no-external-fonts-v4" />
+                <meta name="deploy-ts" content="2026-04-27T08:40:00Z" />
 
                 {/* ✅ Force-clear stale service workers and caches on new builds */}
                 <script dangerouslySetInnerHTML={{
-                    __html: `(function(){var v='no-external-fonts-v3';if(localStorage.getItem('bv')!==v){localStorage.setItem('bv',v);if('caches'in window){caches.keys().then(function(n){return Promise.all(n.map(function(c){return caches.delete(c);}));});}if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.unregister();});});}}})();`
+                    __html: `(function(){var v='no-external-fonts-v4';if(localStorage.getItem('bv')!==v){localStorage.setItem('bv',v);if('caches'in window){caches.keys().then(function(n){return Promise.all(n.map(function(c){return caches.delete(c);}));});}if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.unregister();});});}}})();`
                 }} />
 
                 {/* ✅ Preconnect to API/image CDN — reduces LCP resource load delay */}

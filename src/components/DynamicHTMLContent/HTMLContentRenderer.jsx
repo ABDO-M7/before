@@ -112,9 +112,25 @@ export default function HTMLContentRenderer({
     return null;
   }
 
+  // Strip external render-blocking resources that leak into critical path even inside iframe
+  const sanitizeExternalResources = (html) => {
+    return html
+      // Remove Google Fonts preconnects
+      .replace(/<link[^>]*rel=["']preconnect["'][^>]*href=["']https:\/\/fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '')
+      .replace(/<link[^>]*rel=["']preconnect["'][^>]*href=["']https:\/\/fonts\.gstatic\.com[^"']*["'][^>]*\/?>/gi, '')
+      // Remove Google Fonts CSS
+      .replace(/<link[^>]*href=["']https:\/\/fonts\.googleapis\.com[^"']*["'][^>]*rel=["']stylesheet["'][^>]*\/?>/gi, '')
+      .replace(/<link[^>]*rel=["']stylesheet["'][^>]*href=["']https:\/\/fonts\.googleapis\.com[^"']*["'][^>]*\/?>/gi, '')
+      // Remove Tailwind CDN script
+      .replace(/<script[^>]*src=["']https:\/\/cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi, '')
+      .replace(/<script[^>]*src=["']https:\/\/cdn\.tailwindcss\.com[^"']*["'][^>]*\/?>/gi, '')
+      // Remove inline tailwind config script block
+      .replace(/<script[^>]*>\s*tailwind\.config\s*=\s*\{[\s\S]*?\}\s*<\/script>/gi, '');
+  };
+
   // Prepared HTML content
   const prepareHtml = (content) => {
-    let trimmedContent = content.trim();
+    let trimmedContent = sanitizeExternalResources(content.trim());
     const isFullHtml = trimmedContent.toLowerCase().includes('<html') || trimmedContent.toLowerCase().startsWith('<!doctype');
 
     const resolvedAssetOrigin = (() => {
