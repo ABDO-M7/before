@@ -302,7 +302,7 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           ...securityHeaders,
-          { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=0, must-revalidate' }
+          { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=0, no-store, must-revalidate' }
         ],
       },
     ];
