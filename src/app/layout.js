@@ -77,7 +77,8 @@ export default async function RootLayout({ children }) {
             <head>
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#000000" />
-                <meta name="build-ver" content="no-external-fonts-v2" />
+                <meta name="build-ver" content="no-external-fonts-v3" />
+                <meta name="deploy-ts" content="2026-04-27T04:45:00Z" />
 
                 {/* ✅ Preconnect to API/image CDN — reduces LCP resource load delay */}
                 {API_ORIGIN && (

@@ -297,12 +297,12 @@ const nextConfig = {
         source: '/favicon.ico',
         headers: longCache,
       },
-      // ✅ 4. Catch-all: HTML pages and everything else (security + short HTML cache)
+      // ✅ 4. Catch-all: HTML pages — no edge cache during perf testing to avoid stale builds
       {
         source: '/:path*',
         headers: [
           ...securityHeaders,
-          { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' }
+          { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=0, must-revalidate' }
         ],
       },
     ];
