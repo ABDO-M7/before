@@ -313,7 +313,7 @@
   margin: 0;
   padding: 0;
   /* ✅ Cairo font for entire website - supports both Latin and Arabic */
-  font-family: var(--primary-font, "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, "Helvetica Neue", sans-serif;
   box-sizing: border-box;
 }
 

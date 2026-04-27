@@ -3,23 +3,13 @@
 import AppProviders from "./providers";
 import initFetchLogger from "@/utils/fetchLogger";
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Cairo } from "next/font/google";
-
 if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
     initFetchLogger();
 }
 
-// ✅ Cairo — Arabic + Latin, only weights used in the app
-// display: 'swap' prevents invisible text during font load (critical for LCP/CLS)
-const cairo = Cairo({
-    subsets: ["arabic", "latin"],
-    weight: ["400", "700"],
-    display: "optional",  // ✅ يمنع الـ layout shift تماماً
-    variable: "--primary-font",
-    preload: true,
-    // ✅ Explicitly declare used weights to avoid downloading all variants
-    adjustFontFallback: true, // reduces CLS by adjusting fallback metrics
-});
+// ✅ System font stack — eliminates external font requests and improves LCP/TBT
+// Uses native Arabic-capable system fonts for zero network cost and instant render
+const PRIMARY_FONT = 'system-ui, -apple-system, "Segoe UI", Tahoma, Arial, "Helvetica Neue", sans-serif';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../public/css/style.css";
@@ -83,10 +73,11 @@ const DeferredWebVitals = process.env.NODE_ENV === 'development'
 
 export default async function RootLayout({ children }) {
     return (
-        <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION} className={cairo.variable}>
+        <html lang="ar" dir="rtl" web-version={process.env.NEXT_PUBLIC_WEB_VERSION}>
             <head>
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#000000" />
+                <meta name="build-ver" content="no-external-fonts-v2" />
 
                 {/* ✅ Preconnect to API/image CDN — reduces LCP resource load delay */}
                 {API_ORIGIN && (
@@ -120,7 +111,7 @@ export default async function RootLayout({ children }) {
                 {/* ✅ Critical above-the-fold styles only */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
-                        body{min-height:100vh;margin:0;font-family:var(--primary-font),sans-serif;}
+                        body{min-height:100vh;margin:0;font-family:${PRIMARY_FONT};}
                         #main-content,main{min-height:70vh;}
                         .container{width:100%;margin:0 auto;max-width:1320px;padding-left:12px;padding-right:12px;}
                         .header_logo,.drawer_title_logo{max-width:140px;height:auto;aspect-ratio:140/50;}
